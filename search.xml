@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>GitHub 项目创建与本地同步管理</title>
+    <url>/2025/07/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
+    <content><![CDATA[<blockquote>
+<p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
+</blockquote>
+<hr>
+<h2 id="🔧-准备工具"><a href="#🔧-准备工具" class="headerlink" title="🔧 准备工具"></a>🔧 准备工具</h2><p>在开始前，请确认你已具备以下工具环境：</p>
+<ul>
+<li><p>✅ 已注册 <a href="https://github.com/">GitHub</a> 账号</p>
+</li>
+<li><p>✅ 已安装 Git 工具（推荐安装 <a href="https://git-scm.com/download/win">Git for Windows</a>）</p>
+</li>
+<li><p>✅ 已安装 nodejs（推荐安装 <a href="https://nodejs.org/en/">nodejs</a>）(<a href="https://www.cnblogs.com/liuqiyun/p/8133904.html">Node.js安装及环境配置之Windows篇</a>)</p>
+</li>
+<li><p>✅ 管理员运行cmd，依次输入,完成环境验证</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v（node安装后附带）</span><br><span class="line">git -v</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="一、GitHub-创建新仓库"><a href="#一、GitHub-创建新仓库" class="headerlink" title="一、GitHub 创建新仓库"></a>一、GitHub 创建新仓库</h2><ol>
+<li><p>登录 <a href="https://github.com/">GitHub</a></p>
+</li>
+<li><p>点击右上角 → <code>New repository</code></p>
+</li>
+<li><p>仓库名称填：<code>myProject</code></p>
+</li>
+<li><p>不勾选 <code>Initialize with a README</code>（保持为空仓库）</p>
+</li>
+<li><p>创建成功后会看到仓库地址：<br><code>https://github.com/GithubUserName/myGithubProject.git</code></p>
+</li>
+</ol>
+<hr>
+<h2 id="二、本地初始化-Git-项目并上传"><a href="#二、本地初始化-Git-项目并上传" class="headerlink" title="二、本地初始化 Git 项目并上传"></a>二、本地初始化 Git 项目并上传</h2><h3 id="在-Git-Bash-执行以下命令："><a href="#在-Git-Bash-执行以下命令：" class="headerlink" title="在 Git Bash 执行以下命令："></a>在 Git Bash 执行以下命令：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /项目本地存储的地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git 仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 README 文件（可选）(GitHub创建新仓库若勾选Initialize with a README无需该项)</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;# myGithubProject&quot;</span> &gt;&gt; README.md</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部文件添加到 Git 缓存区</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库，并为该次提交添加备注</span></span><br><span class="line">git commit -m <span class="string">&quot;初始化GitHub项目&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认分支为 main</span></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加远程仓库地址（SSH 方式）(需先为本机配置ssh密钥)</span></span><br><span class="line">git remote add origin git@github.com:GithubUserName/myGithubProject.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送到 GitHub（第一次）</span></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、配置-SSH-密钥（推荐）"><a href="#三、配置-SSH-密钥（推荐）" class="headerlink" title="三、配置 SSH 密钥（推荐）"></a>三、配置 SSH 密钥（推荐）</h2><p>避免每次 push 都输入密码，建议使用 SSH：</p>
+<h3 id="1-检查是否已有密钥："><a href="#1-检查是否已有密钥：" class="headerlink" title="1. 检查是否已有密钥："></a>1. 检查是否已有密钥：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> ~/.ssh</span><br></pre></td></tr></table></figure>
+
+<p>如有 <code>id_rsa</code> 和 <code>id_rsa.pub</code>，可跳过生成步骤。</p>
+<h3 id="2-生成新密钥（如无）："><a href="#2-生成新密钥（如无）：" class="headerlink" title="2. 生成新密钥（如无）："></a>2. 生成新密钥（如无）：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;邮箱地址&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>一路回车生成。</p>
+<h3 id="3-添加到-GitHub："><a href="#3-添加到-GitHub：" class="headerlink" title="3. 添加到 GitHub："></a>3. 添加到 GitHub：</h3><ul>
+<li>打开 GitHub → Settings → SSH and GPG Keys → New SSH Key</li>
+<li>将 <code>C:\Users\用户名\ .ssh/id_rsa.pub</code> 内容复制粘贴进去</li>
+</ul>
+<h3 id="4-测试连接是否成功："><a href="#4-测试连接是否成功：" class="headerlink" title="4. 测试连接是否成功："></a>4. 测试连接是否成功：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p>输出成功即配置完成。</p>
+<hr>
+<h2 id="四、后续上传资源流程"><a href="#四、后续上传资源流程" class="headerlink" title="四、后续上传资源流程"></a>四、后续上传资源流程</h2><p>每次更新本地资源，只需执行：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;更新说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、可选：添加-gitignore-文件"><a href="#五、可选：添加-gitignore-文件" class="headerlink" title="五、可选：添加 .gitignore 文件"></a>五、可选：添加 .gitignore 文件</h2><p>为避免上传无用文件，可添加 <code>.gitignore</code> 文件内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">*.<span class="built_in">log</span>           <span class="comment"># 忽略所有 .log 结尾的日志文件</span></span><br><span class="line">node_modules/   <span class="comment"># 忽略 node_modules 目录（前端项目常用）</span></span><br><span class="line">.DS_Store       <span class="comment"># 忽略 macOS 系统的临时文件</span></span><br><span class="line">Thumbs.db       <span class="comment"># 忽略 Windows 系统缩略图缓存</span></span><br><span class="line">*.tmp           <span class="comment"># 忽略所有 .tmp 临时文件</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-小贴士"><a href="#✅-小贴士" class="headerlink" title="✅ 小贴士"></a>✅ 小贴士</h2><ul>
+<li><p>GitHub 上文件比本地多时，先执行：  </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull --rebase origin main</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看远程仓库地址：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote -v</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看提交历史：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<p>以上就是完整的GitHub项目创建与管理流程</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>GitHub</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2025/07/15/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+</search>
