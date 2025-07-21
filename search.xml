@@ -1,8 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Android 应用发布签名 Keystore 文件生成记录</title>
+    <url>/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<blockquote>
+<p>在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 <code>.keystore</code> 是发布阶段的必要步骤。</p>
+</blockquote>
+<hr>
+<h2 id="📌-一、Keystore-的作用"><a href="#📌-一、Keystore-的作用" class="headerlink" title="📌 一、Keystore 的作用"></a>📌 一、Keystore 的作用</h2><ul>
+<li>🔐 <strong>身份认证</strong>：签名表明这个 APK 来自你这个开发者。</li>
+<li>📦 <strong>应用升级绑定</strong>：以后该应用的所有版本必须使用同一个 keystore 签名，否则无法覆盖安装。</li>
+<li>🏪 <strong>应用商店要求</strong>：如 Google Play、华为应用市场等，均强制要求 Release APK 必须签名。</li>
+</ul>
+<hr>
+<h2 id="🧪-二、验证系统是否已安装-JDK-和-keytool"><a href="#🧪-二、验证系统是否已安装-JDK-和-keytool" class="headerlink" title="🧪 二、验证系统是否已安装 JDK 和 keytool"></a>🧪 二、验证系统是否已安装 JDK 和 keytool</h2><p>打开命令行（CMD 或 PowerShell），输入以下命令检查：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line">keytool -<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">java version &quot;1.8.0_331&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_331-b09)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.331-b09, mixed mode)</span><br><span class="line"></span><br><span class="line">keytool 选项:</span><br><span class="line">-certreq  生成证书签名请求 (CSR)</span><br><span class="line">-genkey    生成密钥对</span><br><span class="line">-help      显示帮助信息</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>keytool</code> 无法识别，请确认 JDK 安装路径是否已加入环境变量的 Path 中。</p>
+<hr>
+<h2 id="🧩-三、Keystore-生成命令"><a href="#🧩-三、Keystore-生成命令" class="headerlink" title="🧩 三、Keystore 生成命令"></a>🧩 三、Keystore 生成命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -<span class="built_in">alias</span> my-key-alias -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-genkey</code></td>
+<td>表示生成密钥对（key pair）</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>输出详细信息</td>
+</tr>
+<tr>
+<td><code>-keystore</code></td>
+<td>指定输出的 keystore 文件名</td>
+</tr>
+<tr>
+<td><code>-alias</code></td>
+<td>为密钥设置一个别名</td>
+</tr>
+<tr>
+<td><code>-keyalg RSA</code></td>
+<td>使用 RSA 加密算法生成密钥</td>
+</tr>
+<tr>
+<td><code>-keysize 2048</code></td>
+<td>密钥长度为 2048 位</td>
+</tr>
+<tr>
+<td><code>-validity 10000</code></td>
+<td>密钥有效期为 10000 天（约 27 年）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🛡️-四、执行后提示填写信息"><a href="#🛡️-四、执行后提示填写信息" class="headerlink" title="🛡️ 四、执行后提示填写信息"></a>🛡️ 四、执行后提示填写信息</h2><p>依次输入以下信息：</p>
+<ol>
+<li>密钥库口令（keystore password）</li>
+<li>姓名（Your first and last name）</li>
+<li>组织单位名（Organizational unit）</li>
+<li>组织名（Organization）</li>
+<li>城市名（City or Locality）</li>
+<li>省份名（State or Province）</li>
+<li>国家代码（Country Code，如 <code>CN</code>）</li>
+<li>确认信息是否正确（输入 <code>是</code> 或 <code>yes</code>）</li>
+<li>可选设置密钥口令（与 keystore 相同可直接回车）</li>
+</ol>
+<hr>
+<h2 id="✅-五、成功结果"><a href="#✅-五、成功结果" class="headerlink" title="✅ 五、成功结果"></a>✅ 五、成功结果</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[正在生成 2048 位 RSA 密钥对，证书采用 SHA256withRSA（有效期为 10000 天）]</span><br><span class="line">[已将密钥库保存到 my-release-key.keystore]</span><br></pre></td></tr></table></figure>
+
+<p>会在当前目录下生成签名文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">my-release-key.keystore</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧩-六、在-Qt-Creator-中配置签名"><a href="#🧩-六、在-Qt-Creator-中配置签名" class="headerlink" title="🧩 六、在 Qt Creator 中配置签名"></a>🧩 六、在 Qt Creator 中配置签名</h2><p>在「项目 → 构建与运行 → Android」中设置：</p>
+<ul>
+<li>Keystore 路径：<code>my-release-key.keystore</code></li>
+<li>Store password：刚输入的密钥库口令</li>
+<li>Key alias：<code>my-key-alias</code></li>
+<li>Key password：与密钥库口令一致或另设</li>
+</ul>
+<hr>
+<h2 id="⚠️-七、可选建议：转为-PKCS12-格式（官方建议）"><a href="#⚠️-七、可选建议：转为-PKCS12-格式（官方建议）" class="headerlink" title="⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）"></a>⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📁-八、Keystore-文件保存建议"><a href="#📁-八、Keystore-文件保存建议" class="headerlink" title="📁 八、Keystore 文件保存建议"></a>📁 八、Keystore 文件保存建议</h2><p>建议将 keystore 文件统一保存至项目目录外安全位置，</p>
+<p>并备份到私密网盘或加密存储设备，防止丢失。</p>
+<hr>
+<p>生成日期：2025-07-21</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>QT for Android</tag>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>GitHub 项目创建与本地同步管理</title>
-    <url>/2025/07/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
+    <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
     <content><![CDATA[<blockquote>
 <p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
 </blockquote>
@@ -80,8 +183,89 @@
       </tags>
   </entry>
   <entry>
+    <title>Qt项目在Android系统环境下实现开机自启</title>
+    <url>/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/</url>
+    <content><![CDATA[<blockquote>
+<p>本文记录如何在 Qt for Android 项目中，实现应用 <strong>随系统开机自动启动</strong> 的功能，适用于设备控制、工控系统等常驻应用场景。</p>
+</blockquote>
+<hr>
+<h2 id="🧩-实现思路概述"><a href="#🧩-实现思路概述" class="headerlink" title="🧩 实现思路概述"></a>🧩 实现思路概述</h2><ol>
+<li><strong>新建一个 <code>BroadcastReceiver</code> 类</strong>，用于监听系统开机广播（<code>BOOT_COMPLETED</code>）。</li>
+<li><strong>接收到广播后，启动主界面 <code>JBmsActivity</code></strong>，它继承自 <code>QtActivity</code>，自动调用 Qt C++ 层的 <code>main()</code> 函数。</li>
+<li><strong>在 <code>AndroidManifest.xml</code> 中声明权限和注册广播接收器</strong>。</li>
+</ol>
+<hr>
+<h2 id="✅-步骤一：新建-BootReceiver-java（监听开机广播）"><a href="#✅-步骤一：新建-BootReceiver-java（监听开机广播）" class="headerlink" title="✅ 步骤一：新建 BootReceiver.java（监听开机广播）"></a>✅ 步骤一：新建 BootReceiver.java（监听开机广播）</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.qtproject.example.activityhandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.BroadcastReceiver;</span><br><span class="line"><span class="keyword">import</span> android.content.Context;</span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 广播接收器类，用于监听 BOOT_COMPLETED 广播（开机完成）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BootReceiver</span> <span class="keyword">extends</span> <span class="title class_">BroadcastReceiver</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 启动 Qt 主界面（JBmsActivity）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">startApp</span><span class="params">(Context context, Intent intent)</span> &#123;</span><br><span class="line">        Log.d(<span class="string">&quot;BootReceiver&quot;</span>, <span class="string">&quot;启动QT应用&quot;</span>);</span><br><span class="line">        <span class="type">Intent</span> <span class="variable">splashIntent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(context, JBmsActivity.class);</span><br><span class="line">        splashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); <span class="comment">// 必须设置此标志，否则会抛异常</span></span><br><span class="line">        context.startActivity(splashIntent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收广播事件</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onReceive</span><span class="params">(Context context, Intent intent)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) &#123;</span><br><span class="line">            startApp(context, intent); <span class="comment">// 收到系统广播后启动应用</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-步骤二：创建-Qt-启动-Activity（JBmsActivity）"><a href="#✅-步骤二：创建-Qt-启动-Activity（JBmsActivity）" class="headerlink" title="✅ 步骤二：创建 Qt 启动 Activity（JBmsActivity）"></a>✅ 步骤二：创建 Qt 启动 Activity（JBmsActivity）</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.qtproject.example.activityhandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.os.Build;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.net.Uri;</span><br><span class="line"><span class="keyword">import</span> android.provider.Settings;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> org.qtproject.qt5.android.bindings.QtActivity;</span><br><span class="line"></span><br><span class="line"><span class="comment">// JBmsActivity 是 Qt 的启动 Activity，继承 QtActivity 后会触发 Qt 的 main()</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JBmsActivity</span> <span class="keyword">extends</span> <span class="title class_">QtActivity</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">TAG</span> <span class="operator">=</span> <span class="string">&quot;JBmsActivity&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(Bundle savedInstanceState)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 检查是否拥有悬浮窗权限（部分国产系统需要）</span></span><br><span class="line">        <span class="keyword">if</span> (!Settings.canDrawOverlays(<span class="built_in">this</span>)) &#123;</span><br><span class="line">            <span class="type">Intent</span> <span class="variable">intent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);</span><br><span class="line">            intent.setData(Uri.parse(<span class="string">&quot;package:&quot;</span> + getPackageName()));</span><br><span class="line">            startActivityForResult(intent, <span class="number">0</span>); <span class="comment">// 请求权限</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        hideBottomUIMenu(); <span class="comment">// 设置全屏沉浸式模式</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 页面恢复时重新隐藏虚拟按键</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onResume</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onResume();</span><br><span class="line">        hideBottomUIMenu();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置沉浸式全屏，隐藏底部导航栏</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">hideBottomUIMenu</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">int</span> flags;</span><br><span class="line">        <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.KITKAT) &#123;</span><br><span class="line">            flags = View.SYSTEM_UI_FLAG_FULLSCREEN</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;</span><br><span class="line">        &#125;</span><br><span class="line">        getWindow().getDecorView().setSystemUiVisibility(flags);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收权限申请结果</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onActivityResult</span><span class="params">(<span class="type">int</span> requestCode, <span class="type">int</span> resultCode, Intent data)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (requestCode == <span class="number">0</span> &amp;&amp; Settings.canDrawOverlays(<span class="built_in">this</span>)) &#123;</span><br><span class="line">            Log.i(TAG, <span class="string">&quot;悬浮窗权限已授权&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">super</span>.onActivityResult(requestCode, resultCode, data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-步骤三：AndroidManifest-xml-配置"><a href="#✅-步骤三：AndroidManifest-xml-配置" class="headerlink" title="✅ 步骤三：AndroidManifest.xml 配置"></a>✅ 步骤三：AndroidManifest.xml 配置</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">&quot;org.qtproject.example.activityhandler&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 开机广播权限 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 悬浮窗权限 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.SYSTEM_ALERT_WINDOW&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">android:label</span>=<span class="string">&quot;@string/app_name&quot;</span> <span class="attr">android:icon</span>=<span class="string">&quot;@mipmap/ic_launcher&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- Qt 启动 Activity --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.JBmsActivity&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:label</span>=<span class="string">&quot;My Qt App&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:configChanges</span>=<span class="string">&quot;orientation|screenSize|keyboardHidden&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:launchMode</span>=<span class="string">&quot;singleTop&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:theme</span>=<span class="string">&quot;@android:style/Theme.NoTitleBar.Fullscreen&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:screenOrientation</span>=<span class="string">&quot;portrait&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.MAIN&quot;</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.LAUNCHER&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- 启动广播监听器 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">receiver</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:name</span>=<span class="string">&quot;.BootReceiver&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:enabled</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:exported</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:permission</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧠-启动流程图（简述）"><a href="#🧠-启动流程图（简述）" class="headerlink" title="🧠 启动流程图（简述）"></a>🧠 启动流程图（简述）</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">设备开机</span><br><span class="line">  ↓</span><br><span class="line">发送 BOOT_COMPLETED 广播</span><br><span class="line">  ↓</span><br><span class="line">BootReceiver 接收 → 启动 JBmsActivity</span><br><span class="line">  ↓</span><br><span class="line">JBmsActivity 继承 QtActivity → 自动启动 Qt 的 main()</span><br><span class="line">  ↓</span><br><span class="line">Qt 应用开始运行</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-注意事项"><a href="#✅-注意事项" class="headerlink" title="✅ 注意事项"></a>✅ 注意事项</h2><ul>
+<li>Android 8.0+ 要求：应用必须 <strong>手动启动过一次</strong> 才能接收 BOOT_COMPLETED</li>
+<li>悬浮窗权限属于特殊权限，用户必须手动授权</li>
+<li>在国产 ROM 中可能还需手动加入“自启白名单”</li>
+</ul>
+<hr>
+<p>本文适用于基于 Qt 5&#x2F;6 的 Android 项目，如需搭配 JNI 与原生服务还可扩展 Service 保活策略。</p>
+<hr>
+<h2 id="🧠-JBmsActivity-就是-Android-下的-Qt-启动“main-函数入口”"><a href="#🧠-JBmsActivity-就是-Android-下的-Qt-启动“main-函数入口”" class="headerlink" title="🧠 JBmsActivity 就是 Android 下的 Qt 启动“main 函数入口”"></a>🧠 JBmsActivity 就是 Android 下的 Qt 启动“main 函数入口”</h2><p>在桌面 Qt 应用中，我们通常通过 <code>main()</code> 函数作为程序入口：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line">    MainWindow w;</span><br><span class="line">    w.<span class="built_in">show</span>();</span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但在 Android 平台，Qt 应用无法直接从 <code>main()</code> 启动，而是依赖 Android 的启动机制：</p>
+<table>
+<thead>
+<tr>
+<th>桌面 Qt</th>
+<th>Android Qt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>直接运行 <code>main()</code></td>
+<td>系统启动 <code>JBmsActivity</code></td>
+</tr>
+<tr>
+<td><code>main()</code> 由开发者控制</td>
+<td><code>main()</code> 被 QtActivity 通过 JNI 间接调用</td>
+</tr>
+<tr>
+<td>生命周期在 C++ 控制</td>
+<td>生命周期由 Java 层控制，可 hook 各阶段逻辑</td>
+</tr>
+</tbody></table>
+<p>因此，<code>JBmsActivity</code>：</p>
+<ul>
+<li>是系统启动 Qt 的第一站；</li>
+<li>可以用来检查权限、加载配置；</li>
+<li>可以控制是否进入 Qt 主程序；</li>
+<li>是控制整个程序生命周期的重要位置；</li>
+<li>类似“Android 环境下的 main 函数守门人”。</li>
+</ul>
+<p>你也可以选择在 <code>JBmsActivity</code> 里根据业务逻辑决定：</p>
+<ul>
+<li>是否直接启动 Qt；</li>
+<li>延迟进入 Qt；</li>
+<li>或者根本不进入 Qt，仅运行 Java 层逻辑。</li>
+</ul>
+<p>这使得 <code>JBmsActivity</code> 成为 Android Qt 项目的关键入口点。</p>
+]]></content>
+      <categories>
+        <category>QT实例</category>
+      </categories>
+      <tags>
+        <tag>QT for Android</tag>
+        <tag>QT</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
-    <url>/2025/07/15/hello-world/</url>
+    <url>/2025/02/16/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
@@ -96,5 +280,223 @@
 
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>Qt for Android 使用 JNI 的完整指南</title>
+    <url>/2025/03/09/qt_android_jni/</url>
+    <content><![CDATA[<blockquote>
+<p>本指南记录了如何在 Qt 项目中通过 JNI（Java Native Interface）调用 Android 原生 Java 方法，适用于需要访问系统功能（如 U 盘读写、广播、Activity 启动等）的场景。</p>
+</blockquote>
+<hr>
+<h2 id="📁-项目结构建议"><a href="#📁-项目结构建议" class="headerlink" title="📁 项目结构建议"></a>📁 项目结构建议</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">your_qt_project/</span><br><span class="line">├── main.cpp</span><br><span class="line">├── your_qt_project.pro</span><br><span class="line">├── android/</span><br><span class="line">│   ├── AndroidManifest.xml</span><br><span class="line">│   └── src/org/qtproject/example/activityhandler/</span><br><span class="line">│       ├── CustomActivity1.java</span><br><span class="line">│       ├── CustomActivity2.java</span><br><span class="line">│       └── CustomActivity3.java</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="⚙️-pro-文件配置"><a href="#⚙️-pro-文件配置" class="headerlink" title="⚙️ .pro 文件配置"></a>⚙️ <code>.pro</code> 文件配置</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    QT += androidextras  # 启用 Qt 封装的 JNI 支持模块</span><br><span class="line"></span><br><span class="line">    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android  # 使用自定义 Android 工程目录</span><br><span class="line"></span><br><span class="line">    # 可选：附加打包 Java 与 Manifest 文件，方便 IDE 显示</span><br><span class="line">    DISTFILES +=         android/AndroidManifest.xml         android/src/org/qtproject/example/activityhandler/CustomActivity1.java         android/src/org/qtproject/example/activityhandler/CustomActivity2.java         android/src/org/qtproject/example/activityhandler/CustomActivity3.java</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📦-Java-类示例"><a href="#📦-Java-类示例" class="headerlink" title="📦 Java 类示例"></a>📦 Java 类示例</h2><p><strong>CustomActivity1.java</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.qtproject.example.activityhandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomActivity1</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">helloFromJava</span><span class="params">()</span> &#123;</span><br><span class="line">        Log.d(<span class="string">&quot;JNI&quot;</span>, <span class="string">&quot;Hello from Java!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">getNtpServer</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;pool.ntp.org&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">notifyCpp</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="🧩-Qt-中调用-Java-的多种方式总结"><a href="#🧩-Qt-中调用-Java-的多种方式总结" class="headerlink" title="🧩 Qt 中调用 Java 的多种方式总结"></a>🧩 Qt 中调用 Java 的多种方式总结</h1><h2 id="✅-1-调用-Java-静态方法（推荐）"><a href="#✅-1-调用-Java-静态方法（推荐）" class="headerlink" title="✅ 1. 调用 Java 静态方法（推荐）"></a>✅ 1. 调用 Java 静态方法（推荐）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QAndroidJniObject::<span class="built_in">callStaticMethod</span>&lt;<span class="type">void</span>&gt;(</span><br><span class="line">    <span class="string">&quot;org/qtproject/example/activityhandler/CustomActivity1&quot;</span>,</span><br><span class="line">    <span class="string">&quot;helloFromJava&quot;</span>,</span><br><span class="line">    <span class="string">&quot;()V&quot;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>适合调用 Java 的 <code>public static</code> 方法。</li>
+<li>方法签名：<code>()V</code> 表示无参无返回。</li>
+</ul>
+<hr>
+<h2 id="✅-2-创建-Java-对象并调用实例方法"><a href="#✅-2-创建-Java-对象并调用实例方法" class="headerlink" title="✅ 2. 创建 Java 对象并调用实例方法"></a>✅ 2. 创建 Java 对象并调用实例方法</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function">QAndroidJniObject <span class="title">javaObj</span><span class="params">(<span class="string">&quot;org/qtproject/example/activityhandler/CustomActivity2&quot;</span>)</span></span>;</span><br><span class="line">javaObj.<span class="built_in">callMethod</span>&lt;<span class="type">void</span>&gt;(<span class="string">&quot;nonStaticMethodName&quot;</span>, <span class="string">&quot;()V&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>适合 Java 的非静态方法。</li>
+<li>支持多次交互使用。</li>
+</ul>
+<hr>
+<h2 id="✅-3-调用带参数的方法"><a href="#✅-3-调用带参数的方法" class="headerlink" title="✅ 3. 调用带参数的方法"></a>✅ 3. 调用带参数的方法</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QAndroidJniObject param = QAndroidJniObject::<span class="built_in">fromString</span>(<span class="string">&quot;Hello&quot;</span>);</span><br><span class="line">QAndroidJniObject::<span class="built_in">callStaticMethod</span>&lt;<span class="type">void</span>&gt;(</span><br><span class="line">    <span class="string">&quot;org/qtproject/example/activityhandler/CustomActivity1&quot;</span>,</span><br><span class="line">    <span class="string">&quot;printMessage&quot;</span>,</span><br><span class="line">    <span class="string">&quot;(Ljava/lang/String;)V&quot;</span>,</span><br><span class="line">    param.<span class="built_in">object</span>&lt;jstring&gt;()</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>(Ljava/lang/String;)V</code> 表示接收一个字符串参数，无返回值。</li>
+<li>参数和返回值的 JNI 签名可参考 JNI 文档。</li>
+</ul>
+<hr>
+<h2 id="✅-4-获取-Java-对象返回值（如-String）"><a href="#✅-4-获取-Java-对象返回值（如-String）" class="headerlink" title="✅ 4. 获取 Java 对象返回值（如 String）"></a>✅ 4. 获取 Java 对象返回值（如 String）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QAndroidJniObject result = QAndroidJniObject::<span class="built_in">callStaticObjectMethod</span>(</span><br><span class="line">    <span class="string">&quot;org/qtproject/example/activityhandler/CustomActivity&quot;</span>,</span><br><span class="line">    <span class="string">&quot;getNtpServer&quot;</span>,</span><br><span class="line">    <span class="string">&quot;()Ljava/lang/String;&quot;</span></span><br><span class="line">);</span><br><span class="line">QString str = result.<span class="built_in">toString</span>();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>适用于返回 Java 对象的情况，如 <code>String</code>。</li>
+<li>返回值使用 <code>QAndroidJniObject</code> 接收并转为 QString。</li>
+</ul>
+<hr>
+<h2 id="✅-5-使用-QAndroidJniEnvironment-进行底层-JNI-调用"><a href="#✅-5-使用-QAndroidJniEnvironment-进行底层-JNI-调用" class="headerlink" title="✅ 5. 使用 QAndroidJniEnvironment 进行底层 JNI 调用"></a>✅ 5. 使用 QAndroidJniEnvironment 进行底层 JNI 调用</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QAndroidJniEnvironment env;</span><br><span class="line">jclass clazz = env-&gt;</span><br><span class="line">    <span class="built_in">FindClass</span>(<span class="string">&quot;org/qtproject/example/activityhandler/CustomActivity1&quot;</span>);</span><br><span class="line">jmethodID methodId = env-&gt;<span class="built_in">GetStaticMethodID</span>(clazz, <span class="string">&quot;helloFromJava&quot;</span>, <span class="string">&quot;()V&quot;</span>);</span><br><span class="line">env-&gt;<span class="built_in">CallStaticVoidMethod</span>(clazz, methodId);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>适合高级场景：复杂参数控制、异常处理。</li>
+<li>可结合原生 JNI 能力使用。</li>
+</ul>
+<hr>
+<h2 id="✅-6-Java-调用-C-（Native-回调）"><a href="#✅-6-Java-调用-C-（Native-回调）" class="headerlink" title="✅ 6. Java 调用 C++（Native 回调）"></a>✅ 6. Java 调用 C++（Native 回调）</h2><p>Java 侧：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CustomActivity1</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">notifyCpp</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>C++ 侧：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> <span class="function">JNIEXPORT <span class="type">void</span> JNICALL</span></span><br><span class="line"><span class="function"><span class="title">Java_org_qtproject_example_activityhandler_CustomActivity1_notifyCpp</span><span class="params">(JNIEnv *env, jobject obj)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;Java 调用了 C++&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Java 使用 <code>native</code> 关键字注册本地函数。</li>
+<li>Qt 使用 JNIEXPORT 提供 C++ 回调实现。</li>
+</ul>
+<hr>
+<h2 id="🔄-callStaticMethod-与-callStaticObjectMethod-区别详解"><a href="#🔄-callStaticMethod-与-callStaticObjectMethod-区别详解" class="headerlink" title="🔄 callStaticMethod&lt;T&gt;() 与 callStaticObjectMethod() 区别详解"></a>🔄 <code>callStaticMethod&lt;T&gt;()</code> 与 <code>callStaticObjectMethod()</code> 区别详解</h2><h3 id="callStaticMethod-：用于返回基本类型"><a href="#callStaticMethod-：用于返回基本类型" class="headerlink" title="callStaticMethod&lt;T&gt;()：用于返回基本类型"></a><code>callStaticMethod&lt;T&gt;()</code>：用于返回基本类型</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> result = QAndroidJniObject::<span class="built_in">callStaticMethod</span>&lt;jint&gt;(</span><br><span class="line">    <span class="string">&quot;org/example/MyJavaClass&quot;</span>,</span><br><span class="line">    <span class="string">&quot;getCount&quot;</span>,</span><br><span class="line">    <span class="string">&quot;()I&quot;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="callStaticObjectMethod-：用于返回-Java-对象类型"><a href="#callStaticObjectMethod-：用于返回-Java-对象类型" class="headerlink" title="callStaticObjectMethod()：用于返回 Java 对象类型"></a><code>callStaticObjectMethod()</code>：用于返回 Java 对象类型</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QAndroidJniObject result = QAndroidJniObject::<span class="built_in">callStaticObjectMethod</span>(</span><br><span class="line">    <span class="string">&quot;org/qtproject/example/activityhandler/CustomActivity&quot;</span>,</span><br><span class="line">    <span class="string">&quot;getNtpServer&quot;</span>,</span><br><span class="line">    <span class="string">&quot;()Ljava/lang/String;&quot;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="🧠-对比总结："><a href="#🧠-对比总结：" class="headerlink" title="🧠 对比总结："></a>🧠 对比总结：</h3><table>
+<thead>
+<tr>
+<th>比较项</th>
+<th><code>callStaticMethod&lt;T&gt;()</code></th>
+<th><code>callStaticObjectMethod()</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>使用场景</td>
+<td>Java 静态方法返回 <strong>基本类型</strong></td>
+<td>Java 静态方法返回 <strong>对象类型</strong></td>
+</tr>
+<tr>
+<td>返回类型</td>
+<td>C++ 基础类型，如 <code>int</code>, <code>bool</code>, <code>void</code></td>
+<td><code>QAndroidJniObject</code></td>
+</tr>
+<tr>
+<td>JNI 方法签名</td>
+<td>如：<code>()I</code>、<code>(I)V</code> 等</td>
+<td>如：<code>()Ljava/lang/String;</code></td>
+</tr>
+<tr>
+<td>获取返回值</td>
+<td>直接使用变量</td>
+<td>需 <code>.toString()</code> 或 <code>.object&lt;&gt;()</code> 提取</td>
+</tr>
+<tr>
+<td>常见对象类型</td>
+<td>不适用</td>
+<td><code>String</code>, <code>List</code>, <code>自定义类</code> 等</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="✅-AndroidManifest-xml-配置"><a href="#✅-AndroidManifest-xml-配置" class="headerlink" title="✅ AndroidManifest.xml 配置"></a>✅ AndroidManifest.xml 配置</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">&quot;org.qtproject.example.activityhandler&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">android:label</span>=<span class="string">&quot;JNIExampleApp&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.CustomActivity1&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.CustomActivity2&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.CustomActivity3&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📌-注意事项"><a href="#📌-注意事项" class="headerlink" title="📌 注意事项"></a>📌 注意事项</h2><ul>
+<li>Java 类必须放在 <code>android/src/...</code> 路径下，包名需与路径一致。</li>
+<li>Java 方法必须为 <code>public static</code> 才能被 <code>QAndroidJniObject::callStaticMethod</code> 调用。</li>
+<li>方法签名 <code>&quot;()V&quot;</code> 表示无参数、无返回值；签名必须与 Java 方法匹配。</li>
+<li>使用 <code>QAndroidJniObject::fromString</code> 创建 Java 字符串。</li>
+<li>使用 <code>object&lt;jstring&gt;()</code>、<code>toString()</code> 等方式进行类型转换。</li>
+</ul>
+<hr>
+<h2 id="🛠-构建与运行"><a href="#🛠-构建与运行" class="headerlink" title="🛠 构建与运行"></a>🛠 构建与运行</h2><ol>
+<li>构建项目（建议先清除再构建）</li>
+<li>连接 Android 设备</li>
+<li>运行项目，查看 logcat 输出是否调用成功</li>
+</ol>
+<hr>
+<h2 id="📚-延伸阅读"><a href="#📚-延伸阅读" class="headerlink" title="📚 延伸阅读"></a>📚 延伸阅读</h2><ul>
+<li><a href="https://doc.qt.io/qt-5/qtandroidextras-index.html">Qt Android Extras 官方文档</a></li>
+<li><a href="https://developer.android.com/training/articles/perf-jni#native-calls">JNI 方法签名表</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>QT实例</category>
+      </categories>
+      <tags>
+        <tag>QT for Android</tag>
+        <tag>QT</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AndroidManifest.xml 配置详解</title>
+    <url>/2025/03/03/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<blockquote>
+<p>以下是 Qt for Android 应用中 <code>AndroidManifest.xml</code> 文件的完整配置及详细注释，适用于自定义权限、注册 Java 活动（Activity）、广播接收器以及加载 Qt 模块资源等场景。</p>
+</blockquote>
+<hr>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">&quot;org.qtproject.example.activityhandler&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:versionName</span>=<span class="string">&quot;-- %%INSERT_VERSION_NAME%% --&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:versionCode</span>=<span class="string">&quot;-- %%INSERT_VERSION_CODE%% --&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:installLocation</span>=<span class="string">&quot;auto&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>package</code>：你的应用 Java 包名</li>
+<li><code>versionName</code>&#x2F;<code>versionCode</code>：构建工具自动替换版本</li>
+<li><code>installLocation</code>：APK 默认安装位置（自动判断）</li>
+</ul>
+<hr>
+<h2 id="🔐-权限声明"><a href="#🔐-权限声明" class="headerlink" title="🔐 权限声明"></a>🔐 权限声明</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.FOREGROUND_SERVICE&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.SYSTEM_ALERT_WINDOW&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.INTERNET&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.ACCESS_NETWORK_STATE&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.CONNECTIVITY_INTERNAL&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.READ_EXTERNAL_STORAGE&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.MANAGE_EXTERNAL_STORAGE&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.ACCESS_CHECKIN_PROPERTIES&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>声明了网络访问、存储访问、系统悬浮窗、后台服务等多个权限</li>
+<li><code>MANAGE_EXTERNAL_STORAGE</code> 属于高权限，Android 11+ 需特殊授权</li>
+<li><code>CONNECTIVITY_INTERNAL</code> 为系统权限，普通应用请谨慎使用</li>
+</ul>
+<hr>
+<h2 id="👮-自定义权限"><a href="#👮-自定义权限" class="headerlink" title="👮 自定义权限"></a>👮 自定义权限</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">permission</span> <span class="attr">android:name</span>=<span class="string">&quot;com.example.myapp.PERMISSION&quot;</span> <span class="attr">android:protectionLevel</span>=<span class="string">&quot;signature&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>用于保护某些组件（如广播、服务）只能被签名应用访问</li>
+</ul>
+<hr>
+<h2 id="📱-屏幕适配"><a href="#📱-屏幕适配" class="headerlink" title="📱 屏幕适配"></a>📱 屏幕适配</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">supports-screens</span> <span class="attr">android:largeScreens</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:normalScreens</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:anyDensity</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:smallScreens</span>=<span class="string">&quot;true&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧩-应用配置及-Qt-Activity"><a href="#🧩-应用配置及-Qt-Activity" class="headerlink" title="🧩 应用配置及 Qt Activity"></a>🧩 应用配置及 Qt Activity</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">application</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">&quot;org.qtproject.qt5.android.bindings.QtApplication&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:hardwareAccelerated</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:label</span>=<span class="string">&quot;-- %%INSERT_APP_NAME%% --&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:extractNativeLibs</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 Qt 官方的 <code>QtApplication</code> 类</li>
+<li>启用硬件加速，解压 native 库到内部目录</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">&quot;org.qtproject.example.activityhandler.JBmsActivity&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:launchMode</span>=<span class="string">&quot;singleTop&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:screenOrientation</span>=<span class="string">&quot;unspecified&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:windowSoftInputMode</span>=<span class="string">&quot;adjustResize&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:configChanges</span>=<span class="string">&quot;...&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>主 Activity，为 Qt 应用入口</li>
+<li>配置了 UI、字体、输入法等重载选项</li>
+<li>含多条 <code>meta-data</code>，告知 Qt 加载哪些库和资源</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.MAIN&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.LAUNCHER&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>将该 Activity 作为 Launcher 主入口</li>
+</ul>
+<hr>
+<h2 id="📂-Qt-所需资源和参数"><a href="#📂-Qt-所需资源和参数" class="headerlink" title="📂 Qt 所需资源和参数"></a>📂 Qt 所需资源和参数</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.lib_name&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;-- %%INSERT_APP_LIB_NAME%% --&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.qt_sources_resource_id&quot;</span> <span class="attr">android:resource</span>=<span class="string">&quot;@array/qt_sources&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.bundled_libs_resource_id&quot;</span> <span class="attr">android:resource</span>=<span class="string">&quot;@array/bundled_libs&quot;</span>/&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<ul>
+<li>所有 Qt 应用运行时必须包含的资源引用</li>
+<li>使用构建工具动态替换</li>
+</ul>
+<hr>
+<h2 id="🌗-Splash、样式、后台运行配置"><a href="#🌗-Splash、样式、后台运行配置" class="headerlink" title="🌗 Splash、样式、后台运行配置"></a>🌗 Splash、样式、后台运行配置</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.extract_android_style&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;minimal&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.background_running&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>minimal</code> 样式提取适用于 QML（Controls 2）更快更轻量</li>
+<li>禁止应用后台运行避免崩溃</li>
+</ul>
+<hr>
+<h2 id="👥-其他自定义-Activity"><a href="#👥-其他自定义-Activity" class="headerlink" title="👥 其他自定义 Activity"></a>👥 其他自定义 Activity</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.CustomActivity&quot;</span> <span class="attr">android:process</span>=<span class="string">&quot;:custom_activity&quot;</span> <span class="attr">...</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.WriteToUsbActivity&quot;</span> <span class="attr">android:exported</span>=<span class="string">&quot;false&quot;</span> <span class="attr">...</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>CustomActivity</code> 可用于独立进程扩展功能</li>
+<li><code>WriteToUsbActivity</code> 用于 USB 相关交互，不导出</li>
+</ul>
+<hr>
+<h2 id="📡-启动广播接收器"><a href="#📡-启动广播接收器" class="headerlink" title="📡 启动广播接收器"></a>📡 启动广播接收器</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">receiver</span> <span class="attr">android:name</span>=<span class="string">&quot;.BootReceiver&quot;</span> <span class="attr">android:enabled</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:exported</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:permission</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span> <span class="attr">android:priority</span>=<span class="string">&quot;1000&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>注册开机启动广播监听器</li>
+</ul>
+<hr>
+<h2 id="✅-注意事项"><a href="#✅-注意事项" class="headerlink" title="✅ 注意事项"></a>✅ 注意事项</h2><ul>
+<li>所有路径需与 Java 包结构一致</li>
+<li><code>%%INSERT_...%%</code> 字段由 Qt 构建时自动替换，不要手动修改</li>
+<li>如果目标 Android 版本 ≥ 11，强烈建议使用作用域存储 + SAF 替代老的存储权限</li>
+</ul>
+<hr>
+<h1 id="最终完整实例："><a href="#最终完整实例：" class="headerlink" title="最终完整实例："></a>最终完整实例：</h1><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">package</span>=<span class="string">&quot;org.qtproject.example.activityhandler&quot;</span> <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span> <span class="attr">android:versionName</span>=<span class="string">&quot;-- %%INSERT_VERSION_NAME%% --&quot;</span> <span class="attr">android:versionCode</span>=<span class="string">&quot;-- %%INSERT_VERSION_CODE%% --&quot;</span> <span class="attr">android:installLocation</span>=<span class="string">&quot;auto&quot;</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--android:sharedUserId=&quot;android.uid.system&quot;--&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.</span></span><br><span class="line"><span class="comment">         Remove the comment if you do not require these default permissions. --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- %%INSERT_PERMISSIONS --&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- The following comment will be replaced upon deployment with default features based on the dependencies of the application.</span></span><br><span class="line"><span class="comment">         Remove the comment if you do not require these default features. --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- %%INSERT_FEATURES --&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.FOREGROUND_SERVICE&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.SYSTEM_ALERT_WINDOW&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.INTERNET&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.ACCESS_NETWORK_STATE&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.CONNECTIVITY_INTERNAL&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.READ_EXTERNAL_STORAGE&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.MANAGE_EXTERNAL_STORAGE&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">permission</span> <span class="attr">android:name</span>=<span class="string">&quot;com.example.myapp.PERMISSION&quot;</span> <span class="attr">android:protectionLevel</span>=<span class="string">&quot;signature&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">supports-screens</span> <span class="attr">android:largeScreens</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:normalScreens</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:anyDensity</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:smallScreens</span>=<span class="string">&quot;true&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">android:hardwareAccelerated</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:name</span>=<span class="string">&quot;org.qtproject.qt5.android.bindings.QtApplication&quot;</span> <span class="attr">android:label</span>=<span class="string">&quot;-- %%INSERT_APP_NAME%% --&quot;</span> <span class="attr">android:extractNativeLibs</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:configChanges</span>=<span class="string">&quot;orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density&quot;</span> <span class="attr">android:name</span>=<span class="string">&quot;org.qtproject.example.activityhandler.JBmsActivity&quot;</span> <span class="attr">android:label</span>=<span class="string">&quot;-- %%INSERT_APP_NAME%% --&quot;</span> <span class="attr">android:screenOrientation</span>=<span class="string">&quot;unspecified&quot;</span> <span class="attr">android:launchMode</span>=<span class="string">&quot;singleTop&quot;</span> <span class="attr">android:windowSoftInputMode</span>=<span class="string">&quot;adjustResize&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.MAIN&quot;</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.LAUNCHER&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Application arguments --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- meta-data android:name=&quot;android.app.arguments&quot; android:value=&quot;arg1 arg2 arg3&quot;/ --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Application arguments --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.lib_name&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;-- %%INSERT_APP_LIB_NAME%% --&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.qt_sources_resource_id&quot;</span> <span class="attr">android:resource</span>=<span class="string">&quot;@array/qt_sources&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.repository&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;default&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.qt_libs_resource_id&quot;</span> <span class="attr">android:resource</span>=<span class="string">&quot;@array/qt_libs&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.bundled_libs_resource_id&quot;</span> <span class="attr">android:resource</span>=<span class="string">&quot;@array/bundled_libs&quot;</span>/&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Deploy Qt libs as part of package --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.bundle_local_qt_libs&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;-- %%BUNDLE_LOCAL_QT_LIBS%% --&quot;</span>/&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Run with local libs --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.use_local_qt_libs&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;-- %%USE_LOCAL_QT_LIBS%% --&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.libs_prefix&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;/data/local/tmp/qt/&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.load_local_libs_resource_id&quot;</span> <span class="attr">android:resource</span>=<span class="string">&quot;@array/load_local_libs&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.load_local_jars&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;-- %%INSERT_LOCAL_JARS%% --&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.static_init_classes&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;-- %%INSERT_INIT_CLASSES%% --&quot;</span>/&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Used to specify custom system library path to run with local system libs --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- &lt;meta-data android:name=&quot;android.app.system_libs_prefix&quot; android:value=&quot;/system/lib/&quot;/&gt; --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--  Messages maps --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:value</span>=<span class="string">&quot;@string/ministro_not_found_msg&quot;</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.ministro_not_found_msg&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:value</span>=<span class="string">&quot;@string/ministro_needed_msg&quot;</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.ministro_needed_msg&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:value</span>=<span class="string">&quot;@string/fatal_error_msg&quot;</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.fatal_error_msg&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:value</span>=<span class="string">&quot;@string/unsupported_android_version&quot;</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.unsupported_android_version&quot;</span>/&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--  Messages maps --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Splash screen --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Orientation-specific (portrait/landscape) data is checked first. If not available for current orientation,</span></span><br><span class="line"><span class="comment">                 then android.app.splash_screen_drawable. For best results, use together with splash_screen_sticky and</span></span><br><span class="line"><span class="comment">                 use hideSplashScreen() with a fade-out animation from Qt Android Extras to hide the splash screen when you</span></span><br><span class="line"><span class="comment">                 are done populating your window with content. --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- meta-data android:name=&quot;android.app.splash_screen_drawable_portrait&quot; android:resource=&quot;@drawable/logo_portrait&quot; / --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- meta-data android:name=&quot;android.app.splash_screen_drawable_landscape&quot; android:resource=&quot;@drawable/logo_landscape&quot; / --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- meta-data android:name=&quot;android.app.splash_screen_drawable&quot; android:resource=&quot;@drawable/logo&quot;/ --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- meta-data android:name=&quot;android.app.splash_screen_sticky&quot; android:value=&quot;true&quot;/ --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Splash screen --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Background running --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Warning: changing this value to true may cause unexpected crashes if the</span></span><br><span class="line"><span class="comment">                          application still try to draw after</span></span><br><span class="line"><span class="comment">                          &quot;applicationStateChanged(Qt::ApplicationSuspended)&quot;</span></span><br><span class="line"><span class="comment">                          signal is sent! --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.background_running&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- Background running --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- auto screen scale factor --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.auto_screen_scale_factor&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- auto screen scale factor --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- extract android style --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- available android:values :</span></span><br><span class="line"><span class="comment">                * default - In most cases this will be the same as &quot;full&quot;, but it can also be something else if needed, e.g., for compatibility reasons</span></span><br><span class="line"><span class="comment">                * full - useful QWidget &amp; Quick Controls 1 apps</span></span><br><span class="line"><span class="comment">                * minimal - useful for Quick Controls 2 apps, it is much faster than &quot;full&quot;</span></span><br><span class="line"><span class="comment">                * none - useful for apps that don&#x27;t use any of the above Qt modules</span></span><br><span class="line"><span class="comment">                --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.extract_android_style&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;minimal&quot;</span>/&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- extract android style --&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:process</span>=<span class="string">&quot;:custom_activity&quot;</span> <span class="attr">android:name</span>=<span class="string">&quot;.CustomActivity&quot;</span> <span class="attr">android:label</span>=<span class="string">&quot;-- %%INSERT_APP_NAME%% --&quot;</span> <span class="attr">android:screenOrientation</span>=<span class="string">&quot;unspecified&quot;</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- android:process=&quot;:qt&quot; is needed to force the service to run on a separate process than the Activity --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">&quot;android.app.lib_name&quot;</span> <span class="attr">android:value</span>=<span class="string">&quot;-- %%INSERT_APP_LIB_NAME%% --&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.WriteToUsbActivity&quot;</span> <span class="attr">android:exported</span>=<span class="string">&quot;false&quot;</span> <span class="attr">android:label</span>=<span class="string">&quot;-- %%INSERT_APP_NAME%% --&quot;</span> <span class="attr">android:screenOrientation</span>=<span class="string">&quot;unspecified&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">receiver</span> <span class="attr">android:name</span>=<span class="string">&quot;.BootReceiver&quot;</span> <span class="attr">android:enabled</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:exported</span>=<span class="string">&quot;true&quot;</span> <span class="attr">android:permission</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span> <span class="attr">android:priority</span>=<span class="string">&quot;1000&quot;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.ACCESS_CHECKIN_PROPERTIES&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>QT实例</category>
+      </categories>
+      <tags>
+        <tag>QT for Android</tag>
+        <tag>QT</tag>
+      </tags>
   </entry>
 </search>

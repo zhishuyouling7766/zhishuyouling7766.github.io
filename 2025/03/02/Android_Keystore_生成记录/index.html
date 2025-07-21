@@ -1,0 +1,302 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Android 应用发布签名 Keystore 文件生成记录 | 浮生往事留痕</title><meta name="author" content="张博豪"><meta name="copyright" content="张博豪"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 &#96;.keystore&#96; 是发布阶段的必要步骤。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 应用发布签名 Keystore 文件生成记录">
+<meta property="og:url" content="http://example.com/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="浮生往事留痕">
+<meta property="og:description" content="在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 &#96;.keystore&#96; 是发布阶段的必要步骤。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95.png">
+<meta property="article:published_time" content="2025-03-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-03-01T16:00:00.000Z">
+<meta property="article:author" content="张博豪">
+<meta property="article:tag" content="QT for Android">
+<meta property="article:tag" content="Android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Android 应用发布签名 Keystore 文件生成记录",
+  "url": "http://example.com/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/",
+  "image": "http://example.com/img/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95.png",
+  "datePublished": "2025-03-01T16:00:00.000Z",
+  "dateModified": "2025-03-01T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "张博豪",
+      "url": "https://zhishuyouling7766.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/bogFavicon.png"><link rel="canonical" href="http://example.com/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":250,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-center"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Android 应用发布签名 Keystore 文件生成记录',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E8%83%8C%E6%99%AF.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">浮生往事留痕</span></a><a class="nav-page-title" href="/"><span class="site-name">Android 应用发布签名 Keystore 文件生成记录</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Android 应用发布签名 Keystore 文件生成记录</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-03-01T16:00:00.000Z" title="发表于 2025-03-02 00:00:00">2025-03-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-03-01T16:00:00.000Z" title="更新于 2025-03-02 00:00:00">2025-03-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 <code>.keystore</code> 是发布阶段的必要步骤。</p>
+</blockquote>
+<hr>
+<h2 id="📌-一、Keystore-的作用"><a href="#📌-一、Keystore-的作用" class="headerlink" title="📌 一、Keystore 的作用"></a>📌 一、Keystore 的作用</h2><ul>
+<li>🔐 <strong>身份认证</strong>：签名表明这个 APK 来自你这个开发者。</li>
+<li>📦 <strong>应用升级绑定</strong>：以后该应用的所有版本必须使用同一个 keystore 签名，否则无法覆盖安装。</li>
+<li>🏪 <strong>应用商店要求</strong>：如 Google Play、华为应用市场等，均强制要求 Release APK 必须签名。</li>
+</ul>
+<hr>
+<h2 id="🧪-二、验证系统是否已安装-JDK-和-keytool"><a href="#🧪-二、验证系统是否已安装-JDK-和-keytool" class="headerlink" title="🧪 二、验证系统是否已安装 JDK 和 keytool"></a>🧪 二、验证系统是否已安装 JDK 和 keytool</h2><p>打开命令行（CMD 或 PowerShell），输入以下命令检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br><span class="line">keytool -<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">java version &quot;1.8.0_331&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_331-b09)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.331-b09, mixed mode)</span><br><span class="line"></span><br><span class="line">keytool 选项:</span><br><span class="line">-certreq  生成证书签名请求 (CSR)</span><br><span class="line">-genkey    生成密钥对</span><br><span class="line">-help      显示帮助信息</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>keytool</code> 无法识别，请确认 JDK 安装路径是否已加入环境变量的 Path 中。</p>
+<hr>
+<h2 id="🧩-三、Keystore-生成命令"><a href="#🧩-三、Keystore-生成命令" class="headerlink" title="🧩 三、Keystore 生成命令"></a>🧩 三、Keystore 生成命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -<span class="built_in">alias</span> my-key-alias -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-genkey</code></td>
+<td>表示生成密钥对（key pair）</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>输出详细信息</td>
+</tr>
+<tr>
+<td><code>-keystore</code></td>
+<td>指定输出的 keystore 文件名</td>
+</tr>
+<tr>
+<td><code>-alias</code></td>
+<td>为密钥设置一个别名</td>
+</tr>
+<tr>
+<td><code>-keyalg RSA</code></td>
+<td>使用 RSA 加密算法生成密钥</td>
+</tr>
+<tr>
+<td><code>-keysize 2048</code></td>
+<td>密钥长度为 2048 位</td>
+</tr>
+<tr>
+<td><code>-validity 10000</code></td>
+<td>密钥有效期为 10000 天（约 27 年）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🛡️-四、执行后提示填写信息"><a href="#🛡️-四、执行后提示填写信息" class="headerlink" title="🛡️ 四、执行后提示填写信息"></a>🛡️ 四、执行后提示填写信息</h2><p>依次输入以下信息：</p>
+<ol>
+<li>密钥库口令（keystore password）</li>
+<li>姓名（Your first and last name）</li>
+<li>组织单位名（Organizational unit）</li>
+<li>组织名（Organization）</li>
+<li>城市名（City or Locality）</li>
+<li>省份名（State or Province）</li>
+<li>国家代码（Country Code，如 <code>CN</code>）</li>
+<li>确认信息是否正确（输入 <code>是</code> 或 <code>yes</code>）</li>
+<li>可选设置密钥口令（与 keystore 相同可直接回车）</li>
+</ol>
+<hr>
+<h2 id="✅-五、成功结果"><a href="#✅-五、成功结果" class="headerlink" title="✅ 五、成功结果"></a>✅ 五、成功结果</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[正在生成 2048 位 RSA 密钥对，证书采用 SHA256withRSA（有效期为 10000 天）]</span><br><span class="line">[已将密钥库保存到 my-release-key.keystore]</span><br></pre></td></tr></table></figure>
+
+<p>会在当前目录下生成签名文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my-release-key.keystore</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧩-六、在-Qt-Creator-中配置签名"><a href="#🧩-六、在-Qt-Creator-中配置签名" class="headerlink" title="🧩 六、在 Qt Creator 中配置签名"></a>🧩 六、在 Qt Creator 中配置签名</h2><p>在「项目 → 构建与运行 → Android」中设置：</p>
+<ul>
+<li>Keystore 路径：<code>my-release-key.keystore</code></li>
+<li>Store password：刚输入的密钥库口令</li>
+<li>Key alias：<code>my-key-alias</code></li>
+<li>Key password：与密钥库口令一致或另设</li>
+</ul>
+<hr>
+<h2 id="⚠️-七、可选建议：转为-PKCS12-格式（官方建议）"><a href="#⚠️-七、可选建议：转为-PKCS12-格式（官方建议）" class="headerlink" title="⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）"></a>⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📁-八、Keystore-文件保存建议"><a href="#📁-八、Keystore-文件保存建议" class="headerlink" title="📁 八、Keystore 文件保存建议"></a>📁 八、Keystore 文件保存建议</h2><p>建议将 keystore 文件统一保存至项目目录外安全位置，</p>
+<p>并备份到私密网盘或加密存储设备，防止丢失。</p>
+<hr>
+<p>生成日期：2025-07-21</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">张博豪</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">https://zhishuyouling7766.github.io/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">此文章版权归 张博豪 所有，如有转载，请注明来自原作者</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/QT-for-Android/">QT for Android</a><a class="post-meta__tags" href="/tags/Android/">Android</a></div><div class="post-share"><div class="social-share" data-image="/img/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/03/03/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE/" title="AndroidManifest.xml 配置详解"><img class="cover" src="/img/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">AndroidManifest.xml 配置详解</div></div><div class="info-2"><div class="info-item-1">以下是 Qt for Android 应用中 `AndroidManifest.xml` 文件的完整配置及详细注释，适用于自定义权限、注册 Java 活动（Activity）、广播接收器以及加载 Qt 模块资源等场景。</div></div></div></a><a class="pagination-related" href="/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/" title="GitHub 项目创建与本地同步管理"><img class="cover" src="/img/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">GitHub 项目创建与本地同步管理</div></div><div class="info-2"><div class="info-item-1">本文记录如何将创建 GitHub 仓库，并使用Git进行本地同步与管理。</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-04</div><div class="info-item-2">Qt项目在Android系统环境下实现开机自启</div></div><div class="info-2"><div class="info-item-1">Qt for Android 实现开机自启功能（BootReceiver + QtActivity）</div></div></div></a><a class="pagination-related" href="/2025/03/09/qt_android_jni/" title="Qt for Android 使用 JNI 的完整指南"><img class="cover" src="/img/qt_android_jni.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-09</div><div class="info-item-2">Qt for Android 使用 JNI 的完整指南</div></div><div class="info-2"><div class="info-item-1">本指南记录了如何在 Qt 项目中通过 JNI（Java Native Interface）调用 Android 原生 Java 方法，适用于需要访问系统功能（如 U 盘读写、广播、Activity 启动等）的场景。</div></div></div></a><a class="pagination-related" href="/2025/03/03/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE/" title="AndroidManifest.xml 配置详解"><img class="cover" src="/img/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-03</div><div class="info-item-2">AndroidManifest.xml 配置详解</div></div><div class="info-2"><div class="info-item-1">以下是 Qt for Android 应用中 `AndroidManifest.xml` 文件的完整配置及详细注释，适用于自定义权限、注册 Java 活动（Activity）、广播接收器以及加载 Qt 模块资源等场景。</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">张博豪</div><div class="author-info-description">18292971228</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhishuyouling7766"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="mailto:zbh18292971228@gmail.com" target="_blank" title="Google Email"><i class="fas fa-envelope" style="color: #000000;"></i></a><a class="social-icon" href="mailto:1932732463@qq.com" target="_blank" title="QQ Email"><i class="fab fa-qq" style="color: #000000;"></i></a><a class="social-icon" href="tel:+18292971228" target="_blank" title="telephone"><i class="fas fa-phone" style="color: #000000;"></i></a><a class="social-icon" href="https://butterfly.js.org/" target="_blank" title="Butterfly官方文档"><i class="fas fa-paperclip" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">本站为个人学习归档，勿擅自转载。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8C-%E4%B8%80%E3%80%81Keystore-%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">📌 一、Keystore 的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%A7%AA-%E4%BA%8C%E3%80%81%E9%AA%8C%E8%AF%81%E7%B3%BB%E7%BB%9F%E6%98%AF%E5%90%A6%E5%B7%B2%E5%AE%89%E8%A3%85-JDK-%E5%92%8C-keytool"><span class="toc-number">2.</span> <span class="toc-text">🧪 二、验证系统是否已安装 JDK 和 keytool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%A7%A9-%E4%B8%89%E3%80%81Keystore-%E7%94%9F%E6%88%90%E5%91%BD%E4%BB%A4"><span class="toc-number">3.</span> <span class="toc-text">🧩 三、Keystore 生成命令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E"><span class="toc-number">3.1.</span> <span class="toc-text">参数说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%9B%A1%EF%B8%8F-%E5%9B%9B%E3%80%81%E6%89%A7%E8%A1%8C%E5%90%8E%E6%8F%90%E7%A4%BA%E5%A1%AB%E5%86%99%E4%BF%A1%E6%81%AF"><span class="toc-number">4.</span> <span class="toc-text">🛡️ 四、执行后提示填写信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%9C%85-%E4%BA%94%E3%80%81%E6%88%90%E5%8A%9F%E7%BB%93%E6%9E%9C"><span class="toc-number">5.</span> <span class="toc-text">✅ 五、成功结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%A7%A9-%E5%85%AD%E3%80%81%E5%9C%A8-Qt-Creator-%E4%B8%AD%E9%85%8D%E7%BD%AE%E7%AD%BE%E5%90%8D"><span class="toc-number">6.</span> <span class="toc-text">🧩 六、在 Qt Creator 中配置签名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%9A%A0%EF%B8%8F-%E4%B8%83%E3%80%81%E5%8F%AF%E9%80%89%E5%BB%BA%E8%AE%AE%EF%BC%9A%E8%BD%AC%E4%B8%BA-PKCS12-%E6%A0%BC%E5%BC%8F%EF%BC%88%E5%AE%98%E6%96%B9%E5%BB%BA%E8%AE%AE%EF%BC%89"><span class="toc-number">7.</span> <span class="toc-text">⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%81-%E5%85%AB%E3%80%81Keystore-%E6%96%87%E4%BB%B6%E4%BF%9D%E5%AD%98%E5%BB%BA%E8%AE%AE"><span class="toc-number">8.</span> <span class="toc-text">📁 八、Keystore 文件保存建议</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/03/09/qt_android_jni/" title="Qt for Android 使用 JNI 的完整指南"><img src="/img/qt_android_jni.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt for Android 使用 JNI 的完整指南"/></a><div class="content"><a class="title" href="/2025/03/09/qt_android_jni/" title="Qt for Android 使用 JNI 的完整指南">Qt for Android 使用 JNI 的完整指南</a><time datetime="2025-03-08T16:00:00.000Z" title="发表于 2025-03-09 00:00:00">2025-03-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启"><img src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt项目在Android系统环境下实现开机自启"/></a><div class="content"><a class="title" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启">Qt项目在Android系统环境下实现开机自启</a><time datetime="2025-03-03T16:00:00.000Z" title="发表于 2025-03-04 00:00:00">2025-03-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/03/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE/" title="AndroidManifest.xml 配置详解"><img src="/img/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AndroidManifest.xml 配置详解"/></a><div class="content"><a class="title" href="/2025/03/03/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE/" title="AndroidManifest.xml 配置详解">AndroidManifest.xml 配置详解</a><time datetime="2025-03-02T16:00:00.000Z" title="发表于 2025-03-03 00:00:00">2025-03-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/" title="Android 应用发布签名 Keystore 文件生成记录"><img src="/img/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Android 应用发布签名 Keystore 文件生成记录"/></a><div class="content"><a class="title" href="/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/" title="Android 应用发布签名 Keystore 文件生成记录">Android 应用发布签名 Keystore 文件生成记录</a><time datetime="2025-03-01T16:00:00.000Z" title="发表于 2025-03-02 00:00:00">2025-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/" title="GitHub 项目创建与本地同步管理"><img src="/img/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GitHub 项目创建与本地同步管理"/></a><div class="content"><a class="title" href="/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/" title="GitHub 项目创建与本地同步管理">GitHub 项目创建与本地同步管理</a><time datetime="2025-02-17T16:00:00.000Z" title="发表于 2025-02-18 00:00:00">2025-02-18</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By 张博豪</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天" style="display:none"><i class="fas fa-message"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script>(() => {
+  window.$crisp = ['safe', true]
+  window.CRISP_WEBSITE_ID = "ab0f1555-16af-410e-9dd6-3f87be0b2664"
+
+  btf.getScript('https://client.crisp.chat/l.js').then(() => {
+    const isChatBtn = true
+    const isChatHideShow = false
+
+    if (isChatBtn) {
+      const open = () => {
+        $crisp.push(["do", "chat:show"])
+        $crisp.push(["do", "chat:open"])
+      }
+
+      const close = () => $crisp.push(["do", "chat:hide"])
+
+      close()
+
+      $crisp.push(["on", "chat:closed", close])
+
+      window.chatBtnFn = () => $crisp.is("chat:visible") ? close() : open()
+
+      document.getElementById('chat-btn').style.display = 'block'
+    } else if (isChatHideShow) {
+      window.chatBtn = {
+        hide: () => $crisp.push(["do", "chat:hide"]),
+        show: () => $crisp.push(["do", "chat:show"])
+      }
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
