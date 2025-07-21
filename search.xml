@@ -1,127 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Android 应用发布签名 Keystore 文件生成记录</title>
-    <url>/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<blockquote>
-<p>在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 <code>.keystore</code> 是发布阶段的必要步骤。</p>
-</blockquote>
-<hr>
-<h2 id="📌-一、Keystore-的作用"><a href="#📌-一、Keystore-的作用" class="headerlink" title="📌 一、Keystore 的作用"></a>📌 一、Keystore 的作用</h2><ul>
-<li>🔐 <strong>身份认证</strong>：签名表明这个 APK 来自你这个开发者。</li>
-<li>📦 <strong>应用升级绑定</strong>：以后该应用的所有版本必须使用同一个 keystore 签名，否则无法覆盖安装。</li>
-<li>🏪 <strong>应用商店要求</strong>：如 Google Play、华为应用市场等，均强制要求 Release APK 必须签名。</li>
-</ul>
-<hr>
-<h2 id="🧪-二、验证系统是否已安装-JDK-和-keytool"><a href="#🧪-二、验证系统是否已安装-JDK-和-keytool" class="headerlink" title="🧪 二、验证系统是否已安装 JDK 和 keytool"></a>🧪 二、验证系统是否已安装 JDK 和 keytool</h2><p>打开命令行（CMD 或 PowerShell），输入以下命令检查：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line">keytool -<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p>输出示例：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">java version &quot;1.8.0_331&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_331-b09)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.331-b09, mixed mode)</span><br><span class="line"></span><br><span class="line">keytool 选项:</span><br><span class="line">-certreq  生成证书签名请求 (CSR)</span><br><span class="line">-genkey    生成密钥对</span><br><span class="line">-help      显示帮助信息</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p>如果 <code>keytool</code> 无法识别，请确认 JDK 安装路径是否已加入环境变量的 Path 中。</p>
-<hr>
-<h2 id="🧩-三、Keystore-生成命令"><a href="#🧩-三、Keystore-生成命令" class="headerlink" title="🧩 三、Keystore 生成命令"></a>🧩 三、Keystore 生成命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -<span class="built_in">alias</span> my-key-alias -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
-
-<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>-genkey</code></td>
-<td>表示生成密钥对（key pair）</td>
-</tr>
-<tr>
-<td><code>-v</code></td>
-<td>输出详细信息</td>
-</tr>
-<tr>
-<td><code>-keystore</code></td>
-<td>指定输出的 keystore 文件名</td>
-</tr>
-<tr>
-<td><code>-alias</code></td>
-<td>为密钥设置一个别名</td>
-</tr>
-<tr>
-<td><code>-keyalg RSA</code></td>
-<td>使用 RSA 加密算法生成密钥</td>
-</tr>
-<tr>
-<td><code>-keysize 2048</code></td>
-<td>密钥长度为 2048 位</td>
-</tr>
-<tr>
-<td><code>-validity 10000</code></td>
-<td>密钥有效期为 10000 天（约 27 年）</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="🛡️-四、执行后提示填写信息"><a href="#🛡️-四、执行后提示填写信息" class="headerlink" title="🛡️ 四、执行后提示填写信息"></a>🛡️ 四、执行后提示填写信息</h2><p>依次输入以下信息：</p>
-<ol>
-<li>密钥库口令（keystore password）</li>
-<li>姓名（Your first and last name）</li>
-<li>组织单位名（Organizational unit）</li>
-<li>组织名（Organization）</li>
-<li>城市名（City or Locality）</li>
-<li>省份名（State or Province）</li>
-<li>国家代码（Country Code，如 <code>CN</code>）</li>
-<li>确认信息是否正确（输入 <code>是</code> 或 <code>yes</code>）</li>
-<li>可选设置密钥口令（与 keystore 相同可直接回车）</li>
-</ol>
-<hr>
-<h2 id="✅-五、成功结果"><a href="#✅-五、成功结果" class="headerlink" title="✅ 五、成功结果"></a>✅ 五、成功结果</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[正在生成 2048 位 RSA 密钥对，证书采用 SHA256withRSA（有效期为 10000 天）]</span><br><span class="line">[已将密钥库保存到 my-release-key.keystore]</span><br></pre></td></tr></table></figure>
-
-<p>会在当前目录下生成签名文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">my-release-key.keystore</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="🧩-六、在-Qt-Creator-中配置签名"><a href="#🧩-六、在-Qt-Creator-中配置签名" class="headerlink" title="🧩 六、在 Qt Creator 中配置签名"></a>🧩 六、在 Qt Creator 中配置签名</h2><p>在「项目 → 构建与运行 → Android」中设置：</p>
-<ul>
-<li>Keystore 路径：<code>my-release-key.keystore</code></li>
-<li>Store password：刚输入的密钥库口令</li>
-<li>Key alias：<code>my-key-alias</code></li>
-<li>Key password：与密钥库口令一致或另设</li>
-</ul>
-<hr>
-<h2 id="⚠️-七、可选建议：转为-PKCS12-格式（官方建议）"><a href="#⚠️-七、可选建议：转为-PKCS12-格式（官方建议）" class="headerlink" title="⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）"></a>⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="📁-八、Keystore-文件保存建议"><a href="#📁-八、Keystore-文件保存建议" class="headerlink" title="📁 八、Keystore 文件保存建议"></a>📁 八、Keystore 文件保存建议</h2><p>建议将 keystore 文件统一保存至项目目录外安全位置，</p>
-<p>并备份到私密网盘或加密存储设备，防止丢失。</p>
-<hr>
-<p>生成日期：2025-07-21</p>
-]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>QT for Android</tag>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2025/02/16/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>GitHub 项目创建与本地同步管理</title>
     <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
     <content><![CDATA[<blockquote>
@@ -199,5 +78,23 @@
         <tag>Git</tag>
         <tag>GitHub</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2025/02/16/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
 </search>
