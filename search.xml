@@ -264,6 +264,196 @@
       </tags>
   </entry>
   <entry>
+    <title>Hello World</title>
+    <url>/2025/02/16/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案</title>
+    <url>/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<blockquote>
+<p>如何手动配置 Qt 的高 DPI 缩放策略。</p>
+</blockquote>
+<hr>
+<h2 id="一、目的说明"><a href="#一、目的说明" class="headerlink" title="一、目的说明"></a>一、目的说明</h2><p>在多分辨率或高 DPI 显示器环境下（例如 1080p 与 4K 显示器混用），默认 Qt 的缩放行为可能导致：</p>
+<ul>
+<li>控件尺寸显示不一致</li>
+<li>字体和控件比例不正确</li>
+</ul>
+<p>为了解决这些问题，需要手动配置 Qt 的高 DPI 缩放策略。</p>
+<hr>
+<h2 id="二、控件与字体缩放不一致问题详解"><a href="#二、控件与字体缩放不一致问题详解" class="headerlink" title="二、控件与字体缩放不一致问题详解"></a>二、控件与字体缩放不一致问题详解</h2><p>在多分辨率显示器环境中，控件尺寸与字体大小常常表现不一致，原因在于它们的单位和缩放机制不同。</p>
+<h3 id="1-控件大小设置（以像素为单位）"><a href="#1-控件大小设置（以像素为单位）" class="headerlink" title="1. 控件大小设置（以像素为单位）"></a>1. 控件大小设置（以像素为单位）</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">button-&gt;<span class="built_in">setFixedSize</span>(<span class="number">100</span>, <span class="number">40</span>); <span class="comment">// 设置为 100x40 像素</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>控件尺寸使用**像素（px）**为单位，<strong>不会自动参与 DPI 缩放</strong>。</li>
+<li>在高 DPI 屏幕中，同样像素会显得更小。</li>
+<li>如果未启用 Qt 的高 DPI 缩放机制，控件尺寸在高分屏上会“缩水”。</li>
+</ul>
+<h3 id="2-字体大小设置（以点为单位）"><a href="#2-字体大小设置（以点为单位）" class="headerlink" title="2. 字体大小设置（以点为单位）"></a>2. 字体大小设置（以点为单位）</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QFont font;</span><br><span class="line">font.<span class="built_in">setPointSize</span>(<span class="number">12</span>);</span><br><span class="line">widget-&gt;<span class="built_in">setFont</span>(font);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>字体大小使用**点（pt）**为单位，<strong>会自动随 DPI 缩放</strong>（启用了高 DPI 支持时）。</li>
+<li>字体在不同 DPI 屏幕下显示更一致。</li>
+</ul>
+<hr>
+<h3 id="📊-常见问题表现对比"><a href="#📊-常见问题表现对比" class="headerlink" title="📊 常见问题表现对比"></a>📊 常见问题表现对比</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>普通屏效果</th>
+<th>高分屏效果（未处理）</th>
+<th>问题说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>控件大小</td>
+<td>正常</td>
+<td>显得很小</td>
+<td>控件按像素渲染，未参与 DPI 缩放</td>
+</tr>
+<tr>
+<td>字体大小</td>
+<td>正常</td>
+<td>看起来合理</td>
+<td>字体按点单位自动缩放了</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、推荐配置方案"><a href="#三、推荐配置方案" class="headerlink" title="三、推荐配置方案"></a>三、推荐配置方案</h2><p>main函数内<br><code>QApplication a(argc, argv);</code>前,设置如下</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 启用高 DPI 缩放支持（Qt 5.6+）</span></span><br><span class="line">QCoreApplication::<span class="built_in">setAttribute</span>(Qt::AA_EnableHighDpiScaling);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用高分辨率图像资源（避免图标模糊）</span></span><br><span class="line">QCoreApplication::<span class="built_in">setAttribute</span>(Qt::AA_UseHighDpiPixmaps);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置缩放因子舍入策略为 PassThrough，避免被 Qt 自动四舍五入</span></span><br><span class="line">QGuiApplication::<span class="built_in">setHighDpiScaleFactorRoundingPolicy</span>(</span><br><span class="line">    Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 启用自动根据屏幕分辨率缩放</span></span><br><span class="line"><span class="built_in">qputenv</span>(<span class="string">&quot;QT_AUTO_SCREEN_SCALE_FACTOR&quot;</span>, <span class="string">&quot;1&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// （可选）固定整个应用缩放比例为 1.25 倍（测试用）</span></span><br><span class="line"><span class="comment">// qputenv(&quot;QT_SCALE_FACTOR&quot;, &quot;1.25&quot;);</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、关键设置解释"><a href="#四、关键设置解释" class="headerlink" title="四、关键设置解释"></a>四、关键设置解释</h2><h3 id="1-Qt-HighDpiScaleFactorRoundingPolicy-PassThrough"><a href="#1-Qt-HighDpiScaleFactorRoundingPolicy-PassThrough" class="headerlink" title="1. Qt::HighDpiScaleFactorRoundingPolicy::PassThrough"></a>1. <code>Qt::HighDpiScaleFactorRoundingPolicy::PassThrough</code></h3><ul>
+<li>不舍入缩放因子，例如 1.25 就保持为 1.25，而不是四舍五入为 1 或 2。</li>
+<li>避免因缩放被改写导致控件或字体显示异常。</li>
+<li>适用于需要精确缩放控制的应用。</li>
+</ul>
+<h3 id="2-QT-AUTO-SCREEN-SCALE-FACTOR-1"><a href="#2-QT-AUTO-SCREEN-SCALE-FACTOR-1" class="headerlink" title="2. QT_AUTO_SCREEN_SCALE_FACTOR=1"></a>2. <code>QT_AUTO_SCREEN_SCALE_FACTOR=1</code></h3><ul>
+<li>根据当前显示器的 DPI 自动计算缩放因子。</li>
+<li>多屏幕（不同 DPI）下自动适配。</li>
+</ul>
+<h3 id="3-AA-EnableHighDpiScaling"><a href="#3-AA-EnableHighDpiScaling" class="headerlink" title="3. AA_EnableHighDpiScaling"></a>3. <code>AA_EnableHighDpiScaling</code></h3><ul>
+<li>启用 Qt 高 DPI 缩放支持。</li>
+<li>这是启用缩放机制的基础配置。</li>
+</ul>
+<h3 id="4-AA-UseHighDpiPixmaps"><a href="#4-AA-UseHighDpiPixmaps" class="headerlink" title="4. AA_UseHighDpiPixmaps"></a>4. <code>AA_UseHighDpiPixmaps</code></h3><ul>
+<li>图像资源也将使用高分辨率版本（如 2x PNG 图标），保证清晰度。</li>
+</ul>
+<h3 id="5-QT-SCALE-FACTOR-1-25（可选）"><a href="#5-QT-SCALE-FACTOR-1-25（可选）" class="headerlink" title="5. QT_SCALE_FACTOR=1.25（可选）"></a>5. <code>QT_SCALE_FACTOR=1.25</code>（可选）</h3><ul>
+<li>手动设置应用缩放倍数，用于调试或临时适配不支持自动缩放的平台。</li>
+</ul>
+<hr>
+<h2 id="五、效果总结"><a href="#五、效果总结" class="headerlink" title="五、效果总结"></a>五、效果总结</h2><ul>
+<li>多显示器缩放一致性增强</li>
+<li>控件与字体按比例精准缩放</li>
+<li>界面清晰不模糊，特别适用于 2K&#x2F;4K 显示器</li>
+</ul>
+<hr>
+]]></content>
+      <categories>
+        <category>QT_UI_样式配置</category>
+      </categories>
+      <tags>
+        <tag>QT</tag>
+        <tag>QT_UI</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo 博客部署 GitHub 失败解决方案</title>
+    <url>/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<blockquote>
+<p>Hexo 博客部署 GitHub Pages 出现 无法更新 甚至404错误 的完整排查与修复记录（含 .nojekyll + Actions 冲突）</p>
+</blockquote>
+<hr>
+<h2 id="📌-背景"><a href="#📌-背景" class="headerlink" title="📌 背景"></a>📌 背景</h2><p>在使用 Hexo 部署静态博客到 GitHub Pages 的过程中，虽然本地 <code>hexo g &amp;&amp; hexo d</code> 执行成功，但访问 <code>https://用户名.github.io/</code> 却发现没有更新，甚至出现 404 错误。</p>
+<hr>
+<h2 id="💥-遇到的问题"><a href="#💥-遇到的问题" class="headerlink" title="💥 遇到的问题"></a>💥 遇到的问题</h2><h3 id="❌-GitHub-Actions-自动部署失败"><a href="#❌-GitHub-Actions-自动部署失败" class="headerlink" title="❌ GitHub Actions 自动部署失败"></a>❌ GitHub Actions 自动部署失败</h3><p>错误如下：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Error: Getting Pages deployment status failed</span><br><span class="line">Error: HttpError: Server Error</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧨-问题症状"><a href="#🧨-问题症状" class="headerlink" title="🧨 问题症状"></a>🧨 问题症状</h2><ul>
+<li>页面提示：<code>404 - There isn&#39;t a GitHub Pages site here.</code></li>
+<li>GitHub Actions 中的 <code>pages-build-deployment</code> 多次失败</li>
+<li>GitHub Pages 设置正确，使用的是 <code>main</code> 分支 + <code>/ (root)</code></li>
+<li>本地 Hexo 部署成功，<code>public/</code> 目录文件也正常生成</li>
+</ul>
+<hr>
+<h2 id="🧠-问题原因总结"><a href="#🧠-问题原因总结" class="headerlink" title="🧠 问题原因总结"></a>🧠 问题原因总结</h2><h3 id="✅-问题-1：GitHub-默认使用-Jekyll-构建"><a href="#✅-问题-1：GitHub-默认使用-Jekyll-构建" class="headerlink" title="✅ 问题 1：GitHub 默认使用 Jekyll 构建"></a>✅ 问题 1：GitHub 默认使用 Jekyll 构建</h3><p>Hexo 是静态文件，不需要 Jekyll。但 GitHub 默认认为你的站点是用 Jekyll 构建的，导致：</p>
+<ul>
+<li>部分页面不停的构建失败</li>
+<li>原因未知，部分页面可以完成构建，部分将失败，这部分是失败的构建将使当此部署失败</li>
+</ul>
+<hr>
+<h2 id="✅-解决方案步骤"><a href="#✅-解决方案步骤" class="headerlink" title="✅ 解决方案步骤"></a>✅ 解决方案步骤</h2><h3 id="🔧-步骤-1：创建-nojekyll-文件"><a href="#🔧-步骤-1：创建-nojekyll-文件" class="headerlink" title="🔧 步骤 1：创建 .nojekyll 文件"></a>🔧 步骤 1：创建 <code>.nojekyll</code> 文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> &gt; <span class="built_in">source</span>/.nojekyll</span><br></pre></td></tr></table></figure>
+
+<p>或者在 <code>source/</code> 目录下手动新建一个 <code>.nojekyll</code> 空文件。</p>
+<p>该文件为空白文件，意思为声明该目录不需要github进行Jekyll 构建。</p>
+<hr>
+<h3 id="🔧-步骤-2：配置-Hexo-自动包含-nojekyll"><a href="#🔧-步骤-2：配置-Hexo-自动包含-nojekyll" class="headerlink" title="🔧 步骤 2：配置 Hexo 自动包含 .nojekyll"></a>🔧 步骤 2：配置 Hexo 自动包含 <code>.nojekyll</code></h3><p>打开 Hexo 根目录下的 <code>_config.yml</code>，添加：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">include:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">.nojekyll</span></span><br></pre></td></tr></table></figure>
+
+<p>这一步非常关键！它能让 Hexo 构建时自动将 <code>.nojekyll</code> 拷贝进 <code>public/</code> 目录。</p>
+<hr>
+<h3 id="🔧-步骤-3：重新构建并部署"><a href="#🔧-步骤-3：重新构建并部署" class="headerlink" title="🔧 步骤 3：重新构建并部署"></a>🔧 步骤 3：重新构建并部署</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>- </p>
+<hr>
+<h2 id="✅-最终效果"><a href="#✅-最终效果" class="headerlink" title="✅ 最终效果"></a>✅ 最终效果</h2><ul>
+<li><code>https://用户名.github.io/</code> 正常加载页面</li>
+<li>GitHub Pages 不再报错</li>
+<li>所有 Hexo 静态资源都被正确部署并可访问</li>
+</ul>
+<hr>
+<h2 id="✨-总结"><a href="#✨-总结" class="headerlink" title="✨ 总结"></a>✨ 总结</h2><table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>是否完成</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.nojekyll</code> 文件</td>
+<td>✅</td>
+<td>禁用 Jekyll</td>
+</tr>
+<tr>
+<td><code>include:</code> 配置</td>
+<td>✅</td>
+<td>确保 <code>.nojekyll</code> 被打包到 public</td>
+</tr>
+<tr>
+<td>Pages 源设置</td>
+<td>✅</td>
+<td>main 分支 + &#x2F; 根目录</td>
+</tr>
+</tbody></table>
+<hr>
+<p>🚀 <strong>部署成功的关键在于 <code>.nojekyll + include 配置</code>，一旦设置完毕，即可跳过所有 Jekyll 和 Actions 的构建干扰。</strong></p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>GitHub</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Qt for Android 使用 JNI 的完整指南</title>
     <url>/2025/03/09/qt_android_jni/</url>
     <content><![CDATA[<blockquote>
@@ -396,84 +586,192 @@
       </tags>
   </entry>
   <entry>
-    <title>Hexo 博客部署 GitHub 失败解决方案</title>
-    <url>/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <title>Qt 传统线程与线程池机制对比总结</title>
+    <url>/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/</url>
     <content><![CDATA[<blockquote>
-<p>Hexo 博客部署 GitHub Pages 出现 无法更新 甚至404错误 的完整排查与修复记录（含 .nojekyll + Actions 冲突）</p>
+<p>本文阐述了传统线程和线程池在应用场景和用法上的区别和使用要点。</p>
 </blockquote>
 <hr>
-<h2 id="📌-背景"><a href="#📌-背景" class="headerlink" title="📌 背景"></a>📌 背景</h2><p>在使用 Hexo 部署静态博客到 GitHub Pages 的过程中，虽然本地 <code>hexo g &amp;&amp; hexo d</code> 执行成功，但访问 <code>https://用户名.github.io/</code> 却发现没有更新，甚至出现 404 错误。</p>
-<hr>
-<h2 id="💥-遇到的问题"><a href="#💥-遇到的问题" class="headerlink" title="💥 遇到的问题"></a>💥 遇到的问题</h2><h3 id="❌-GitHub-Actions-自动部署失败"><a href="#❌-GitHub-Actions-自动部署失败" class="headerlink" title="❌ GitHub Actions 自动部署失败"></a>❌ GitHub Actions 自动部署失败</h3><p>错误如下：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Error: Getting Pages deployment status failed</span><br><span class="line">Error: HttpError: Server Error</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="🧨-问题症状"><a href="#🧨-问题症状" class="headerlink" title="🧨 问题症状"></a>🧨 问题症状</h2><ul>
-<li>页面提示：<code>404 - There isn&#39;t a GitHub Pages site here.</code></li>
-<li>GitHub Actions 中的 <code>pages-build-deployment</code> 多次失败</li>
-<li>GitHub Pages 设置正确，使用的是 <code>main</code> 分支 + <code>/ (root)</code></li>
-<li>本地 Hexo 部署成功，<code>public/</code> 目录文件也正常生成</li>
-</ul>
-<hr>
-<h2 id="🧠-问题原因总结"><a href="#🧠-问题原因总结" class="headerlink" title="🧠 问题原因总结"></a>🧠 问题原因总结</h2><h3 id="✅-问题-1：GitHub-默认使用-Jekyll-构建"><a href="#✅-问题-1：GitHub-默认使用-Jekyll-构建" class="headerlink" title="✅ 问题 1：GitHub 默认使用 Jekyll 构建"></a>✅ 问题 1：GitHub 默认使用 Jekyll 构建</h3><p>Hexo 是静态文件，不需要 Jekyll。但 GitHub 默认认为你的站点是用 Jekyll 构建的，导致：</p>
-<ul>
-<li>部分页面不停的构建失败</li>
-<li>原因未知，部分页面可以完成构建，部分将失败，这部分是失败的构建将使当此部署失败</li>
-</ul>
-<hr>
-<h2 id="✅-解决方案步骤"><a href="#✅-解决方案步骤" class="headerlink" title="✅ 解决方案步骤"></a>✅ 解决方案步骤</h2><h3 id="🔧-步骤-1：创建-nojekyll-文件"><a href="#🔧-步骤-1：创建-nojekyll-文件" class="headerlink" title="🔧 步骤 1：创建 .nojekyll 文件"></a>🔧 步骤 1：创建 <code>.nojekyll</code> 文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> &gt; <span class="built_in">source</span>/.nojekyll</span><br></pre></td></tr></table></figure>
-
-<p>或者在 <code>source/</code> 目录下手动新建一个 <code>.nojekyll</code> 空文件。</p>
-<p>该文件为空白文件，意思为声明该目录不需要github进行Jekyll 构建。</p>
-<hr>
-<h3 id="🔧-步骤-2：配置-Hexo-自动包含-nojekyll"><a href="#🔧-步骤-2：配置-Hexo-自动包含-nojekyll" class="headerlink" title="🔧 步骤 2：配置 Hexo 自动包含 .nojekyll"></a>🔧 步骤 2：配置 Hexo 自动包含 <code>.nojekyll</code></h3><p>打开 Hexo 根目录下的 <code>_config.yml</code>，添加：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">include:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">.nojekyll</span></span><br></pre></td></tr></table></figure>
-
-<p>这一步非常关键！它能让 Hexo 构建时自动将 <code>.nojekyll</code> 拷贝进 <code>public/</code> 目录。</p>
-<hr>
-<h3 id="🔧-步骤-3：重新构建并部署"><a href="#🔧-步骤-3：重新构建并部署" class="headerlink" title="🔧 步骤 3：重新构建并部署"></a>🔧 步骤 3：重新构建并部署</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>- </p>
-<hr>
-<h2 id="✅-最终效果"><a href="#✅-最终效果" class="headerlink" title="✅ 最终效果"></a>✅ 最终效果</h2><ul>
-<li><code>https://用户名.github.io/</code> 正常加载页面</li>
-<li>GitHub Pages 不再报错</li>
-<li>所有 Hexo 静态资源都被正确部署并可访问</li>
-</ul>
-<hr>
-<h2 id="✨-总结"><a href="#✨-总结" class="headerlink" title="✨ 总结"></a>✨ 总结</h2><table>
+<h2 id="一、核心区别总览"><a href="#一、核心区别总览" class="headerlink" title="一、核心区别总览"></a>一、核心区别总览</h2><table>
 <thead>
 <tr>
-<th>配置项</th>
-<th>是否完成</th>
+<th>对比项</th>
+<th>QThread 传统线程</th>
+<th>QThreadPool + QRunnable 线程池</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动方式</td>
+<td><code>thread-&gt;start()</code></td>
+<td><code>threadPool-&gt;start(runnable)</code></td>
+</tr>
+<tr>
+<td>执行入口</td>
+<td>重写 <code>QThread::run()</code></td>
+<td>实现 <code>QRunnable::run()</code></td>
+</tr>
+<tr>
+<td>是否为子线程对象本体</td>
+<td>✅ <code>QThread</code> 是子线程</td>
+<td>❌ <code>QRunnable</code> 是主线程对象，仅 run() 属于子线程</td>
+</tr>
+<tr>
+<td>是否有事件循环</td>
+<td>✔️ 可启用（通过 <code>exec()</code>）</td>
+<td>❌ 无事件循环</td>
+</tr>
+<tr>
+<td>是否支持 moveToThread</td>
+<td>✔️ 可绑定 <code>QObject</code> 对象</td>
+<td>❌ 不支持</td>
+</tr>
+<tr>
+<td>是否支持信号槽机制</td>
+<td>✔️ 可跨线程通信</td>
+<td>❌ 默认不支持（需手动 hack）</td>
+</tr>
+<tr>
+<td>适合用途</td>
+<td>长期存在、复杂控制、协议通信</td>
+<td>轻量任务、短时批处理</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、QThread-传统线程用法"><a href="#二、QThread-传统线程用法" class="headerlink" title="二、QThread 传统线程用法"></a>二、QThread 传统线程用法</h2><h3 id="1-创建逻辑对象与线程"><a href="#1-创建逻辑对象与线程" class="headerlink" title="1. 创建逻辑对象与线程"></a>1. 创建逻辑对象与线程</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建对象</span></span><br><span class="line">Worker* worker = <span class="keyword">new</span> Worker;  <span class="comment">//任务对象，可以被绑定到子线程的逻辑对象，用于执行实际任务</span></span><br><span class="line">QThread* thread = <span class="keyword">new</span> QThread;  <span class="comment">//子线程对象</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 迁移对象</span></span><br><span class="line">worker-&gt;<span class="built_in">moveToThread</span>(thread); <span class="comment">//将任务对象迁移至子线程对象，worker可以为创建线程的this对象本身</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 信号槽连接：</span></span><br><span class="line">	<span class="comment">//当线程启动时自动调用工作对象的任务函数 doWork()</span></span><br><span class="line"><span class="built_in">connect</span>(thread, &amp;QThread::started, worker, &amp;Worker::doWork); </span><br><span class="line">	<span class="comment">//当工作对象发出 finished 信号时，通知线程退出事件循环</span></span><br><span class="line"><span class="built_in">connect</span>(worker, &amp;Worker::finished, thread, &amp;QThread::quit);</span><br><span class="line">	<span class="comment">//当线程退出后，销毁 QThread 对象</span></span><br><span class="line"><span class="built_in">connect</span>(thread, &amp;QThread::finished, thread, &amp;QThread::deleteLater);</span><br><span class="line">	<span class="comment">//当工作完成，自动销毁 worker 对象</span></span><br><span class="line"><span class="built_in">connect</span>(worker, &amp;Worker::finished, worker, &amp;QObject::deleteLater);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 启动线程</span></span><br><span class="line">thread-&gt;<span class="built_in">start</span>();</span><br></pre></td></tr></table></figure>
+
+<p><code>QThread</code> 是 Qt 框架中用于<strong>创建和管理子线程</strong>的类，本质上是<strong>一个线程控制器</strong>。</p>
+<ul>
+<li>它自身不是用来写任务逻辑的</li>
+<li>也不建议重写 <code>QThread::run()</code> 来做事</li>
+<li>推荐做法是：<strong>将逻辑类（QObject）通过 <code>moveToThread()</code> 移到 <code>QThread</code> 中运行</strong></li>
+</ul>
+<h3 id="✅-特点"><a href="#✅-特点" class="headerlink" title="✅ 特点"></a>✅ 特点</h3><ul>
+<li>逻辑对象可以用 <code>moveToThread()</code> 迁移至线程中运行</li>
+<li>支持完整事件循环：定时器、信号槽、异步操作</li>
+<li>适合长期保持运行、状态驱动的任务（如协议连接、设备通讯）</li>
+</ul>
+<hr>
+<h2 id="三、线程池-QThreadPool-QRunnable-机制"><a href="#三、线程池-QThreadPool-QRunnable-机制" class="headerlink" title="三、线程池 QThreadPool + QRunnable 机制"></a>三、线程池 QThreadPool + QRunnable 机制</h2><h3 id="✅-基本结构"><a href="#✅-基本结构" class="headerlink" title="✅ 基本结构"></a>✅ 基本结构</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyTask</span> : <span class="keyword">public</span> QRunnable &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 这里的代码将在线程池中某个线程执行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">QThreadPool::<span class="built_in">globalInstance</span>()-&gt;<span class="built_in">start</span>(<span class="keyword">new</span> MyTask);</span><br></pre></td></tr></table></figure>
+
+<h3 id="✅-特点-1"><a href="#✅-特点-1" class="headerlink" title="✅ 特点"></a>✅ 特点</h3><ul>
+<li><p>无事件循环，不能使用信号槽、moveToThread</p>
+</li>
+<li><p>任务函数 run() 运行于子线程</p>
+</li>
+<li><p>非 QObject 类，仅适合一次性短任务处理</p>
+</li>
+</ul>
+<h3 id="📌重点"><a href="#📌重点" class="headerlink" title="📌重点"></a>📌重点</h3><ul>
+<li><p>run()函数内部才属于子线程，MyTask本身并不属于子线程！</p>
+</li>
+<li><p>run()函数内部调用任何属于MyTask构造函数内构建的对象，都属于非法访问！</p>
+</li>
+<li><p>run()函数内部可以调用MyTask.h声明的基本数据类型，这是被允许的！</p>
+</li>
+</ul>
+<hr>
+<h2 id="四、主线程对象的访问与-QMetaObject-invokeMethod"><a href="#四、主线程对象的访问与-QMetaObject-invokeMethod" class="headerlink" title="四、主线程对象的访问与 QMetaObject::invokeMethod"></a>四、主线程对象的访问与 QMetaObject::invokeMethod</h2><h3 id="✅-语法结构"><a href="#✅-语法结构" class="headerlink" title="✅ 语法结构"></a>✅ 语法结构</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QMetaObject::<span class="built_in">invokeMethod</span>(mainObj, <span class="string">&quot;updateUI&quot;</span>, Qt::QueuedConnection, <span class="built_in">Q_ARG</span>(QString, result));</span><br></pre></td></tr></table></figure>
+
+<h3 id="✅-参数解析"><a href="#✅-参数解析" class="headerlink" title="✅ 参数解析"></a>✅ 参数解析</h3><table>
+<thead>
+<tr>
+<th>参数</th>
 <th>说明</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>.nojekyll</code> 文件</td>
-<td>✅</td>
-<td>禁用 Jekyll</td>
+<td><code>mainObj</code></td>
+<td>主线程中的 QObject 派生对象指针</td>
 </tr>
 <tr>
-<td><code>include:</code> 配置</td>
-<td>✅</td>
-<td>确保 <code>.nojekyll</code> 被打包到 public</td>
+<td><code>&quot;updateUI&quot;</code></td>
+<td>要调用的槽函数名（必须是 slot 或 Q_INVOKABLE）</td>
 </tr>
 <tr>
-<td>Pages 源设置</td>
-<td>✅</td>
-<td>main 分支 + &#x2F; 根目录</td>
+<td><code>Qt::QueuedConnection</code></td>
+<td>跨线程排队执行</td>
+</tr>
+<tr>
+<td><code>Q_ARG(QString, result)</code></td>
+<td>参数类型和值封装</td>
+</tr>
+</tbody></table>
+<h3 id="✅-执行原理"><a href="#✅-执行原理" class="headerlink" title="✅ 执行原理"></a>✅ 执行原理</h3><ul>
+<li>子线程调用 <code>invokeMethod</code></li>
+<li>Qt 检测 <code>mainObj</code> 所属线程（主线程）</li>
+<li>将调用请求放入 <code>mainObj</code> 所属线程的事件队列</li>
+<li>最终由主线程事件循环执行此方法</li>
+</ul>
+<h3 id="✅-示例"><a href="#✅-示例" class="headerlink" title="✅ 示例"></a>✅ 示例</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyTask</span> : <span class="keyword">public</span> QRunnable &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyTask</span>(QObject* target) : <span class="built_in">mainObj</span>(target) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        QMetaObject::<span class="built_in">invokeMethod</span>(mainObj, <span class="string">&quot;updateUI&quot;</span>,</span><br><span class="line">                                  Qt::QueuedConnection,</span><br><span class="line">                                  <span class="built_in">Q_ARG</span>(QString, <span class="string">&quot;任务完成&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    QObject* mainObj;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="📌重点-1"><a href="#📌重点-1" class="headerlink" title="📌重点"></a>📌重点</h3><ul>
+<li>mainObj属于主线程，QMetaObject::invokeMethod存在于子线程仅声明了mainObj对象，不属于直接调用，并不会触发报错。</li>
+<li>在 <code>run()</code> 中你只是使用它的地址调用 <code>invokeMethod</code>，实际执行仍在主线程。</li>
+</ul>
+<hr>
+<h2 id="五、线程安全性说明"><a href="#五、线程安全性说明" class="headerlink" title="五、线程安全性说明"></a>五、线程安全性说明</h2><h3 id="✅-子线程中可安全操作："><a href="#✅-子线程中可安全操作：" class="headerlink" title="✅ 子线程中可安全操作："></a>✅ 子线程中可安全操作：</h3><ul>
+<li>局部基本类型变量（int, float, QString 等）</li>
+<li>不与其他线程共享的私有数据</li>
+</ul>
+<h3 id="⚠️-需要加锁的情况："><a href="#⚠️-需要加锁的情况：" class="headerlink" title="⚠️ 需要加锁的情况："></a>⚠️ 需要加锁的情况：</h3><ul>
+<li>全局变量</li>
+<li>多线程共享的成员变量（static、引用）</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">mutex.<span class="built_in">lock</span>();</span><br><span class="line">sharedData += <span class="number">1</span>;</span><br><span class="line">mutex.<span class="built_in">unlock</span>();</span><br></pre></td></tr></table></figure>
+
+<h3 id="❌-严禁子线程中直接操作主线程-UI："><a href="#❌-严禁子线程中直接操作主线程-UI：" class="headerlink" title="❌ 严禁子线程中直接操作主线程 UI："></a>❌ 严禁子线程中直接操作主线程 UI：</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">ui-&gt;label-&gt;<span class="built_in">setText</span>(<span class="string">&quot;XXX&quot;</span>);  <span class="comment">// ❌ 不允许（线程不安全）</span></span><br></pre></td></tr></table></figure>
+
+<p>请使用 <code>invokeMethod</code> 或信号槽跨线程通知主线程操作 UI。</p>
+<hr>
+<h2 id="六、信号槽-跨线程通信-要点声明"><a href="#六、信号槽-跨线程通信-要点声明" class="headerlink" title="六、信号槽 跨线程通信 要点声明"></a>六、信号槽 跨线程通信 要点声明</h2><h3 id="✅-跨线程通信时，须使用-Qt-QueuedConnection-强制排队调用槽函数"><a href="#✅-跨线程通信时，须使用-Qt-QueuedConnection-强制排队调用槽函数" class="headerlink" title="✅ 跨线程通信时，须使用 Qt::QueuedConnection 强制排队调用槽函数"></a>✅ 跨线程通信时，须使用 Qt::QueuedConnection 强制排队调用槽函数</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">connect(worker, &amp;Worker::resultReady,</span><br><span class="line">        mainWindow, &amp;MainWindow::updateUI,</span><br><span class="line">        Qt::QueuedConnection);  // 强制主线程中执行</span><br></pre></td></tr></table></figure>
+
+<h3 id="⚠️-为什么需要强制排队："><a href="#⚠️-为什么需要强制排队：" class="headerlink" title="⚠️ 为什么需要强制排队："></a>⚠️ 为什么需要强制排队：</h3><ul>
+<li><code>Qt::AutoConnection</code> 默认行为不确定：线程未启动或迁移失败时，可能槽函数仍在错误线程中执行</li>
+<li><code>Qt::QueuedConnection</code> 可确保槽函数<strong>总是在线程归属对象的线程中执行</strong>（如主线程）</li>
+<li>避免崩溃、死锁、UI 线程访问冲突</li>
+</ul>
+<h3 id="✅-常见连接类型解释"><a href="#✅-常见连接类型解释" class="headerlink" title="✅ 常见连接类型解释"></a>✅ 常见连接类型解释</h3><table>
+<thead>
+<tr>
+<th>连接类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Qt::AutoConnection</code></td>
+<td>自动判断是否跨线程，默认值（⚠️不安全）</td>
+</tr>
+<tr>
+<td><code>Qt::DirectConnection</code></td>
+<td>立即在当前线程调用槽函数（⚠️跨线程风险）</td>
+</tr>
+<tr>
+<td><code>Qt::QueuedConnection</code></td>
+<td>投递到目标线程事件队列执行（✔️推荐）</td>
+</tr>
+<tr>
+<td><code>Qt::BlockingQueuedConnection</code></td>
+<td>阻塞当前线程直到槽函数执行完（⚠️容易死锁）</td>
+</tr>
+<tr>
+<td><code>Qt::UniqueConnection</code></td>
+<td>防止重复连接，可与其他连接类型组合使用</td>
 </tr>
 </tbody></table>
 <hr>
-<p>🚀 <strong>部署成功的关键在于 <code>.nojekyll + include 配置</code>，一旦设置完毕，即可跳过所有 Jekyll 和 Actions 的构建干扰。</strong></p>
+<h2 id="七、总结建议"><a href="#七、总结建议" class="headerlink" title="七、总结建议"></a>七、总结建议</h2><ul>
+<li><strong>协议接入、串口通信、长期任务：</strong> 推荐使用 <code>QThread + QObject + moveToThread</code> 模式</li>
+<li><strong>高并发短时任务，如数据块计算、图像处理：</strong> 推荐使用 <code>QThreadPool + QRunnable</code></li>
+<li>**跨线程通信：**统一用 <code>信号槽</code> 或 <code>QMetaObject::invokeMethod(Qt::QueuedConnection)</code></li>
+</ul>
+<p>二者可以在项目中混合使用，按照任务特点灵活选型。</p>
 ]]></content>
       <categories>
-        <category>教程</category>
+        <category>QT</category>
       </categories>
       <tags>
-        <tag>GitHub</tag>
+        <tag>QT</tag>
+        <tag>线程</tag>
       </tags>
   </entry>
   <entry>
@@ -561,23 +859,5 @@
         <tag>QT for Android</tag>
         <tag>QT</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2025/02/16/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
 </search>

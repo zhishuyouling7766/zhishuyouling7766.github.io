@@ -1,0 +1,388 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Qt 传统线程与线程池机制对比总结 | 浮生往事留痕</title><meta name="author" content="张博豪"><meta name="copyright" content="张博豪"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文阐述了传统线程和线程池在应用场景和用法上的区别，罗列了种种要点和易错点">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qt 传统线程与线程池机制对比总结">
+<meta property="og:url" content="http://example.com/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="浮生往事留痕">
+<meta property="og:description" content="本文阐述了传统线程和线程池在应用场景和用法上的区别，罗列了种种要点和易错点">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93.png">
+<meta property="article:published_time" content="2025-06-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-13T16:00:00.000Z">
+<meta property="article:author" content="张博豪">
+<meta property="article:tag" content="QT">
+<meta property="article:tag" content="线程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Qt 传统线程与线程池机制对比总结",
+  "url": "http://example.com/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/",
+  "image": "http://example.com/img/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93.png",
+  "datePublished": "2025-06-13T16:00:00.000Z",
+  "dateModified": "2025-06-13T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "张博豪",
+      "url": "https://zhishuyouling7766.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/bogFavicon.png"><link rel="canonical" href="http://example.com/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":250,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-center"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Qt 传统线程与线程池机制对比总结',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E8%83%8C%E6%99%AF.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">浮生往事留痕</span></a><a class="nav-page-title" href="/"><span class="site-name">Qt 传统线程与线程池机制对比总结</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Qt 传统线程与线程池机制对比总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-06-13T16:00:00.000Z" title="发表于 2025-06-14 00:00:00">2025-06-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-13T16:00:00.000Z" title="更新于 2025-06-14 00:00:00">2025-06-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/QT/">QT</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>本文阐述了传统线程和线程池在应用场景和用法上的区别和使用要点。</p>
+</blockquote>
+<hr>
+<h2 id="一、核心区别总览"><a href="#一、核心区别总览" class="headerlink" title="一、核心区别总览"></a>一、核心区别总览</h2><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>QThread 传统线程</th>
+<th>QThreadPool + QRunnable 线程池</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动方式</td>
+<td><code>thread-&gt;start()</code></td>
+<td><code>threadPool-&gt;start(runnable)</code></td>
+</tr>
+<tr>
+<td>执行入口</td>
+<td>重写 <code>QThread::run()</code></td>
+<td>实现 <code>QRunnable::run()</code></td>
+</tr>
+<tr>
+<td>是否为子线程对象本体</td>
+<td>✅ <code>QThread</code> 是子线程</td>
+<td>❌ <code>QRunnable</code> 是主线程对象，仅 run() 属于子线程</td>
+</tr>
+<tr>
+<td>是否有事件循环</td>
+<td>✔️ 可启用（通过 <code>exec()</code>）</td>
+<td>❌ 无事件循环</td>
+</tr>
+<tr>
+<td>是否支持 moveToThread</td>
+<td>✔️ 可绑定 <code>QObject</code> 对象</td>
+<td>❌ 不支持</td>
+</tr>
+<tr>
+<td>是否支持信号槽机制</td>
+<td>✔️ 可跨线程通信</td>
+<td>❌ 默认不支持（需手动 hack）</td>
+</tr>
+<tr>
+<td>适合用途</td>
+<td>长期存在、复杂控制、协议通信</td>
+<td>轻量任务、短时批处理</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、QThread-传统线程用法"><a href="#二、QThread-传统线程用法" class="headerlink" title="二、QThread 传统线程用法"></a>二、QThread 传统线程用法</h2><h3 id="1-创建逻辑对象与线程"><a href="#1-创建逻辑对象与线程" class="headerlink" title="1. 创建逻辑对象与线程"></a>1. 创建逻辑对象与线程</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建对象</span></span><br><span class="line">Worker* worker = <span class="keyword">new</span> Worker;  <span class="comment">//任务对象，可以被绑定到子线程的逻辑对象，用于执行实际任务</span></span><br><span class="line">QThread* thread = <span class="keyword">new</span> QThread;  <span class="comment">//子线程对象</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 迁移对象</span></span><br><span class="line">worker-&gt;<span class="built_in">moveToThread</span>(thread); <span class="comment">//将任务对象迁移至子线程对象，worker可以为创建线程的this对象本身</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 信号槽连接：</span></span><br><span class="line">	<span class="comment">//当线程启动时自动调用工作对象的任务函数 doWork()</span></span><br><span class="line"><span class="built_in">connect</span>(thread, &amp;QThread::started, worker, &amp;Worker::doWork); </span><br><span class="line">	<span class="comment">//当工作对象发出 finished 信号时，通知线程退出事件循环</span></span><br><span class="line"><span class="built_in">connect</span>(worker, &amp;Worker::finished, thread, &amp;QThread::quit);</span><br><span class="line">	<span class="comment">//当线程退出后，销毁 QThread 对象</span></span><br><span class="line"><span class="built_in">connect</span>(thread, &amp;QThread::finished, thread, &amp;QThread::deleteLater);</span><br><span class="line">	<span class="comment">//当工作完成，自动销毁 worker 对象</span></span><br><span class="line"><span class="built_in">connect</span>(worker, &amp;Worker::finished, worker, &amp;QObject::deleteLater);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 启动线程</span></span><br><span class="line">thread-&gt;<span class="built_in">start</span>();</span><br></pre></td></tr></table></figure>
+
+<p><code>QThread</code> 是 Qt 框架中用于<strong>创建和管理子线程</strong>的类，本质上是<strong>一个线程控制器</strong>。</p>
+<ul>
+<li>它自身不是用来写任务逻辑的</li>
+<li>也不建议重写 <code>QThread::run()</code> 来做事</li>
+<li>推荐做法是：<strong>将逻辑类（QObject）通过 <code>moveToThread()</code> 移到 <code>QThread</code> 中运行</strong></li>
+</ul>
+<h3 id="✅-特点"><a href="#✅-特点" class="headerlink" title="✅ 特点"></a>✅ 特点</h3><ul>
+<li>逻辑对象可以用 <code>moveToThread()</code> 迁移至线程中运行</li>
+<li>支持完整事件循环：定时器、信号槽、异步操作</li>
+<li>适合长期保持运行、状态驱动的任务（如协议连接、设备通讯）</li>
+</ul>
+<hr>
+<h2 id="三、线程池-QThreadPool-QRunnable-机制"><a href="#三、线程池-QThreadPool-QRunnable-机制" class="headerlink" title="三、线程池 QThreadPool + QRunnable 机制"></a>三、线程池 QThreadPool + QRunnable 机制</h2><h3 id="✅-基本结构"><a href="#✅-基本结构" class="headerlink" title="✅ 基本结构"></a>✅ 基本结构</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyTask</span> : <span class="keyword">public</span> QRunnable &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 这里的代码将在线程池中某个线程执行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">QThreadPool::<span class="built_in">globalInstance</span>()-&gt;<span class="built_in">start</span>(<span class="keyword">new</span> MyTask);</span><br></pre></td></tr></table></figure>
+
+<h3 id="✅-特点-1"><a href="#✅-特点-1" class="headerlink" title="✅ 特点"></a>✅ 特点</h3><ul>
+<li><p>无事件循环，不能使用信号槽、moveToThread</p>
+</li>
+<li><p>任务函数 run() 运行于子线程</p>
+</li>
+<li><p>非 QObject 类，仅适合一次性短任务处理</p>
+</li>
+</ul>
+<h3 id="📌重点"><a href="#📌重点" class="headerlink" title="📌重点"></a>📌重点</h3><ul>
+<li><p>run()函数内部才属于子线程，MyTask本身并不属于子线程！</p>
+</li>
+<li><p>run()函数内部调用任何属于MyTask构造函数内构建的对象，都属于非法访问！</p>
+</li>
+<li><p>run()函数内部可以调用MyTask.h声明的基本数据类型，这是被允许的！</p>
+</li>
+</ul>
+<hr>
+<h2 id="四、主线程对象的访问与-QMetaObject-invokeMethod"><a href="#四、主线程对象的访问与-QMetaObject-invokeMethod" class="headerlink" title="四、主线程对象的访问与 QMetaObject::invokeMethod"></a>四、主线程对象的访问与 QMetaObject::invokeMethod</h2><h3 id="✅-语法结构"><a href="#✅-语法结构" class="headerlink" title="✅ 语法结构"></a>✅ 语法结构</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">QMetaObject::<span class="built_in">invokeMethod</span>(mainObj, <span class="string">&quot;updateUI&quot;</span>, Qt::QueuedConnection, <span class="built_in">Q_ARG</span>(QString, result));</span><br></pre></td></tr></table></figure>
+
+<h3 id="✅-参数解析"><a href="#✅-参数解析" class="headerlink" title="✅ 参数解析"></a>✅ 参数解析</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>mainObj</code></td>
+<td>主线程中的 QObject 派生对象指针</td>
+</tr>
+<tr>
+<td><code>&quot;updateUI&quot;</code></td>
+<td>要调用的槽函数名（必须是 slot 或 Q_INVOKABLE）</td>
+</tr>
+<tr>
+<td><code>Qt::QueuedConnection</code></td>
+<td>跨线程排队执行</td>
+</tr>
+<tr>
+<td><code>Q_ARG(QString, result)</code></td>
+<td>参数类型和值封装</td>
+</tr>
+</tbody></table>
+<h3 id="✅-执行原理"><a href="#✅-执行原理" class="headerlink" title="✅ 执行原理"></a>✅ 执行原理</h3><ul>
+<li>子线程调用 <code>invokeMethod</code></li>
+<li>Qt 检测 <code>mainObj</code> 所属线程（主线程）</li>
+<li>将调用请求放入 <code>mainObj</code> 所属线程的事件队列</li>
+<li>最终由主线程事件循环执行此方法</li>
+</ul>
+<h3 id="✅-示例"><a href="#✅-示例" class="headerlink" title="✅ 示例"></a>✅ 示例</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyTask</span> : <span class="keyword">public</span> QRunnable &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyTask</span>(QObject* target) : <span class="built_in">mainObj</span>(target) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        QMetaObject::<span class="built_in">invokeMethod</span>(mainObj, <span class="string">&quot;updateUI&quot;</span>,</span><br><span class="line">                                  Qt::QueuedConnection,</span><br><span class="line">                                  <span class="built_in">Q_ARG</span>(QString, <span class="string">&quot;任务完成&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    QObject* mainObj;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="📌重点-1"><a href="#📌重点-1" class="headerlink" title="📌重点"></a>📌重点</h3><ul>
+<li>mainObj属于主线程，QMetaObject::invokeMethod存在于子线程仅声明了mainObj对象，不属于直接调用，并不会触发报错。</li>
+<li>在 <code>run()</code> 中你只是使用它的地址调用 <code>invokeMethod</code>，实际执行仍在主线程。</li>
+</ul>
+<hr>
+<h2 id="五、线程安全性说明"><a href="#五、线程安全性说明" class="headerlink" title="五、线程安全性说明"></a>五、线程安全性说明</h2><h3 id="✅-子线程中可安全操作："><a href="#✅-子线程中可安全操作：" class="headerlink" title="✅ 子线程中可安全操作："></a>✅ 子线程中可安全操作：</h3><ul>
+<li>局部基本类型变量（int, float, QString 等）</li>
+<li>不与其他线程共享的私有数据</li>
+</ul>
+<h3 id="⚠️-需要加锁的情况："><a href="#⚠️-需要加锁的情况：" class="headerlink" title="⚠️ 需要加锁的情况："></a>⚠️ 需要加锁的情况：</h3><ul>
+<li>全局变量</li>
+<li>多线程共享的成员变量（static、引用）</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mutex.<span class="built_in">lock</span>();</span><br><span class="line">sharedData += <span class="number">1</span>;</span><br><span class="line">mutex.<span class="built_in">unlock</span>();</span><br></pre></td></tr></table></figure>
+
+<h3 id="❌-严禁子线程中直接操作主线程-UI："><a href="#❌-严禁子线程中直接操作主线程-UI：" class="headerlink" title="❌ 严禁子线程中直接操作主线程 UI："></a>❌ 严禁子线程中直接操作主线程 UI：</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ui-&gt;label-&gt;<span class="built_in">setText</span>(<span class="string">&quot;XXX&quot;</span>);  <span class="comment">// ❌ 不允许（线程不安全）</span></span><br></pre></td></tr></table></figure>
+
+<p>请使用 <code>invokeMethod</code> 或信号槽跨线程通知主线程操作 UI。</p>
+<hr>
+<h2 id="六、信号槽-跨线程通信-要点声明"><a href="#六、信号槽-跨线程通信-要点声明" class="headerlink" title="六、信号槽 跨线程通信 要点声明"></a>六、信号槽 跨线程通信 要点声明</h2><h3 id="✅-跨线程通信时，须使用-Qt-QueuedConnection-强制排队调用槽函数"><a href="#✅-跨线程通信时，须使用-Qt-QueuedConnection-强制排队调用槽函数" class="headerlink" title="✅ 跨线程通信时，须使用 Qt::QueuedConnection 强制排队调用槽函数"></a>✅ 跨线程通信时，须使用 Qt::QueuedConnection 强制排队调用槽函数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">connect(worker, &amp;Worker::resultReady,</span><br><span class="line">        mainWindow, &amp;MainWindow::updateUI,</span><br><span class="line">        Qt::QueuedConnection);  // 强制主线程中执行</span><br></pre></td></tr></table></figure>
+
+<h3 id="⚠️-为什么需要强制排队："><a href="#⚠️-为什么需要强制排队：" class="headerlink" title="⚠️ 为什么需要强制排队："></a>⚠️ 为什么需要强制排队：</h3><ul>
+<li><code>Qt::AutoConnection</code> 默认行为不确定：线程未启动或迁移失败时，可能槽函数仍在错误线程中执行</li>
+<li><code>Qt::QueuedConnection</code> 可确保槽函数<strong>总是在线程归属对象的线程中执行</strong>（如主线程）</li>
+<li>避免崩溃、死锁、UI 线程访问冲突</li>
+</ul>
+<h3 id="✅-常见连接类型解释"><a href="#✅-常见连接类型解释" class="headerlink" title="✅ 常见连接类型解释"></a>✅ 常见连接类型解释</h3><table>
+<thead>
+<tr>
+<th>连接类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Qt::AutoConnection</code></td>
+<td>自动判断是否跨线程，默认值（⚠️不安全）</td>
+</tr>
+<tr>
+<td><code>Qt::DirectConnection</code></td>
+<td>立即在当前线程调用槽函数（⚠️跨线程风险）</td>
+</tr>
+<tr>
+<td><code>Qt::QueuedConnection</code></td>
+<td>投递到目标线程事件队列执行（✔️推荐）</td>
+</tr>
+<tr>
+<td><code>Qt::BlockingQueuedConnection</code></td>
+<td>阻塞当前线程直到槽函数执行完（⚠️容易死锁）</td>
+</tr>
+<tr>
+<td><code>Qt::UniqueConnection</code></td>
+<td>防止重复连接，可与其他连接类型组合使用</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="七、总结建议"><a href="#七、总结建议" class="headerlink" title="七、总结建议"></a>七、总结建议</h2><ul>
+<li><strong>协议接入、串口通信、长期任务：</strong> 推荐使用 <code>QThread + QObject + moveToThread</code> 模式</li>
+<li><strong>高并发短时任务，如数据块计算、图像处理：</strong> 推荐使用 <code>QThreadPool + QRunnable</code></li>
+<li>**跨线程通信：**统一用 <code>信号槽</code> 或 <code>QMetaObject::invokeMethod(Qt::QueuedConnection)</code></li>
+</ul>
+<p>二者可以在项目中混合使用，按照任务特点灵活选型。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">张博豪</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">https://zhishuyouling7766.github.io/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">此文章版权归 张博豪 所有，如有转载，请注明来自原作者</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/QT/">QT</a><a class="post-meta__tags" href="/tags/%E7%BA%BF%E7%A8%8B/">线程</a></div><div class="post-share"><div class="social-share" data-image="/img/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案</div></div><div class="info-2"><div class="info-item-1">在多分辨率或高 DPI 显示器环境下（例如 1080p 与 4K 显示器混用），默认 Qt 的缩放行为可能导致:字体和控件比例不正确</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-04</div><div class="info-item-2">Qt项目在Android系统环境下实现开机自启</div></div><div class="info-2"><div class="info-item-1">Qt for Android 实现开机自启功能（BootReceiver + QtActivity）</div></div></div></a><a class="pagination-related" href="/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-02</div><div class="info-item-2">Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案</div></div><div class="info-2"><div class="info-item-1">在多分辨率或高 DPI 显示器环境下（例如 1080p 与 4K 显示器混用），默认 Qt 的缩放行为可能导致:字体和控件比例不正确</div></div></div></a><a class="pagination-related" href="/2025/03/09/qt_android_jni/" title="Qt for Android 使用 JNI 的完整指南"><img class="cover" src="/img/qt_android_jni.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-09</div><div class="info-item-2">Qt for Android 使用 JNI 的完整指南</div></div><div class="info-2"><div class="info-item-1">本指南记录了如何在 Qt 项目中通过 JNI（Java Native Interface）调用 Android 原生 Java 方法，适用于需要访问系统功能（如 U 盘读写、广播、Activity 启动等）的场景。</div></div></div></a><a class="pagination-related" href="/2025/03/03/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE/" title="AndroidManifest.xml 配置详解"><img class="cover" src="/img/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-03</div><div class="info-item-2">AndroidManifest.xml 配置详解</div></div><div class="info-2"><div class="info-item-1">以下是 Qt for Android 应用中 `AndroidManifest.xml` 文件的完整配置及详细注释，适用于自定义权限、注册 Java 活动（Activity）、广播接收器以及加载 Qt 模块资源等场景。</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">张博豪</div><div class="author-info-description">18292971228</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhishuyouling7766"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="mailto:zbh18292971228@gmail.com" target="_blank" title="Google Email"><i class="fas fa-envelope" style="color: #000000;"></i></a><a class="social-icon" href="mailto:1932732463@qq.com" target="_blank" title="QQ Email"><i class="fab fa-qq" style="color: #000000;"></i></a><a class="social-icon" href="tel:+18292971228" target="_blank" title="telephone"><i class="fas fa-phone" style="color: #000000;"></i></a><a class="social-icon" href="https://butterfly.js.org/" target="_blank" title="Butterfly官方文档"><i class="fas fa-paperclip" style="color: #000000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">由于浏览器缓存策略问题（为了快速的页面加载），博客内容可能无法自动获取更新，如有需求，请使用Ctrl+F5强制刷新页面，获取最新内容！！！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%A0%B8%E5%BF%83%E5%8C%BA%E5%88%AB%E6%80%BB%E8%A7%88"><span class="toc-number">1.</span> <span class="toc-text">一、核心区别总览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81QThread-%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%94%A8%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">二、QThread 传统线程用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E9%80%BB%E8%BE%91%E5%AF%B9%E8%B1%A1%E4%B8%8E%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.1.</span> <span class="toc-text">1. 创建逻辑对象与线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E7%89%B9%E7%82%B9"><span class="toc-number">2.2.</span> <span class="toc-text">✅ 特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%BA%BF%E7%A8%8B%E6%B1%A0-QThreadPool-QRunnable-%E6%9C%BA%E5%88%B6"><span class="toc-number">3.</span> <span class="toc-text">三、线程池 QThreadPool + QRunnable 机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">3.1.</span> <span class="toc-text">✅ 基本结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E7%89%B9%E7%82%B9-1"><span class="toc-number">3.2.</span> <span class="toc-text">✅ 特点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%93%8C%E9%87%8D%E7%82%B9"><span class="toc-number">3.3.</span> <span class="toc-text">📌重点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E4%B8%BB%E7%BA%BF%E7%A8%8B%E5%AF%B9%E8%B1%A1%E7%9A%84%E8%AE%BF%E9%97%AE%E4%B8%8E-QMetaObject-invokeMethod"><span class="toc-number">4.</span> <span class="toc-text">四、主线程对象的访问与 QMetaObject::invokeMethod</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E8%AF%AD%E6%B3%95%E7%BB%93%E6%9E%84"><span class="toc-number">4.1.</span> <span class="toc-text">✅ 语法结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90"><span class="toc-number">4.2.</span> <span class="toc-text">✅ 参数解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86"><span class="toc-number">4.3.</span> <span class="toc-text">✅ 执行原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E7%A4%BA%E4%BE%8B"><span class="toc-number">4.4.</span> <span class="toc-text">✅ 示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%93%8C%E9%87%8D%E7%82%B9-1"><span class="toc-number">4.5.</span> <span class="toc-text">📌重点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%80%A7%E8%AF%B4%E6%98%8E"><span class="toc-number">5.</span> <span class="toc-text">五、线程安全性说明</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E5%AD%90%E7%BA%BF%E7%A8%8B%E4%B8%AD%E5%8F%AF%E5%AE%89%E5%85%A8%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="toc-number">5.1.</span> <span class="toc-text">✅ 子线程中可安全操作：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9A%A0%EF%B8%8F-%E9%9C%80%E8%A6%81%E5%8A%A0%E9%94%81%E7%9A%84%E6%83%85%E5%86%B5%EF%BC%9A"><span class="toc-number">5.2.</span> <span class="toc-text">⚠️ 需要加锁的情况：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9D%8C-%E4%B8%A5%E7%A6%81%E5%AD%90%E7%BA%BF%E7%A8%8B%E4%B8%AD%E7%9B%B4%E6%8E%A5%E6%93%8D%E4%BD%9C%E4%B8%BB%E7%BA%BF%E7%A8%8B-UI%EF%BC%9A"><span class="toc-number">5.3.</span> <span class="toc-text">❌ 严禁子线程中直接操作主线程 UI：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E4%BF%A1%E5%8F%B7%E6%A7%BD-%E8%B7%A8%E7%BA%BF%E7%A8%8B%E9%80%9A%E4%BF%A1-%E8%A6%81%E7%82%B9%E5%A3%B0%E6%98%8E"><span class="toc-number">6.</span> <span class="toc-text">六、信号槽 跨线程通信 要点声明</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E8%B7%A8%E7%BA%BF%E7%A8%8B%E9%80%9A%E4%BF%A1%E6%97%B6%EF%BC%8C%E9%A1%BB%E4%BD%BF%E7%94%A8-Qt-QueuedConnection-%E5%BC%BA%E5%88%B6%E6%8E%92%E9%98%9F%E8%B0%83%E7%94%A8%E6%A7%BD%E5%87%BD%E6%95%B0"><span class="toc-number">6.1.</span> <span class="toc-text">✅ 跨线程通信时，须使用 Qt::QueuedConnection 强制排队调用槽函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9A%A0%EF%B8%8F-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%BC%BA%E5%88%B6%E6%8E%92%E9%98%9F%EF%BC%9A"><span class="toc-number">6.2.</span> <span class="toc-text">⚠️ 为什么需要强制排队：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%9C%85-%E5%B8%B8%E8%A7%81%E8%BF%9E%E6%8E%A5%E7%B1%BB%E5%9E%8B%E8%A7%A3%E9%87%8A"><span class="toc-number">6.3.</span> <span class="toc-text">✅ 常见连接类型解释</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93%E5%BB%BA%E8%AE%AE"><span class="toc-number">7.</span> <span class="toc-text">七、总结建议</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/" title="Qt 传统线程与线程池机制对比总结"><img src="/img/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 传统线程与线程池机制对比总结"/></a><div class="content"><a class="title" href="/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/" title="Qt 传统线程与线程池机制对比总结">Qt 传统线程与线程池机制对比总结</a><time datetime="2025-06-13T16:00:00.000Z" title="发表于 2025-06-14 00:00:00">2025-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案"><img src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案"/></a><div class="content"><a class="title" href="/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案">Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案</a><time datetime="2025-04-01T16:00:00.000Z" title="发表于 2025-04-02 00:00:00">2025-04-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Hexo 博客部署 GitHub 失败解决方案"><img src="/img/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hexo 博客部署 GitHub 失败解决方案"/></a><div class="content"><a class="title" href="/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Hexo 博客部署 GitHub 失败解决方案">Hexo 博客部署 GitHub 失败解决方案</a><time datetime="2025-03-24T16:00:00.000Z" title="发表于 2025-03-25 00:00:00">2025-03-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/09/qt_android_jni/" title="Qt for Android 使用 JNI 的完整指南"><img src="/img/qt_android_jni.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt for Android 使用 JNI 的完整指南"/></a><div class="content"><a class="title" href="/2025/03/09/qt_android_jni/" title="Qt for Android 使用 JNI 的完整指南">Qt for Android 使用 JNI 的完整指南</a><time datetime="2025-03-08T16:00:00.000Z" title="发表于 2025-03-09 00:00:00">2025-03-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启"><img src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt项目在Android系统环境下实现开机自启"/></a><div class="content"><a class="title" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启">Qt项目在Android系统环境下实现开机自启</a><time datetime="2025-03-03T16:00:00.000Z" title="发表于 2025-03-04 00:00:00">2025-03-04</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By 张博豪</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天" style="display:none"><i class="fas fa-message"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script>(() => {
+  window.$crisp = ['safe', true]
+  window.CRISP_WEBSITE_ID = "ab0f1555-16af-410e-9dd6-3f87be0b2664"
+
+  btf.getScript('https://client.crisp.chat/l.js').then(() => {
+    const isChatBtn = true
+    const isChatHideShow = false
+
+    if (isChatBtn) {
+      const open = () => {
+        $crisp.push(["do", "chat:show"])
+        $crisp.push(["do", "chat:open"])
+      }
+
+      const close = () => $crisp.push(["do", "chat:hide"])
+
+      close()
+
+      $crisp.push(["on", "chat:closed", close])
+
+      window.chatBtnFn = () => $crisp.is("chat:visible") ? close() : open()
+
+      document.getElementById('chat-btn').style.display = 'block'
+    } else if (isChatHideShow) {
+      window.chatBtn = {
+        hide: () => $crisp.push(["do", "chat:hide"]),
+        show: () => $crisp.push(["do", "chat:show"])
+      }
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
