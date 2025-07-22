@@ -104,83 +104,22 @@
       </tags>
   </entry>
   <entry>
-    <title>GitHub 项目创建与本地同步管理</title>
-    <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
-    <content><![CDATA[<blockquote>
-<p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
-</blockquote>
-<hr>
-<h2 id="🔧-准备工具"><a href="#🔧-准备工具" class="headerlink" title="🔧 准备工具"></a>🔧 准备工具</h2><p>在开始前，请确认你已具备以下工具环境：</p>
-<ul>
-<li><p>✅ 已注册 <a href="https://github.com/">GitHub</a> 账号</p>
-</li>
-<li><p>✅ 已安装 Git 工具（推荐安装 <a href="https://git-scm.com/download/win">Git for Windows</a>）</p>
-</li>
-<li><p>✅ 已安装 nodejs（推荐安装 <a href="https://nodejs.org/en/">nodejs</a>）(<a href="https://www.cnblogs.com/liuqiyun/p/8133904.html">Node.js安装及环境配置之Windows篇</a>)</p>
-</li>
-<li><p>✅ 管理员运行cmd，依次输入,完成环境验证</p>
-<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v（node安装后附带）</span><br><span class="line">git -v</span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<h2 id="一、GitHub-创建新仓库"><a href="#一、GitHub-创建新仓库" class="headerlink" title="一、GitHub 创建新仓库"></a>一、GitHub 创建新仓库</h2><ol>
-<li><p>登录 <a href="https://github.com/">GitHub</a></p>
-</li>
-<li><p>点击右上角 → <code>New repository</code></p>
-</li>
-<li><p>仓库名称填：<code>myProject</code></p>
-</li>
-<li><p>不勾选 <code>Initialize with a README</code>（保持为空仓库）</p>
-</li>
-<li><p>创建成功后会看到仓库地址：<br><code>https://github.com/GithubUserName/myGithubProject.git</code></p>
-</li>
-</ol>
-<hr>
-<h2 id="二、本地初始化-Git-项目并上传"><a href="#二、本地初始化-Git-项目并上传" class="headerlink" title="二、本地初始化 Git 项目并上传"></a>二、本地初始化 Git 项目并上传</h2><h3 id="在-Git-Bash-执行以下命令："><a href="#在-Git-Bash-执行以下命令：" class="headerlink" title="在 Git Bash 执行以下命令："></a>在 Git Bash 执行以下命令：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /项目本地存储的地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git 仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 README 文件（可选）(GitHub创建新仓库若勾选Initialize with a README无需该项)</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;# myGithubProject&quot;</span> &gt;&gt; README.md</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部文件添加到 Git 缓存区</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库，并为该次提交添加备注</span></span><br><span class="line">git commit -m <span class="string">&quot;初始化GitHub项目&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认分支为 main</span></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加远程仓库地址（SSH 方式）(需先为本机配置ssh密钥)</span></span><br><span class="line">git remote add origin git@github.com:GithubUserName/myGithubProject.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送到 GitHub（第一次）</span></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+    <title>Hello World</title>
+    <url>/2025/02/16/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
-<hr>
-<h2 id="三、配置-SSH-密钥（推荐）"><a href="#三、配置-SSH-密钥（推荐）" class="headerlink" title="三、配置 SSH 密钥（推荐）"></a>三、配置 SSH 密钥（推荐）</h2><p>避免每次 push 都输入密码，建议使用 SSH：</p>
-<h3 id="1-检查是否已有密钥："><a href="#1-检查是否已有密钥：" class="headerlink" title="1. 检查是否已有密钥："></a>1. 检查是否已有密钥：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> ~/.ssh</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
 
-<p>如有 <code>id_rsa</code> 和 <code>id_rsa.pub</code>，可跳过生成步骤。</p>
-<h3 id="2-生成新密钥（如无）："><a href="#2-生成新密钥（如无）：" class="headerlink" title="2. 生成新密钥（如无）："></a>2. 生成新密钥（如无）：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;邮箱地址&quot;</span></span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
 
-<p>一路回车生成。</p>
-<h3 id="3-添加到-GitHub："><a href="#3-添加到-GitHub：" class="headerlink" title="3. 添加到 GitHub："></a>3. 添加到 GitHub：</h3><ul>
-<li>打开 GitHub → Settings → SSH and GPG Keys → New SSH Key</li>
-<li>将 <code>C:\Users\用户名\ .ssh/id_rsa.pub</code> 内容复制粘贴进去</li>
-</ul>
-<h3 id="4-测试连接是否成功："><a href="#4-测试连接是否成功：" class="headerlink" title="4. 测试连接是否成功："></a>4. 测试连接是否成功：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
 
-<p>输出成功即配置完成。</p>
-<hr>
-<h2 id="四、后续上传资源流程"><a href="#四、后续上传资源流程" class="headerlink" title="四、后续上传资源流程"></a>四、后续上传资源流程</h2><p>每次更新本地资源，只需执行：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;更新说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="五、可选：添加-gitignore-文件"><a href="#五、可选：添加-gitignore-文件" class="headerlink" title="五、可选：添加 .gitignore 文件"></a>五、可选：添加 .gitignore 文件</h2><p>为避免上传无用文件，可添加 <code>.gitignore</code> 文件内容如下：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">*.<span class="built_in">log</span>           <span class="comment"># 忽略所有 .log 结尾的日志文件</span></span><br><span class="line">node_modules/   <span class="comment"># 忽略 node_modules 目录（前端项目常用）</span></span><br><span class="line">.DS_Store       <span class="comment"># 忽略 macOS 系统的临时文件</span></span><br><span class="line">Thumbs.db       <span class="comment"># 忽略 Windows 系统缩略图缓存</span></span><br><span class="line">*.tmp           <span class="comment"># 忽略所有 .tmp 临时文件</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-小贴士"><a href="#✅-小贴士" class="headerlink" title="✅ 小贴士"></a>✅ 小贴士</h2><ul>
-<li><p>GitHub 上文件比本地多时，先执行：  </p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull --rebase origin main</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看远程仓库地址：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote -v</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看提交历史：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<p>以上就是完整的GitHub项目创建与管理流程</p>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-        <tag>GitHub</tag>
-      </tags>
   </entry>
   <entry>
     <title>Qt项目在Android系统环境下实现开机自启</title>
@@ -261,105 +200,6 @@
       <tags>
         <tag>QT for Android</tag>
         <tag>QT</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2025/02/16/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Hexo 博客部署 GitHub 失败解决方案</title>
-    <url>/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
-    <content><![CDATA[<blockquote>
-<p>Hexo 博客部署 GitHub Pages 出现 无法更新 甚至404错误 的完整排查与修复记录（含 .nojekyll + Actions 冲突）</p>
-</blockquote>
-<hr>
-<h2 id="📌-背景"><a href="#📌-背景" class="headerlink" title="📌 背景"></a>📌 背景</h2><p>在使用 Hexo 部署静态博客到 GitHub Pages 的过程中，虽然本地 <code>hexo g &amp;&amp; hexo d</code> 执行成功，但访问 <code>https://用户名.github.io/</code> 却发现没有更新，甚至出现 404 错误。</p>
-<hr>
-<h2 id="💥-遇到的问题"><a href="#💥-遇到的问题" class="headerlink" title="💥 遇到的问题"></a>💥 遇到的问题</h2><h3 id="❌-GitHub-Actions-自动部署失败"><a href="#❌-GitHub-Actions-自动部署失败" class="headerlink" title="❌ GitHub Actions 自动部署失败"></a>❌ GitHub Actions 自动部署失败</h3><p>错误如下：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Error: Getting Pages deployment status failed</span><br><span class="line">Error: HttpError: Server Error</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="🧨-问题症状"><a href="#🧨-问题症状" class="headerlink" title="🧨 问题症状"></a>🧨 问题症状</h2><ul>
-<li>页面提示：<code>404 - There isn&#39;t a GitHub Pages site here.</code></li>
-<li>GitHub Actions 中的 <code>pages-build-deployment</code> 多次失败</li>
-<li>GitHub Pages 设置正确，使用的是 <code>main</code> 分支 + <code>/ (root)</code></li>
-<li>本地 Hexo 部署成功，<code>public/</code> 目录文件也正常生成</li>
-</ul>
-<hr>
-<h2 id="🧠-问题原因总结"><a href="#🧠-问题原因总结" class="headerlink" title="🧠 问题原因总结"></a>🧠 问题原因总结</h2><h3 id="✅-问题-1：GitHub-默认使用-Jekyll-构建"><a href="#✅-问题-1：GitHub-默认使用-Jekyll-构建" class="headerlink" title="✅ 问题 1：GitHub 默认使用 Jekyll 构建"></a>✅ 问题 1：GitHub 默认使用 Jekyll 构建</h3><p>Hexo 是静态文件，不需要 Jekyll。但 GitHub 默认认为你的站点是用 Jekyll 构建的，导致：</p>
-<ul>
-<li>部分页面不停的构建失败</li>
-<li>原因未知，部分页面可以完成构建，部分将失败，这部分是失败的构建将使当此部署失败</li>
-</ul>
-<hr>
-<h2 id="✅-解决方案步骤"><a href="#✅-解决方案步骤" class="headerlink" title="✅ 解决方案步骤"></a>✅ 解决方案步骤</h2><h3 id="🔧-步骤-1：创建-nojekyll-文件"><a href="#🔧-步骤-1：创建-nojekyll-文件" class="headerlink" title="🔧 步骤 1：创建 .nojekyll 文件"></a>🔧 步骤 1：创建 <code>.nojekyll</code> 文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> &gt; <span class="built_in">source</span>/.nojekyll</span><br></pre></td></tr></table></figure>
-
-<p>或者在 <code>source/</code> 目录下手动新建一个 <code>.nojekyll</code> 空文件。</p>
-<p>该文件为空白文件，意思为声明该目录不需要github进行Jekyll 构建。</p>
-<hr>
-<h3 id="🔧-步骤-2：配置-Hexo-自动包含-nojekyll"><a href="#🔧-步骤-2：配置-Hexo-自动包含-nojekyll" class="headerlink" title="🔧 步骤 2：配置 Hexo 自动包含 .nojekyll"></a>🔧 步骤 2：配置 Hexo 自动包含 <code>.nojekyll</code></h3><p>打开 Hexo 根目录下的 <code>_config.yml</code>，添加：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">include:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">.nojekyll</span></span><br></pre></td></tr></table></figure>
-
-<p>这一步非常关键！它能让 Hexo 构建时自动将 <code>.nojekyll</code> 拷贝进 <code>public/</code> 目录。</p>
-<hr>
-<h3 id="🔧-步骤-3：重新构建并部署"><a href="#🔧-步骤-3：重新构建并部署" class="headerlink" title="🔧 步骤 3：重新构建并部署"></a>🔧 步骤 3：重新构建并部署</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>- </p>
-<hr>
-<h2 id="✅-最终效果"><a href="#✅-最终效果" class="headerlink" title="✅ 最终效果"></a>✅ 最终效果</h2><ul>
-<li><code>https://用户名.github.io/</code> 正常加载页面</li>
-<li>GitHub Pages 不再报错</li>
-<li>所有 Hexo 静态资源都被正确部署并可访问</li>
-</ul>
-<hr>
-<h2 id="✨-总结"><a href="#✨-总结" class="headerlink" title="✨ 总结"></a>✨ 总结</h2><table>
-<thead>
-<tr>
-<th>配置项</th>
-<th>是否完成</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>.nojekyll</code> 文件</td>
-<td>✅</td>
-<td>禁用 Jekyll</td>
-</tr>
-<tr>
-<td><code>include:</code> 配置</td>
-<td>✅</td>
-<td>确保 <code>.nojekyll</code> 被打包到 public</td>
-</tr>
-<tr>
-<td>Pages 源设置</td>
-<td>✅</td>
-<td>main 分支 + &#x2F; 根目录</td>
-</tr>
-</tbody></table>
-<hr>
-<p>🚀 <strong>部署成功的关键在于 <code>.nojekyll + include 配置</code>，一旦设置完毕，即可跳过所有 Jekyll 和 Actions 的构建干扰。</strong></p>
-]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>GitHub</tag>
       </tags>
   </entry>
   <entry>
@@ -451,6 +291,87 @@
       <tags>
         <tag>QT</tag>
         <tag>QT_UI</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo 博客部署 GitHub 失败解决方案</title>
+    <url>/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<blockquote>
+<p>Hexo 博客部署 GitHub Pages 出现 无法更新 甚至404错误 的完整排查与修复记录（含 .nojekyll + Actions 冲突）</p>
+</blockquote>
+<hr>
+<h2 id="📌-背景"><a href="#📌-背景" class="headerlink" title="📌 背景"></a>📌 背景</h2><p>在使用 Hexo 部署静态博客到 GitHub Pages 的过程中，虽然本地 <code>hexo g &amp;&amp; hexo d</code> 执行成功，但访问 <code>https://用户名.github.io/</code> 却发现没有更新，甚至出现 404 错误。</p>
+<hr>
+<h2 id="💥-遇到的问题"><a href="#💥-遇到的问题" class="headerlink" title="💥 遇到的问题"></a>💥 遇到的问题</h2><h3 id="❌-GitHub-Actions-自动部署失败"><a href="#❌-GitHub-Actions-自动部署失败" class="headerlink" title="❌ GitHub Actions 自动部署失败"></a>❌ GitHub Actions 自动部署失败</h3><p>错误如下：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Error: Getting Pages deployment status failed</span><br><span class="line">Error: HttpError: Server Error</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧨-问题症状"><a href="#🧨-问题症状" class="headerlink" title="🧨 问题症状"></a>🧨 问题症状</h2><ul>
+<li>页面提示：<code>404 - There isn&#39;t a GitHub Pages site here.</code></li>
+<li>GitHub Actions 中的 <code>pages-build-deployment</code> 多次失败</li>
+<li>GitHub Pages 设置正确，使用的是 <code>main</code> 分支 + <code>/ (root)</code></li>
+<li>本地 Hexo 部署成功，<code>public/</code> 目录文件也正常生成</li>
+</ul>
+<hr>
+<h2 id="🧠-问题原因总结"><a href="#🧠-问题原因总结" class="headerlink" title="🧠 问题原因总结"></a>🧠 问题原因总结</h2><h3 id="✅-问题-1：GitHub-默认使用-Jekyll-构建"><a href="#✅-问题-1：GitHub-默认使用-Jekyll-构建" class="headerlink" title="✅ 问题 1：GitHub 默认使用 Jekyll 构建"></a>✅ 问题 1：GitHub 默认使用 Jekyll 构建</h3><p>Hexo 是静态文件，不需要 Jekyll。但 GitHub 默认认为你的站点是用 Jekyll 构建的，导致：</p>
+<ul>
+<li>部分页面不停的构建失败</li>
+<li>原因未知，部分页面可以完成构建，部分将失败，这部分是失败的构建将使当此部署失败</li>
+</ul>
+<hr>
+<h2 id="✅-解决方案步骤"><a href="#✅-解决方案步骤" class="headerlink" title="✅ 解决方案步骤"></a>✅ 解决方案步骤</h2><h3 id="🔧-步骤-1：创建-nojekyll-文件"><a href="#🔧-步骤-1：创建-nojekyll-文件" class="headerlink" title="🔧 步骤 1：创建 .nojekyll 文件"></a>🔧 步骤 1：创建 <code>.nojekyll</code> 文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> &gt; <span class="built_in">source</span>/.nojekyll</span><br></pre></td></tr></table></figure>
+
+<p>或者在 <code>source/</code> 目录下手动新建一个 <code>.nojekyll</code> 空文件。</p>
+<p>该文件为空白文件，意思为声明该目录不需要github进行Jekyll 构建。</p>
+<hr>
+<h3 id="🔧-步骤-2：配置-Hexo-自动包含-nojekyll"><a href="#🔧-步骤-2：配置-Hexo-自动包含-nojekyll" class="headerlink" title="🔧 步骤 2：配置 Hexo 自动包含 .nojekyll"></a>🔧 步骤 2：配置 Hexo 自动包含 <code>.nojekyll</code></h3><p>打开 Hexo 根目录下的 <code>_config.yml</code>，添加：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">include:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">.nojekyll</span></span><br></pre></td></tr></table></figure>
+
+<p>这一步非常关键！它能让 Hexo 构建时自动将 <code>.nojekyll</code> 拷贝进 <code>public/</code> 目录。</p>
+<hr>
+<h3 id="🔧-步骤-3：重新构建并部署"><a href="#🔧-步骤-3：重新构建并部署" class="headerlink" title="🔧 步骤 3：重新构建并部署"></a>🔧 步骤 3：重新构建并部署</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>- </p>
+<hr>
+<h2 id="✅-最终效果"><a href="#✅-最终效果" class="headerlink" title="✅ 最终效果"></a>✅ 最终效果</h2><ul>
+<li><code>https://用户名.github.io/</code> 正常加载页面</li>
+<li>GitHub Pages 不再报错</li>
+<li>所有 Hexo 静态资源都被正确部署并可访问</li>
+</ul>
+<hr>
+<h2 id="✨-总结"><a href="#✨-总结" class="headerlink" title="✨ 总结"></a>✨ 总结</h2><table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>是否完成</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.nojekyll</code> 文件</td>
+<td>✅</td>
+<td>禁用 Jekyll</td>
+</tr>
+<tr>
+<td><code>include:</code> 配置</td>
+<td>✅</td>
+<td>确保 <code>.nojekyll</code> 被打包到 public</td>
+</tr>
+<tr>
+<td>Pages 源设置</td>
+<td>✅</td>
+<td>main 分支 + &#x2F; 根目录</td>
+</tr>
+</tbody></table>
+<hr>
+<p>🚀 <strong>部署成功的关键在于 <code>.nojekyll + include 配置</code>，一旦设置完毕，即可跳过所有 Jekyll 和 Actions 的构建干扰。</strong></p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>GitHub</tag>
       </tags>
   </entry>
   <entry>
@@ -672,6 +593,85 @@
       </tags>
   </entry>
   <entry>
+    <title>GitHub 项目创建与本地同步管理</title>
+    <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
+    <content><![CDATA[<blockquote>
+<p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
+</blockquote>
+<hr>
+<h2 id="🔧-准备工具"><a href="#🔧-准备工具" class="headerlink" title="🔧 准备工具"></a>🔧 准备工具</h2><p>在开始前，请确认你已具备以下工具环境：</p>
+<ul>
+<li><p>✅ 已注册 <a href="https://github.com/">GitHub</a> 账号</p>
+</li>
+<li><p>✅ 已安装 Git 工具（推荐安装 <a href="https://git-scm.com/download/win">Git for Windows</a>）</p>
+</li>
+<li><p>✅ 已安装 nodejs（推荐安装 <a href="https://nodejs.org/en/">nodejs</a>）(<a href="https://www.cnblogs.com/liuqiyun/p/8133904.html">Node.js安装及环境配置之Windows篇</a>)</p>
+</li>
+<li><p>✅ 管理员运行cmd，依次输入,完成环境验证</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v（node安装后附带）</span><br><span class="line">git -v</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="一、GitHub-创建新仓库"><a href="#一、GitHub-创建新仓库" class="headerlink" title="一、GitHub 创建新仓库"></a>一、GitHub 创建新仓库</h2><ol>
+<li><p>登录 <a href="https://github.com/">GitHub</a></p>
+</li>
+<li><p>点击右上角 → <code>New repository</code></p>
+</li>
+<li><p>仓库名称填：<code>myProject</code></p>
+</li>
+<li><p>不勾选 <code>Initialize with a README</code>（保持为空仓库）</p>
+</li>
+<li><p>创建成功后会看到仓库地址：<br><code>https://github.com/GithubUserName/myGithubProject.git</code></p>
+</li>
+</ol>
+<hr>
+<h2 id="二、本地初始化-Git-项目并上传"><a href="#二、本地初始化-Git-项目并上传" class="headerlink" title="二、本地初始化 Git 项目并上传"></a>二、本地初始化 Git 项目并上传</h2><h3 id="在-Git-Bash-执行以下命令："><a href="#在-Git-Bash-执行以下命令：" class="headerlink" title="在 Git Bash 执行以下命令："></a>在 Git Bash 执行以下命令：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /项目本地存储的地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git 仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 README 文件（可选）(GitHub创建新仓库若勾选Initialize with a README无需该项)</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;# myGithubProject&quot;</span> &gt;&gt; README.md</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部文件添加到 Git 缓存区</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库，并为该次提交添加备注</span></span><br><span class="line">git commit -m <span class="string">&quot;初始化GitHub项目&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认分支为 main</span></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加远程仓库地址（SSH 方式）(需先为本机配置ssh密钥)</span></span><br><span class="line">git remote add origin git@github.com:GithubUserName/myGithubProject.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送到 GitHub（第一次）</span></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、配置-SSH-密钥（推荐）"><a href="#三、配置-SSH-密钥（推荐）" class="headerlink" title="三、配置 SSH 密钥（推荐）"></a>三、配置 SSH 密钥（推荐）</h2><p>避免每次 push 都输入密码，建议使用 SSH：</p>
+<h3 id="1-检查是否已有密钥："><a href="#1-检查是否已有密钥：" class="headerlink" title="1. 检查是否已有密钥："></a>1. 检查是否已有密钥：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> ~/.ssh</span><br></pre></td></tr></table></figure>
+
+<p>如有 <code>id_rsa</code> 和 <code>id_rsa.pub</code>，可跳过生成步骤。</p>
+<h3 id="2-生成新密钥（如无）："><a href="#2-生成新密钥（如无）：" class="headerlink" title="2. 生成新密钥（如无）："></a>2. 生成新密钥（如无）：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;邮箱地址&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>一路回车生成。</p>
+<h3 id="3-添加到-GitHub："><a href="#3-添加到-GitHub：" class="headerlink" title="3. 添加到 GitHub："></a>3. 添加到 GitHub：</h3><ul>
+<li>打开 GitHub → Settings → SSH and GPG Keys → New SSH Key</li>
+<li>将 <code>C:\Users\用户名\ .ssh/id_rsa.pub</code> 内容复制粘贴进去</li>
+</ul>
+<h3 id="4-测试连接是否成功："><a href="#4-测试连接是否成功：" class="headerlink" title="4. 测试连接是否成功："></a>4. 测试连接是否成功：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p>输出成功即配置完成。</p>
+<hr>
+<h2 id="四、后续上传资源流程"><a href="#四、后续上传资源流程" class="headerlink" title="四、后续上传资源流程"></a>四、后续上传资源流程</h2><p>每次更新本地资源，只需执行：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;更新说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、可选：添加-gitignore-文件"><a href="#五、可选：添加-gitignore-文件" class="headerlink" title="五、可选：添加 .gitignore 文件"></a>五、可选：添加 .gitignore 文件</h2><p>为避免上传无用文件，可添加 <code>.gitignore</code> 文件内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">*.<span class="built_in">log</span>           <span class="comment"># 忽略所有 .log 结尾的日志文件</span></span><br><span class="line">node_modules/   <span class="comment"># 忽略 node_modules 目录（前端项目常用）</span></span><br><span class="line">.DS_Store       <span class="comment"># 忽略 macOS 系统的临时文件</span></span><br><span class="line">Thumbs.db       <span class="comment"># 忽略 Windows 系统缩略图缓存</span></span><br><span class="line">*.tmp           <span class="comment"># 忽略所有 .tmp 临时文件</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-小贴士"><a href="#✅-小贴士" class="headerlink" title="✅ 小贴士"></a>✅ 小贴士</h2><ul>
+<li><p>GitHub 上文件比本地多时，先执行：  </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull --rebase origin main</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看远程仓库地址：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote -v</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看提交历史：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<p>以上就是完整的GitHub项目创建与管理流程</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>GitHub</tag>
+        <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Qt 传统线程与线程池机制对比总结</title>
     <url>/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/</url>
     <content><![CDATA[<blockquote>
@@ -756,30 +756,41 @@
 </li>
 </ul>
 <hr>
-<h2 id="四、主线程对象的访问与-QMetaObject-invokeMethod"><a href="#四、主线程对象的访问与-QMetaObject-invokeMethod" class="headerlink" title="四、主线程对象的访问与 QMetaObject::invokeMethod"></a>四、主线程对象的访问与 QMetaObject::invokeMethod</h2><h3 id="✅-语法结构"><a href="#✅-语法结构" class="headerlink" title="✅ 语法结构"></a>✅ 语法结构</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QMetaObject::<span class="built_in">invokeMethod</span>(mainObj, <span class="string">&quot;updateUI&quot;</span>, Qt::QueuedConnection, <span class="built_in">Q_ARG</span>(QString, result));</span><br></pre></td></tr></table></figure>
+<h2 id="四、主线程对象的访问与-QMetaObject-invokeMethod"><a href="#四、主线程对象的访问与-QMetaObject-invokeMethod" class="headerlink" title="四、主线程对象的访问与 QMetaObject::invokeMethod"></a>四、主线程对象的访问与 QMetaObject::invokeMethod</h2><h3 id="✅-语法结构"><a href="#✅-语法结构" class="headerlink" title="✅ 语法结构"></a>✅ 语法结构</h3><p>无返回值多参调用：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">QMetaObject::<span class="built_in">invokeMethod</span>(mainObj, <span class="string">&quot;update&quot;</span>, </span><br><span class="line">                          Qt::QueuedConnection,</span><br><span class="line">                          <span class="built_in">Q_ARG</span>(QString, <span class="string">&quot;参数一&quot;</span>),</span><br><span class="line">                          <span class="built_in">Q_ARG</span>(QString, <span class="string">&quot;参数二&quot;</span>),</span><br><span class="line">                          <span class="built_in">Q_ARG</span>(<span class="type">int</span>, <span class="number">3</span>),</span><br><span class="line">                          <span class="built_in">Q_ARG</span>(<span class="type">float</span>, <span class="literal">true</span>));</span><br></pre></td></tr></table></figure>
+<p>有返回值调用：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">QString result;</span><br><span class="line"><span class="type">bool</span> success = QMetaObject::<span class="built_in">invokeMethod</span>(targetObj, <span class="string">&quot;getProcessedString&quot;</span>,</span><br><span class="line">                                         Qt::BlockingQueuedConnection,</span><br><span class="line">                                         <span class="built_in">Q_RETURN_ARG</span>(QString, result),</span><br><span class="line">                                         <span class="built_in">Q_ARG</span>(QString, <span class="string">&quot;参数一&quot;</span>));</span><br></pre></td></tr></table></figure>
 
 <h3 id="✅-参数解析"><a href="#✅-参数解析" class="headerlink" title="✅ 参数解析"></a>✅ 参数解析</h3><table>
 <thead>
 <tr>
 <th>参数</th>
-<th>说明</th>
+<th align="left">说明</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><code>mainObj</code></td>
-<td>主线程中的 QObject 派生对象指针</td>
+<td align="left">主线程中的 QObject 派生对象指针</td>
 </tr>
 <tr>
-<td><code>&quot;updateUI&quot;</code></td>
-<td>要调用的槽函数名（必须是 slot 或 Q_INVOKABLE）</td>
+<td><code>&quot;update&quot;</code></td>
+<td align="left">要调用的槽函数名<br />（必须是 slot 或 Q_INVOKABLE 即函数被 public slots: 声明 ）</td>
 </tr>
 <tr>
 <td><code>Qt::QueuedConnection</code></td>
-<td>跨线程排队执行</td>
+<td align="left">跨线程排队执行</td>
 </tr>
 <tr>
 <td><code>Q_ARG(QString, result)</code></td>
-<td>参数类型和值封装</td>
+<td align="left">参数类型和值封装</td>
+</tr>
+<tr>
+<td><code>Qt::BlockingQueuedConnection</code></td>
+<td align="left">跨线程排队执行  带返回值</td>
+</tr>
+<tr>
+<td><code>Q_RETURN_ARG(QString, result)</code></td>
+<td align="left">返回值类型和值封装</td>
 </tr>
 </tbody></table>
 <h3 id="✅-执行原理"><a href="#✅-执行原理" class="headerlink" title="✅ 执行原理"></a>✅ 执行原理</h3><ul>
