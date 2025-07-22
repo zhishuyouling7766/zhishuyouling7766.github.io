@@ -104,87 +104,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Qt项目在Android系统环境下实现开机自启</title>
-    <url>/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/</url>
-    <content><![CDATA[<blockquote>
-<p>本文记录如何在 Qt for Android 项目中，实现应用 <strong>随系统开机自动启动</strong> 的功能，适用于设备控制、工控系统等常驻应用场景。</p>
-</blockquote>
-<hr>
-<h2 id="🧩-实现思路概述"><a href="#🧩-实现思路概述" class="headerlink" title="🧩 实现思路概述"></a>🧩 实现思路概述</h2><ol>
-<li><strong>新建一个 <code>BroadcastReceiver</code> 类</strong>，用于监听系统开机广播（<code>BOOT_COMPLETED</code>）。</li>
-<li><strong>接收到广播后，启动主界面 <code>JBmsActivity</code></strong>，它继承自 <code>QtActivity</code>，自动调用 Qt C++ 层的 <code>main()</code> 函数。</li>
-<li><strong>在 <code>AndroidManifest.xml</code> 中声明权限和注册广播接收器</strong>。</li>
-</ol>
-<hr>
-<h2 id="✅-步骤一：新建-BootReceiver-java（监听开机广播）"><a href="#✅-步骤一：新建-BootReceiver-java（监听开机广播）" class="headerlink" title="✅ 步骤一：新建 BootReceiver.java（监听开机广播）"></a>✅ 步骤一：新建 BootReceiver.java（监听开机广播）</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.qtproject.example.activityhandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.BroadcastReceiver;</span><br><span class="line"><span class="keyword">import</span> android.content.Context;</span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 广播接收器类，用于监听 BOOT_COMPLETED 广播（开机完成）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BootReceiver</span> <span class="keyword">extends</span> <span class="title class_">BroadcastReceiver</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 启动 Qt 主界面（JBmsActivity）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">startApp</span><span class="params">(Context context, Intent intent)</span> &#123;</span><br><span class="line">        Log.d(<span class="string">&quot;BootReceiver&quot;</span>, <span class="string">&quot;启动QT应用&quot;</span>);</span><br><span class="line">        <span class="type">Intent</span> <span class="variable">splashIntent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(context, JBmsActivity.class);</span><br><span class="line">        splashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); <span class="comment">// 必须设置此标志，否则会抛异常</span></span><br><span class="line">        context.startActivity(splashIntent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收广播事件</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onReceive</span><span class="params">(Context context, Intent intent)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) &#123;</span><br><span class="line">            startApp(context, intent); <span class="comment">// 收到系统广播后启动应用</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-步骤二：创建-Qt-启动-Activity（JBmsActivity）"><a href="#✅-步骤二：创建-Qt-启动-Activity（JBmsActivity）" class="headerlink" title="✅ 步骤二：创建 Qt 启动 Activity（JBmsActivity）"></a>✅ 步骤二：创建 Qt 启动 Activity（JBmsActivity）</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.qtproject.example.activityhandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.os.Build;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.net.Uri;</span><br><span class="line"><span class="keyword">import</span> android.provider.Settings;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> org.qtproject.qt5.android.bindings.QtActivity;</span><br><span class="line"></span><br><span class="line"><span class="comment">// JBmsActivity 是 Qt 的启动 Activity，继承 QtActivity 后会触发 Qt 的 main()</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JBmsActivity</span> <span class="keyword">extends</span> <span class="title class_">QtActivity</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">TAG</span> <span class="operator">=</span> <span class="string">&quot;JBmsActivity&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(Bundle savedInstanceState)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 检查是否拥有悬浮窗权限（部分国产系统需要）</span></span><br><span class="line">        <span class="keyword">if</span> (!Settings.canDrawOverlays(<span class="built_in">this</span>)) &#123;</span><br><span class="line">            <span class="type">Intent</span> <span class="variable">intent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);</span><br><span class="line">            intent.setData(Uri.parse(<span class="string">&quot;package:&quot;</span> + getPackageName()));</span><br><span class="line">            startActivityForResult(intent, <span class="number">0</span>); <span class="comment">// 请求权限</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        hideBottomUIMenu(); <span class="comment">// 设置全屏沉浸式模式</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 页面恢复时重新隐藏虚拟按键</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onResume</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onResume();</span><br><span class="line">        hideBottomUIMenu();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置沉浸式全屏，隐藏底部导航栏</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">hideBottomUIMenu</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">int</span> flags;</span><br><span class="line">        <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.KITKAT) &#123;</span><br><span class="line">            flags = View.SYSTEM_UI_FLAG_FULLSCREEN</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;</span><br><span class="line">        &#125;</span><br><span class="line">        getWindow().getDecorView().setSystemUiVisibility(flags);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收权限申请结果</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onActivityResult</span><span class="params">(<span class="type">int</span> requestCode, <span class="type">int</span> resultCode, Intent data)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (requestCode == <span class="number">0</span> &amp;&amp; Settings.canDrawOverlays(<span class="built_in">this</span>)) &#123;</span><br><span class="line">            Log.i(TAG, <span class="string">&quot;悬浮窗权限已授权&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">super</span>.onActivityResult(requestCode, resultCode, data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-步骤三：AndroidManifest-xml-配置"><a href="#✅-步骤三：AndroidManifest-xml-配置" class="headerlink" title="✅ 步骤三：AndroidManifest.xml 配置"></a>✅ 步骤三：AndroidManifest.xml 配置</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">&quot;org.qtproject.example.activityhandler&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 开机广播权限 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 悬浮窗权限 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.SYSTEM_ALERT_WINDOW&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">android:label</span>=<span class="string">&quot;@string/app_name&quot;</span> <span class="attr">android:icon</span>=<span class="string">&quot;@mipmap/ic_launcher&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- Qt 启动 Activity --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.JBmsActivity&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:label</span>=<span class="string">&quot;My Qt App&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:configChanges</span>=<span class="string">&quot;orientation|screenSize|keyboardHidden&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:launchMode</span>=<span class="string">&quot;singleTop&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:theme</span>=<span class="string">&quot;@android:style/Theme.NoTitleBar.Fullscreen&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:screenOrientation</span>=<span class="string">&quot;portrait&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.MAIN&quot;</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.LAUNCHER&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- 启动广播监听器 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">receiver</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:name</span>=<span class="string">&quot;.BootReceiver&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:enabled</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:exported</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:permission</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="🧠-启动流程图（简述）"><a href="#🧠-启动流程图（简述）" class="headerlink" title="🧠 启动流程图（简述）"></a>🧠 启动流程图（简述）</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">设备开机</span><br><span class="line">  ↓</span><br><span class="line">发送 BOOT_COMPLETED 广播</span><br><span class="line">  ↓</span><br><span class="line">BootReceiver 接收 → 启动 JBmsActivity</span><br><span class="line">  ↓</span><br><span class="line">JBmsActivity 继承 QtActivity → 自动启动 Qt 的 main()</span><br><span class="line">  ↓</span><br><span class="line">Qt 应用开始运行</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-注意事项"><a href="#✅-注意事项" class="headerlink" title="✅ 注意事项"></a>✅ 注意事项</h2><ul>
-<li>Android 8.0+ 要求：应用必须 <strong>手动启动过一次</strong> 才能接收 BOOT_COMPLETED</li>
-<li>悬浮窗权限属于特殊权限，用户必须手动授权</li>
-<li>在国产 ROM 中可能还需手动加入“自启白名单”</li>
-</ul>
-<hr>
-<p>本文适用于基于 Qt 5&#x2F;6 的 Android 项目，如需搭配 JNI 与原生服务还可扩展 Service 保活策略。</p>
-<hr>
-<h2 id="🧠-JBmsActivity-就是-Android-下的-Qt-启动“main-函数入口”"><a href="#🧠-JBmsActivity-就是-Android-下的-Qt-启动“main-函数入口”" class="headerlink" title="🧠 JBmsActivity 就是 Android 下的 Qt 启动“main 函数入口”"></a>🧠 JBmsActivity 就是 Android 下的 Qt 启动“main 函数入口”</h2><p>在桌面 Qt 应用中，我们通常通过 <code>main()</code> 函数作为程序入口：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line">    MainWindow w;</span><br><span class="line">    w.<span class="built_in">show</span>();</span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>但在 Android 平台，Qt 应用无法直接从 <code>main()</code> 启动，而是依赖 Android 的启动机制：</p>
-<table>
-<thead>
-<tr>
-<th>桌面 Qt</th>
-<th>Android Qt</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>直接运行 <code>main()</code></td>
-<td>系统启动 <code>JBmsActivity</code></td>
-</tr>
-<tr>
-<td><code>main()</code> 由开发者控制</td>
-<td><code>main()</code> 被 QtActivity 通过 JNI 间接调用</td>
-</tr>
-<tr>
-<td>生命周期在 C++ 控制</td>
-<td>生命周期由 Java 层控制，可 hook 各阶段逻辑</td>
-</tr>
-</tbody></table>
-<p>因此，<code>JBmsActivity</code>：</p>
-<ul>
-<li>是系统启动 Qt 的第一站；</li>
-<li>可以用来检查权限、加载配置；</li>
-<li>可以控制是否进入 Qt 主程序；</li>
-<li>是控制整个程序生命周期的重要位置；</li>
-<li>类似“Android 环境下的 main 函数守门人”。</li>
-</ul>
-<p>你也可以选择在 <code>JBmsActivity</code> 里根据业务逻辑决定：</p>
-<ul>
-<li>是否直接启动 Qt；</li>
-<li>延迟进入 Qt；</li>
-<li>或者根本不进入 Qt，仅运行 Java 层逻辑。</li>
-</ul>
-<p>这使得 <code>JBmsActivity</code> 成为 Android Qt 项目的关键入口点。</p>
-]]></content>
-      <categories>
-        <category>QT实例</category>
-      </categories>
-      <tags>
-        <tag>QT for Android</tag>
-        <tag>QT</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>GitHub 项目创建与本地同步管理</title>
     <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
     <content><![CDATA[<blockquote>
@@ -264,103 +183,85 @@
       </tags>
   </entry>
   <entry>
-    <title>Hexo 博客部署 GitHub 失败解决方案</title>
-    <url>/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <title>Qt项目在Android系统环境下实现开机自启</title>
+    <url>/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/</url>
     <content><![CDATA[<blockquote>
-<p>Hexo 博客部署 GitHub Pages 出现 无法更新 甚至404错误 的完整排查与修复记录（含 .nojekyll + Actions 冲突）</p>
+<p>本文记录如何在 Qt for Android 项目中，实现应用 <strong>随系统开机自动启动</strong> 的功能，适用于设备控制、工控系统等常驻应用场景。</p>
 </blockquote>
 <hr>
-<h2 id="📌-背景"><a href="#📌-背景" class="headerlink" title="📌 背景"></a>📌 背景</h2><p>在使用 Hexo 部署静态博客到 GitHub Pages 的过程中，虽然本地 <code>hexo g &amp;&amp; hexo d</code> 执行成功，但访问 <code>https://用户名.github.io/</code> 却发现没有更新，甚至出现 404 错误。</p>
+<h2 id="🧩-实现思路概述"><a href="#🧩-实现思路概述" class="headerlink" title="🧩 实现思路概述"></a>🧩 实现思路概述</h2><ol>
+<li><strong>新建一个 <code>BroadcastReceiver</code> 类</strong>，用于监听系统开机广播（<code>BOOT_COMPLETED</code>）。</li>
+<li><strong>接收到广播后，启动主界面 <code>JBmsActivity</code></strong>，它继承自 <code>QtActivity</code>，自动调用 Qt C++ 层的 <code>main()</code> 函数。</li>
+<li><strong>在 <code>AndroidManifest.xml</code> 中声明权限和注册广播接收器</strong>。</li>
+</ol>
 <hr>
-<h2 id="💥-遇到的问题"><a href="#💥-遇到的问题" class="headerlink" title="💥 遇到的问题"></a>💥 遇到的问题</h2><h3 id="❌-GitHub-Actions-自动部署失败"><a href="#❌-GitHub-Actions-自动部署失败" class="headerlink" title="❌ GitHub Actions 自动部署失败"></a>❌ GitHub Actions 自动部署失败</h3><p>错误如下：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Error: Getting Pages deployment status failed</span><br><span class="line">Error: HttpError: Server Error</span><br></pre></td></tr></table></figure>
+<h2 id="✅-步骤一：新建-BootReceiver-java（监听开机广播）"><a href="#✅-步骤一：新建-BootReceiver-java（监听开机广播）" class="headerlink" title="✅ 步骤一：新建 BootReceiver.java（监听开机广播）"></a>✅ 步骤一：新建 BootReceiver.java（监听开机广播）</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.qtproject.example.activityhandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.BroadcastReceiver;</span><br><span class="line"><span class="keyword">import</span> android.content.Context;</span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 广播接收器类，用于监听 BOOT_COMPLETED 广播（开机完成）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BootReceiver</span> <span class="keyword">extends</span> <span class="title class_">BroadcastReceiver</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 启动 Qt 主界面（JBmsActivity）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">startApp</span><span class="params">(Context context, Intent intent)</span> &#123;</span><br><span class="line">        Log.d(<span class="string">&quot;BootReceiver&quot;</span>, <span class="string">&quot;启动QT应用&quot;</span>);</span><br><span class="line">        <span class="type">Intent</span> <span class="variable">splashIntent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(context, JBmsActivity.class);</span><br><span class="line">        splashIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); <span class="comment">// 必须设置此标志，否则会抛异常</span></span><br><span class="line">        context.startActivity(splashIntent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收广播事件</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onReceive</span><span class="params">(Context context, Intent intent)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) &#123;</span><br><span class="line">            startApp(context, intent); <span class="comment">// 收到系统广播后启动应用</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <hr>
-<h2 id="🧨-问题症状"><a href="#🧨-问题症状" class="headerlink" title="🧨 问题症状"></a>🧨 问题症状</h2><ul>
-<li>页面提示：<code>404 - There isn&#39;t a GitHub Pages site here.</code></li>
-<li>GitHub Actions 中的 <code>pages-build-deployment</code> 多次失败</li>
-<li>GitHub Pages 设置正确，使用的是 <code>main</code> 分支 + <code>/ (root)</code></li>
-<li>本地 Hexo 部署成功，<code>public/</code> 目录文件也正常生成</li>
+<h2 id="✅-步骤二：创建-Qt-启动-Activity（JBmsActivity）"><a href="#✅-步骤二：创建-Qt-启动-Activity（JBmsActivity）" class="headerlink" title="✅ 步骤二：创建 Qt 启动 Activity（JBmsActivity）"></a>✅ 步骤二：创建 Qt 启动 Activity（JBmsActivity）</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.qtproject.example.activityhandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.os.Build;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.net.Uri;</span><br><span class="line"><span class="keyword">import</span> android.provider.Settings;</span><br><span class="line"><span class="keyword">import</span> android.util.Log;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> org.qtproject.qt5.android.bindings.QtActivity;</span><br><span class="line"></span><br><span class="line"><span class="comment">// JBmsActivity 是 Qt 的启动 Activity，继承 QtActivity 后会触发 Qt 的 main()</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JBmsActivity</span> <span class="keyword">extends</span> <span class="title class_">QtActivity</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">TAG</span> <span class="operator">=</span> <span class="string">&quot;JBmsActivity&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(Bundle savedInstanceState)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 检查是否拥有悬浮窗权限（部分国产系统需要）</span></span><br><span class="line">        <span class="keyword">if</span> (!Settings.canDrawOverlays(<span class="built_in">this</span>)) &#123;</span><br><span class="line">            <span class="type">Intent</span> <span class="variable">intent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);</span><br><span class="line">            intent.setData(Uri.parse(<span class="string">&quot;package:&quot;</span> + getPackageName()));</span><br><span class="line">            startActivityForResult(intent, <span class="number">0</span>); <span class="comment">// 请求权限</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        hideBottomUIMenu(); <span class="comment">// 设置全屏沉浸式模式</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 页面恢复时重新隐藏虚拟按键</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onResume</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onResume();</span><br><span class="line">        hideBottomUIMenu();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置沉浸式全屏，隐藏底部导航栏</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">hideBottomUIMenu</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">int</span> flags;</span><br><span class="line">        <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.KITKAT) &#123;</span><br><span class="line">            flags = View.SYSTEM_UI_FLAG_FULLSCREEN</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION</span><br><span class="line">                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;</span><br><span class="line">        &#125;</span><br><span class="line">        getWindow().getDecorView().setSystemUiVisibility(flags);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收权限申请结果</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onActivityResult</span><span class="params">(<span class="type">int</span> requestCode, <span class="type">int</span> resultCode, Intent data)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (requestCode == <span class="number">0</span> &amp;&amp; Settings.canDrawOverlays(<span class="built_in">this</span>)) &#123;</span><br><span class="line">            Log.i(TAG, <span class="string">&quot;悬浮窗权限已授权&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">super</span>.onActivityResult(requestCode, resultCode, data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-步骤三：AndroidManifest-xml-配置"><a href="#✅-步骤三：AndroidManifest-xml-配置" class="headerlink" title="✅ 步骤三：AndroidManifest.xml 配置"></a>✅ 步骤三：AndroidManifest.xml 配置</h2><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">package</span>=<span class="string">&quot;org.qtproject.example.activityhandler&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 开机广播权限 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 悬浮窗权限 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">&quot;android.permission.SYSTEM_ALERT_WINDOW&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">application</span> <span class="attr">android:label</span>=<span class="string">&quot;@string/app_name&quot;</span> <span class="attr">android:icon</span>=<span class="string">&quot;@mipmap/ic_launcher&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- Qt 启动 Activity --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">&quot;.JBmsActivity&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:label</span>=<span class="string">&quot;My Qt App&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:configChanges</span>=<span class="string">&quot;orientation|screenSize|keyboardHidden&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:launchMode</span>=<span class="string">&quot;singleTop&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:theme</span>=<span class="string">&quot;@android:style/Theme.NoTitleBar.Fullscreen&quot;</span></span></span><br><span class="line"><span class="tag">                  <span class="attr">android:screenOrientation</span>=<span class="string">&quot;portrait&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.MAIN&quot;</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.LAUNCHER&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">activity</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- 启动广播监听器 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">receiver</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:name</span>=<span class="string">&quot;.BootReceiver&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:enabled</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:exported</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">android:permission</span>=<span class="string">&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.BOOT_COMPLETED&quot;</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">application</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧠-启动流程图（简述）"><a href="#🧠-启动流程图（简述）" class="headerlink" title="🧠 启动流程图（简述）"></a>🧠 启动流程图（简述）</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">设备开机</span><br><span class="line">  ↓</span><br><span class="line">发送 BOOT_COMPLETED 广播</span><br><span class="line">  ↓</span><br><span class="line">BootReceiver 接收 → 启动 JBmsActivity</span><br><span class="line">  ↓</span><br><span class="line">JBmsActivity 继承 QtActivity → 自动启动 Qt 的 main()</span><br><span class="line">  ↓</span><br><span class="line">Qt 应用开始运行</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-注意事项"><a href="#✅-注意事项" class="headerlink" title="✅ 注意事项"></a>✅ 注意事项</h2><ul>
+<li>Android 8.0+ 要求：应用必须 <strong>手动启动过一次</strong> 才能接收 BOOT_COMPLETED</li>
+<li>悬浮窗权限属于特殊权限，用户必须手动授权</li>
+<li>在国产 ROM 中可能还需手动加入“自启白名单”</li>
 </ul>
 <hr>
-<h2 id="🧠-问题原因总结"><a href="#🧠-问题原因总结" class="headerlink" title="🧠 问题原因总结"></a>🧠 问题原因总结</h2><h3 id="✅-问题-1：GitHub-默认使用-Jekyll-构建"><a href="#✅-问题-1：GitHub-默认使用-Jekyll-构建" class="headerlink" title="✅ 问题 1：GitHub 默认使用 Jekyll 构建"></a>✅ 问题 1：GitHub 默认使用 Jekyll 构建</h3><p>Hexo 是静态文件，不需要 Jekyll。但 GitHub 默认认为你的站点是用 Jekyll 构建的，导致：</p>
-<ul>
-<li>部分页面不停的构建失败</li>
-<li>原因未知，部分页面可以完成构建，部分将失败，这部分是失败的构建将使当此部署失败</li>
-</ul>
+<p>本文适用于基于 Qt 5&#x2F;6 的 Android 项目，如需搭配 JNI 与原生服务还可扩展 Service 保活策略。</p>
 <hr>
-<h2 id="✅-解决方案步骤"><a href="#✅-解决方案步骤" class="headerlink" title="✅ 解决方案步骤"></a>✅ 解决方案步骤</h2><h3 id="🔧-步骤-1：创建-nojekyll-文件"><a href="#🔧-步骤-1：创建-nojekyll-文件" class="headerlink" title="🔧 步骤 1：创建 .nojekyll 文件"></a>🔧 步骤 1：创建 <code>.nojekyll</code> 文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> &gt; <span class="built_in">source</span>/.nojekyll</span><br></pre></td></tr></table></figure>
+<h2 id="🧠-JBmsActivity-就是-Android-下的-Qt-启动“main-函数入口”"><a href="#🧠-JBmsActivity-就是-Android-下的-Qt-启动“main-函数入口”" class="headerlink" title="🧠 JBmsActivity 就是 Android 下的 Qt 启动“main 函数入口”"></a>🧠 JBmsActivity 就是 Android 下的 Qt 启动“main 函数入口”</h2><p>在桌面 Qt 应用中，我们通常通过 <code>main()</code> 函数作为程序入口：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line">    MainWindow w;</span><br><span class="line">    w.<span class="built_in">show</span>();</span><br><span class="line">    <span class="keyword">return</span> app.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>或者在 <code>source/</code> 目录下手动新建一个 <code>.nojekyll</code> 空文件。</p>
-<p>该文件为空白文件，意思为声明该目录不需要github进行Jekyll 构建。</p>
-<hr>
-<h3 id="🔧-步骤-2：配置-Hexo-自动包含-nojekyll"><a href="#🔧-步骤-2：配置-Hexo-自动包含-nojekyll" class="headerlink" title="🔧 步骤 2：配置 Hexo 自动包含 .nojekyll"></a>🔧 步骤 2：配置 Hexo 自动包含 <code>.nojekyll</code></h3><p>打开 Hexo 根目录下的 <code>_config.yml</code>，添加：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">include:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">.nojekyll</span></span><br></pre></td></tr></table></figure>
-
-<p>这一步非常关键！它能让 Hexo 构建时自动将 <code>.nojekyll</code> 拷贝进 <code>public/</code> 目录。</p>
-<hr>
-<h3 id="🔧-步骤-3：重新构建并部署"><a href="#🔧-步骤-3：重新构建并部署" class="headerlink" title="🔧 步骤 3：重新构建并部署"></a>🔧 步骤 3：重新构建并部署</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>- </p>
-<hr>
-<h2 id="✅-最终效果"><a href="#✅-最终效果" class="headerlink" title="✅ 最终效果"></a>✅ 最终效果</h2><ul>
-<li><code>https://用户名.github.io/</code> 正常加载页面</li>
-<li>GitHub Pages 不再报错</li>
-<li>所有 Hexo 静态资源都被正确部署并可访问</li>
-</ul>
-<hr>
-<h2 id="✨-总结"><a href="#✨-总结" class="headerlink" title="✨ 总结"></a>✨ 总结</h2><table>
+<p>但在 Android 平台，Qt 应用无法直接从 <code>main()</code> 启动，而是依赖 Android 的启动机制：</p>
+<table>
 <thead>
 <tr>
-<th>配置项</th>
-<th>是否完成</th>
-<th>说明</th>
+<th>桌面 Qt</th>
+<th>Android Qt</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>.nojekyll</code> 文件</td>
-<td>✅</td>
-<td>禁用 Jekyll</td>
+<td>直接运行 <code>main()</code></td>
+<td>系统启动 <code>JBmsActivity</code></td>
 </tr>
 <tr>
-<td><code>include:</code> 配置</td>
-<td>✅</td>
-<td>确保 <code>.nojekyll</code> 被打包到 public</td>
+<td><code>main()</code> 由开发者控制</td>
+<td><code>main()</code> 被 QtActivity 通过 JNI 间接调用</td>
 </tr>
 <tr>
-<td>Pages 源设置</td>
-<td>✅</td>
-<td>main 分支 + &#x2F; 根目录</td>
+<td>生命周期在 C++ 控制</td>
+<td>生命周期由 Java 层控制，可 hook 各阶段逻辑</td>
 </tr>
 </tbody></table>
-<hr>
-<p>🚀 <strong>部署成功的关键在于 <code>.nojekyll + include 配置</code>，一旦设置完毕，即可跳过所有 Jekyll 和 Actions 的构建干扰。</strong></p>
+<p>因此，<code>JBmsActivity</code>：</p>
+<ul>
+<li>是系统启动 Qt 的第一站；</li>
+<li>可以用来检查权限、加载配置；</li>
+<li>可以控制是否进入 Qt 主程序；</li>
+<li>是控制整个程序生命周期的重要位置；</li>
+<li>类似“Android 环境下的 main 函数守门人”。</li>
+</ul>
+<p>你也可以选择在 <code>JBmsActivity</code> 里根据业务逻辑决定：</p>
+<ul>
+<li>是否直接启动 Qt；</li>
+<li>延迟进入 Qt；</li>
+<li>或者根本不进入 Qt，仅运行 Java 层逻辑。</li>
+</ul>
+<p>这使得 <code>JBmsActivity</code> 成为 Android Qt 项目的关键入口点。</p>
 ]]></content>
       <categories>
-        <category>教程</category>
+        <category>QT实例</category>
       </categories>
       <tags>
-        <tag>GitHub</tag>
+        <tag>QT for Android</tag>
+        <tag>QT</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2025/02/16/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
   <entry>
     <title>Qt for Android 使用 JNI 的完整指南</title>
@@ -495,6 +396,87 @@
       </tags>
   </entry>
   <entry>
+    <title>Hexo 博客部署 GitHub 失败解决方案</title>
+    <url>/2025/03/25/hexo_github_%E9%83%A8%E7%BD%B2%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<blockquote>
+<p>Hexo 博客部署 GitHub Pages 出现 无法更新 甚至404错误 的完整排查与修复记录（含 .nojekyll + Actions 冲突）</p>
+</blockquote>
+<hr>
+<h2 id="📌-背景"><a href="#📌-背景" class="headerlink" title="📌 背景"></a>📌 背景</h2><p>在使用 Hexo 部署静态博客到 GitHub Pages 的过程中，虽然本地 <code>hexo g &amp;&amp; hexo d</code> 执行成功，但访问 <code>https://用户名.github.io/</code> 却发现没有更新，甚至出现 404 错误。</p>
+<hr>
+<h2 id="💥-遇到的问题"><a href="#💥-遇到的问题" class="headerlink" title="💥 遇到的问题"></a>💥 遇到的问题</h2><h3 id="❌-GitHub-Actions-自动部署失败"><a href="#❌-GitHub-Actions-自动部署失败" class="headerlink" title="❌ GitHub Actions 自动部署失败"></a>❌ GitHub Actions 自动部署失败</h3><p>错误如下：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Error: Getting Pages deployment status failed</span><br><span class="line">Error: HttpError: Server Error</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧨-问题症状"><a href="#🧨-问题症状" class="headerlink" title="🧨 问题症状"></a>🧨 问题症状</h2><ul>
+<li>页面提示：<code>404 - There isn&#39;t a GitHub Pages site here.</code></li>
+<li>GitHub Actions 中的 <code>pages-build-deployment</code> 多次失败</li>
+<li>GitHub Pages 设置正确，使用的是 <code>main</code> 分支 + <code>/ (root)</code></li>
+<li>本地 Hexo 部署成功，<code>public/</code> 目录文件也正常生成</li>
+</ul>
+<hr>
+<h2 id="🧠-问题原因总结"><a href="#🧠-问题原因总结" class="headerlink" title="🧠 问题原因总结"></a>🧠 问题原因总结</h2><h3 id="✅-问题-1：GitHub-默认使用-Jekyll-构建"><a href="#✅-问题-1：GitHub-默认使用-Jekyll-构建" class="headerlink" title="✅ 问题 1：GitHub 默认使用 Jekyll 构建"></a>✅ 问题 1：GitHub 默认使用 Jekyll 构建</h3><p>Hexo 是静态文件，不需要 Jekyll。但 GitHub 默认认为你的站点是用 Jekyll 构建的，导致：</p>
+<ul>
+<li>部分页面不停的构建失败</li>
+<li>原因未知，部分页面可以完成构建，部分将失败，这部分是失败的构建将使当此部署失败</li>
+</ul>
+<hr>
+<h2 id="✅-解决方案步骤"><a href="#✅-解决方案步骤" class="headerlink" title="✅ 解决方案步骤"></a>✅ 解决方案步骤</h2><h3 id="🔧-步骤-1：创建-nojekyll-文件"><a href="#🔧-步骤-1：创建-nojekyll-文件" class="headerlink" title="🔧 步骤 1：创建 .nojekyll 文件"></a>🔧 步骤 1：创建 <code>.nojekyll</code> 文件</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> &gt; <span class="built_in">source</span>/.nojekyll</span><br></pre></td></tr></table></figure>
+
+<p>或者在 <code>source/</code> 目录下手动新建一个 <code>.nojekyll</code> 空文件。</p>
+<p>该文件为空白文件，意思为声明该目录不需要github进行Jekyll 构建。</p>
+<hr>
+<h3 id="🔧-步骤-2：配置-Hexo-自动包含-nojekyll"><a href="#🔧-步骤-2：配置-Hexo-自动包含-nojekyll" class="headerlink" title="🔧 步骤 2：配置 Hexo 自动包含 .nojekyll"></a>🔧 步骤 2：配置 Hexo 自动包含 <code>.nojekyll</code></h3><p>打开 Hexo 根目录下的 <code>_config.yml</code>，添加：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">include:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">.nojekyll</span></span><br></pre></td></tr></table></figure>
+
+<p>这一步非常关键！它能让 Hexo 构建时自动将 <code>.nojekyll</code> 拷贝进 <code>public/</code> 目录。</p>
+<hr>
+<h3 id="🔧-步骤-3：重新构建并部署"><a href="#🔧-步骤-3：重新构建并部署" class="headerlink" title="🔧 步骤 3：重新构建并部署"></a>🔧 步骤 3：重新构建并部署</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>- </p>
+<hr>
+<h2 id="✅-最终效果"><a href="#✅-最终效果" class="headerlink" title="✅ 最终效果"></a>✅ 最终效果</h2><ul>
+<li><code>https://用户名.github.io/</code> 正常加载页面</li>
+<li>GitHub Pages 不再报错</li>
+<li>所有 Hexo 静态资源都被正确部署并可访问</li>
+</ul>
+<hr>
+<h2 id="✨-总结"><a href="#✨-总结" class="headerlink" title="✨ 总结"></a>✨ 总结</h2><table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>是否完成</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.nojekyll</code> 文件</td>
+<td>✅</td>
+<td>禁用 Jekyll</td>
+</tr>
+<tr>
+<td><code>include:</code> 配置</td>
+<td>✅</td>
+<td>确保 <code>.nojekyll</code> 被打包到 public</td>
+</tr>
+<tr>
+<td>Pages 源设置</td>
+<td>✅</td>
+<td>main 分支 + &#x2F; 根目录</td>
+</tr>
+</tbody></table>
+<hr>
+<p>🚀 <strong>部署成功的关键在于 <code>.nojekyll + include 配置</code>，一旦设置完毕，即可跳过所有 Jekyll 和 Actions 的构建干扰。</strong></p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>GitHub</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>AndroidManifest.xml 配置详解</title>
     <url>/2025/03/03/qt_android_manifest_AndroidManifest%E9%85%8D%E7%BD%AE/</url>
     <content><![CDATA[<blockquote>
@@ -579,5 +561,23 @@
         <tag>QT for Android</tag>
         <tag>QT</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2025/02/16/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
 </search>
