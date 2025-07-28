@@ -1,0 +1,242 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Qt UI 界面无操作超时自动返回首页 | 浮生往事留痕</title><meta name="author" content="张博豪"><meta name="copyright" content="张博豪"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Qt 应用全局计时器功能实现：无操作一段时间后自动返回首页">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qt UI 界面无操作超时自动返回首页">
+<meta property="og:url" content="http://example.com/2025/04/05/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5/index.html">
+<meta property="og:site_name" content="浮生往事留痕">
+<meta property="og:description" content="Qt 应用全局计时器功能实现：无操作一段时间后自动返回首页">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5.png">
+<meta property="article:published_time" content="2025-04-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-04-04T16:00:00.000Z">
+<meta property="article:author" content="张博豪">
+<meta property="article:tag" content="QT">
+<meta property="article:tag" content="QT_UI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Qt UI 界面无操作超时自动返回首页",
+  "url": "http://example.com/2025/04/05/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5/",
+  "image": "http://example.com/img/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5.png",
+  "datePublished": "2025-04-04T16:00:00.000Z",
+  "dateModified": "2025-04-04T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "张博豪",
+      "url": "https://zhishuyouling7766.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/bogFavicon.png"><link rel="canonical" href="http://example.com/2025/04/05/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":250,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-center"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Qt UI 界面无操作超时自动返回首页',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E8%83%8C%E6%99%AF.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">浮生往事留痕</span></a><a class="nav-page-title" href="/"><span class="site-name">Qt UI 界面无操作超时自动返回首页</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Qt UI 界面无操作超时自动返回首页</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-04T16:00:00.000Z" title="发表于 2025-04-05 00:00:00">2025-04-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-04T16:00:00.000Z" title="更新于 2025-04-05 00:00:00">2025-04-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/QT-UI%E9%85%8D%E7%BD%AE/">QT_UI配置</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>本文档介绍如何在 Qt 应用程序中实现“无操作一段时间后自动返回首页”的功能，适用于工业终端、信息展示屏等场景。</p>
+</blockquote>
+<hr>
+<h2 id="🧠-实现原理"><a href="#🧠-实现原理" class="headerlink" title="🧠 实现原理"></a>🧠 实现原理</h2><p>通过自定义 <code>QApplication</code> 类，重载 <code>notify()</code> 方法来监听全局用户操作（如鼠标点击、键盘按键等），每次操作后重置一个计时器。当计时器超时后，触发槽函数自动返回主界面或首页。</p>
+<hr>
+<h2 id="🔧-步骤一：自定义-MyApplication-类"><a href="#🔧-步骤一：自定义-MyApplication-类" class="headerlink" title="🔧 步骤一：自定义 MyApplication 类"></a>🔧 步骤一：自定义 MyApplication 类</h2><figure class="highlight qt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 自定义 QApplication 类，添加全局鼠标点击触发器</span></span><br><span class="line">class <span class="attribute">MyApplication</span> : public <span class="title">QApplication</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="attribute">public</span>:</span><br><span class="line">    MyApplication(<span class="built_in">int</span>&amp; argc, char** argv) : QApplication(argc, argv) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">bool</span> notify(QObject* receiver, QEvent* event) <span class="title">override</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (event-&gt;type() == <span class="attribute">QEvent</span>::MouseButtonPress) &#123; <span class="comment">// 检测鼠标按下事件</span></span><br><span class="line">            QMouseEvent* mouseEvent = static_cast&lt;QMouseEvent*&gt;(event);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果是左键点击事件，重置计时器</span></span><br><span class="line">            <span class="keyword">if</span> (mouseEvent-&gt;buttons() &amp; <span class="attribute">Qt</span>::LeftButton) &#123;</span><br><span class="line">                <span class="keyword">if</span>(overallTimer != nullptr)</span><br><span class="line">                    overallTimer-&gt;start(); <span class="comment">// 重置计时器</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 继续传递事件给父类的 notify() 函数进行处理</span></span><br><span class="line">        <span class="keyword">return</span> <span class="attribute">QApplication</span>::notify(receiver, event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧷-步骤二：main-函数中初始化计时器"><a href="#🧷-步骤二：main-函数中初始化计时器" class="headerlink" title="🧷 步骤二：main 函数中初始化计时器"></a>🧷 步骤二：main 函数中初始化计时器</h2><figure class="highlight qt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//#include &quot;main.h&quot;</span></span><br><span class="line"><span class="comment">//extern QTimer* overallTimer;</span></span><br><span class="line"></span><br><span class="line">QTimer* overallTimer = nullptr; <span class="comment">// 固定时间跳转至首页的计时器</span></span><br><span class="line"><span class="built_in">int</span> main(<span class="built_in">int</span> argc, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    MyApplication app(argc, argv);</span><br><span class="line">    MainWindow w;</span><br><span class="line">    w.show();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化计时器并挂到 app 对象上</span></span><br><span class="line">    overallTimer = <span class="keyword">new</span> QTimer(&amp;app);</span><br><span class="line">    overallTimer-&gt;start(<span class="number">5</span> * <span class="number">60</span> * <span class="number">1000</span>);  <span class="comment">// 启动定时器：5分钟</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 连接超时信号到主窗口的返回首页槽函数</span></span><br><span class="line">    <span class="attribute">QObject</span>::connect(overallTimer, &amp;<span class="attribute">QTimer</span>::timeout, &amp;w, &amp;<span class="attribute">MainWindow</span>::backHomePage);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.exec();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📌-backHomePage-示例（MainWindow-内）"><a href="#📌-backHomePage-示例（MainWindow-内）" class="headerlink" title="📌 backHomePage 示例（MainWindow 内）"></a>📌 backHomePage 示例（MainWindow 内）</h2><figure class="highlight qt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="attribute">MainWindow</span>::backHomePage() &#123;</span><br><span class="line">    <span class="comment">// 获取所有顶层窗口</span></span><br><span class="line">    <span class="keyword">const</span> auto widgets = <span class="attribute">QApplication</span>::topLevelWidgets();</span><br><span class="line">    <span class="keyword">for</span> (QWidget *<span class="attribute">widget</span> : widgets) &#123;</span><br><span class="line">        <span class="comment">// 判断是否为 QDialog 类型</span></span><br><span class="line">        <span class="keyword">if</span> (QDialog *dialog = qobject_cast&lt;QDialog *&gt;(widget)) &#123;</span><br><span class="line">            qDebug() &lt;&lt; <span class="string">&quot;Closing dialog:&quot;</span> &lt;&lt; dialog-&gt;objectName();</span><br><span class="line">            dialog-&gt;close(); <span class="comment">// 关闭对话框</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 实现返回主界面的逻辑</span></span><br><span class="line">    ui-&gt;stackedWidget-&gt;setCurrentIndex(<span class="number">0</span>);</span><br><span class="line">    qDebug() &lt;&lt; <span class="string">&quot;长时间无操作，已返回首页&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-效果总结"><a href="#✅-效果总结" class="headerlink" title="✅ 效果总结"></a>✅ 效果总结</h2><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自动检测</td>
+<td>鼠标、键盘、触摸等输入</td>
+</tr>
+<tr>
+<td>自动重置</td>
+<td>每次交互后自动重置定时器</td>
+</tr>
+<tr>
+<td>超时触发</td>
+<td>一段时间无操作后调用返回首页槽函数</td>
+</tr>
+<tr>
+<td>应用场景</td>
+<td>工控界面、自动售卖机、展览终端等</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="📌-可拓展点"><a href="#📌-可拓展点" class="headerlink" title="📌 可拓展点"></a>📌 可拓展点</h2><ul>
+<li>支持自定义超时时间、配置项持久化</li>
+<li>支持动态阻止自动跳转（如播放视频时暂停倒计时）</li>
+<li>集成状态栏提示“x秒后返回首页”等</li>
+</ul>
+<hr>
+<blockquote>
+<p>本功能适用于 Qt 5&#x2F;6 全平台，推荐用于工业控制和人机交互系统中提升用户体验。</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">张博豪</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">https://zhishuyouling7766.github.io/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">此文章版权归 张博豪 所有，如有转载，请注明来自原作者</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/QT/">QT</a><a class="post-meta__tags" href="/tags/QT-UI/">QT_UI</a></div><div class="post-share"><div class="social-share" data-image="/img/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/04/12/qt_%E4%BC%A0%E7%BB%9F%E6%97%A5%E5%BF%97/" title="Qt 传统日志机制示例解析"><img class="cover" src="/img/qt_%E4%BC%A0%E7%BB%9F%E6%97%A5%E5%BF%97.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Qt 传统日志机制示例解析</div></div><div class="info-2"><div class="info-item-1">本文介绍如何将 Qt 自带的日志（如 `qDebug()`、`qWarning()` 等）重定向到文件保存，并适配多线程环境。</div></div></div></a><a class="pagination-related" href="/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案</div></div><div class="info-2"><div class="info-item-1">在多分辨率或高 DPI 显示器环境下（例如 1080p 与 4K 显示器混用），默认 Qt 的缩放行为可能导致:字体和控件比例不正确</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-02</div><div class="info-item-2">Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案</div></div><div class="info-2"><div class="info-item-1">在多分辨率或高 DPI 显示器环境下（例如 1080p 与 4K 显示器混用），默认 Qt 的缩放行为可能导致:字体和控件比例不正确</div></div></div></a><a class="pagination-related" href="/2025/07/25/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F/" title="Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）"><img class="cover" src="/img/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-25</div><div class="info-item-2">Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）</div></div><div class="info-2"><div class="info-item-1">本说明整理了如何在 Qt Designer 界面中设置首页顶部导航 QMenu 与 QAction，以及它们的关系和属性设置。</div></div></div></a><a class="pagination-related" href="/2025/04/30/C++%20%E4%B8%8E%20Qt%20%E5%AE%8F%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AF%B9%E6%AF%94/" title="C++ 与 Qt 宏机制详解与对比"><img class="cover" src="/img/C++%20%E4%B8%8E%20Qt%20%E5%AE%8F%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AF%B9%E6%AF%94.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-30</div><div class="info-item-2">C++ 与 Qt 宏机制详解与对比</div></div><div class="info-2"><div class="info-item-1">本文档介绍如何在 Qt 定义和运用宏 ， C++的一些常用宏 ， QT标准宏</div></div></div></a><a class="pagination-related" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-04</div><div class="info-item-2">Qt项目在Android系统环境下实现开机自启</div></div><div class="info-2"><div class="info-item-1">Qt for Android 实现开机自启功能（BootReceiver + QtActivity）</div></div></div></a><a class="pagination-related" href="/2025/03/17/qmake_vs_cmake%20%E5%AF%B9%E6%AF%94%E5%88%86%E6%9E%90/" title="qmake vs CMake 对比分析"><img class="cover" src="/img/qmake_vs_cmake%20%E5%AF%B9%E6%AF%94%E5%88%86%E6%9E%90.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-17</div><div class="info-item-2">qmake vs CMake 对比分析</div></div><div class="info-2"><div class="info-item-1">QT两种配置文件qmake和CMake的对比分析与总结</div></div></div></a><a class="pagination-related" href="/2025/03/09/qt_android_jni/" title="Qt for Android 使用 JNI 的完整指南"><img class="cover" src="/img/qt_android_jni.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-09</div><div class="info-item-2">Qt for Android 使用 JNI 的完整指南</div></div><div class="info-2"><div class="info-item-1">本指南记录了如何在 Qt 项目中通过 JNI（Java Native Interface）调用 Android 原生 Java 方法，适用于需要访问系统功能（如 U 盘读写、广播、Activity 启动等）的场景。</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">张博豪</div><div class="author-info-description">18292971228</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhishuyouling7766"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="mailto:zbh18292971228@gmail.com" target="_blank" title="Google Email"><i class="fas fa-envelope" style="color: #646464;"></i></a><a class="social-icon" href="mailto:1932732463@qq.com" target="_blank" title="QQ Email"><i class="fab fa-qq" style="color: #646464;"></i></a><a class="social-icon" href="tel:+18292971228" target="_blank" title="telephone"><i class="fas fa-phone" style="color: #646464;"></i></a><a class="social-icon" href="https://butterfly.js.org/" target="_blank" title="Butterfly官方文档"><i class="fas fa-paperclip" style="color: #646464;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">由于浏览器缓存策略问题（为了快速的页面加载），博客内容可能无法自动获取更新，如有需求，请使用Ctrl+F5强制刷新页面，获取最新内容！！！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%A7%A0-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">🧠 实现原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%A7-%E6%AD%A5%E9%AA%A4%E4%B8%80%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89-MyApplication-%E7%B1%BB"><span class="toc-number">2.</span> <span class="toc-text">🔧 步骤一：自定义 MyApplication 类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%A7%B7-%E6%AD%A5%E9%AA%A4%E4%BA%8C%EF%BC%9Amain-%E5%87%BD%E6%95%B0%E4%B8%AD%E5%88%9D%E5%A7%8B%E5%8C%96%E8%AE%A1%E6%97%B6%E5%99%A8"><span class="toc-number">3.</span> <span class="toc-text">🧷 步骤二：main 函数中初始化计时器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8C-backHomePage-%E7%A4%BA%E4%BE%8B%EF%BC%88MainWindow-%E5%86%85%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">📌 backHomePage 示例（MainWindow 内）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%9C%85-%E6%95%88%E6%9E%9C%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">✅ 效果总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8C-%E5%8F%AF%E6%8B%93%E5%B1%95%E7%82%B9"><span class="toc-number">6.</span> <span class="toc-text">📌 可拓展点</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/07/25/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F/" title="Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）"><img src="/img/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）"/></a><div class="content"><a class="title" href="/2025/07/25/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F/" title="Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）">Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）</a><time datetime="2025-07-24T16:00:00.000Z" title="发表于 2025-07-25 00:00:00">2025-07-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/03/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B/" title="Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结"><img src="/img/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结"/></a><div class="content"><a class="title" href="/2025/07/03/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B/" title="Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结">Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结</a><time datetime="2025-07-02T16:00:00.000Z" title="发表于 2025-07-03 00:00:00">2025-07-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/06/15/%E9%94%81%E6%9C%BA%E5%88%B6%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%AF%A6%E8%A7%A3/" title="锁机制与类型详解（C++ / Qt）"><img src="/img/%E9%94%81%E6%9C%BA%E5%88%B6%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%AF%A6%E8%A7%A3.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="锁机制与类型详解（C++ / Qt）"/></a><div class="content"><a class="title" href="/2025/06/15/%E9%94%81%E6%9C%BA%E5%88%B6%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%AF%A6%E8%A7%A3/" title="锁机制与类型详解（C++ / Qt）">锁机制与类型详解（C++ / Qt）</a><time datetime="2025-06-14T16:00:00.000Z" title="发表于 2025-06-15 00:00:00">2025-06-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/" title="Qt 传统线程与线程池机制对比总结"><img src="/img/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt 传统线程与线程池机制对比总结"/></a><div class="content"><a class="title" href="/2025/06/14/qt_%E4%BC%A0%E7%BB%9F%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B7%AE%E5%BC%82%E6%80%BB%E7%BB%93/" title="Qt 传统线程与线程池机制对比总结">Qt 传统线程与线程池机制对比总结</a><time datetime="2025-06-13T16:00:00.000Z" title="发表于 2025-06-14 00:00:00">2025-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/06/14/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%AD%96%E7%95%A5%E8%AF%A6%E8%A7%A3/" title="多线程中的线程安全策略详解"><img src="/img/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%AD%96%E7%95%A5%E8%AF%A6%E8%A7%A3.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="多线程中的线程安全策略详解"/></a><div class="content"><a class="title" href="/2025/06/14/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%AD%96%E7%95%A5%E8%AF%A6%E8%A7%A3/" title="多线程中的线程安全策略详解">多线程中的线程安全策略详解</a><time datetime="2025-06-13T16:00:00.000Z" title="发表于 2025-06-14 00:00:00">2025-06-14</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By 张博豪</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天" style="display:none"><i class="fas fa-message"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script>(() => {
+  window.$crisp = ['safe', true]
+  window.CRISP_WEBSITE_ID = "ab0f1555-16af-410e-9dd6-3f87be0b2664"
+
+  btf.getScript('https://client.crisp.chat/l.js').then(() => {
+    const isChatBtn = true
+    const isChatHideShow = false
+
+    if (isChatBtn) {
+      const open = () => {
+        $crisp.push(["do", "chat:show"])
+        $crisp.push(["do", "chat:open"])
+      }
+
+      const close = () => $crisp.push(["do", "chat:hide"])
+
+      close()
+
+      $crisp.push(["on", "chat:closed", close])
+
+      window.chatBtnFn = () => $crisp.is("chat:visible") ? close() : open()
+
+      document.getElementById('chat-btn').style.display = 'block'
+    } else if (isChatHideShow) {
+      window.chatBtn = {
+        hide: () => $crisp.push(["do", "chat:hide"]),
+        show: () => $crisp.push(["do", "chat:show"])
+      }
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
