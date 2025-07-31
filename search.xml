@@ -1,109 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Android 应用发布签名 Keystore 文件生成记录</title>
-    <url>/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<blockquote>
-<p>在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 <code>.keystore</code> 是发布阶段的必要步骤。</p>
-</blockquote>
-<hr>
-<h2 id="📌-一、Keystore-的作用"><a href="#📌-一、Keystore-的作用" class="headerlink" title="📌 一、Keystore 的作用"></a>📌 一、Keystore 的作用</h2><ul>
-<li>🔐 <strong>身份认证</strong>：签名表明这个 APK 来自你这个开发者。</li>
-<li>📦 <strong>应用升级绑定</strong>：以后该应用的所有版本必须使用同一个 keystore 签名，否则无法覆盖安装。</li>
-<li>🏪 <strong>应用商店要求</strong>：如 Google Play、华为应用市场等，均强制要求 Release APK 必须签名。</li>
-</ul>
-<hr>
-<h2 id="🧪-二、验证系统是否已安装-JDK-和-keytool"><a href="#🧪-二、验证系统是否已安装-JDK-和-keytool" class="headerlink" title="🧪 二、验证系统是否已安装 JDK 和 keytool"></a>🧪 二、验证系统是否已安装 JDK 和 keytool</h2><p>打开命令行（CMD 或 PowerShell），输入以下命令检查：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line">keytool -<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p>输出示例：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">java version &quot;1.8.0_331&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_331-b09)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.331-b09, mixed mode)</span><br><span class="line"></span><br><span class="line">keytool 选项:</span><br><span class="line">-certreq  生成证书签名请求 (CSR)</span><br><span class="line">-genkey    生成密钥对</span><br><span class="line">-help      显示帮助信息</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p>如果 <code>keytool</code> 无法识别，请确认 JDK 安装路径是否已加入环境变量的 Path 中。</p>
-<hr>
-<h2 id="🧩-三、Keystore-生成命令"><a href="#🧩-三、Keystore-生成命令" class="headerlink" title="🧩 三、Keystore 生成命令"></a>🧩 三、Keystore 生成命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -<span class="built_in">alias</span> my-key-alias -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
-
-<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><table>
-<thead>
-<tr>
-<th>参数</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>-genkey</code></td>
-<td>表示生成密钥对（key pair）</td>
-</tr>
-<tr>
-<td><code>-v</code></td>
-<td>输出详细信息</td>
-</tr>
-<tr>
-<td><code>-keystore</code></td>
-<td>指定输出的 keystore 文件名</td>
-</tr>
-<tr>
-<td><code>-alias</code></td>
-<td>为密钥设置一个别名</td>
-</tr>
-<tr>
-<td><code>-keyalg RSA</code></td>
-<td>使用 RSA 加密算法生成密钥</td>
-</tr>
-<tr>
-<td><code>-keysize 2048</code></td>
-<td>密钥长度为 2048 位</td>
-</tr>
-<tr>
-<td><code>-validity 10000</code></td>
-<td>密钥有效期为 10000 天（约 27 年）</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="🛡️-四、执行后提示填写信息"><a href="#🛡️-四、执行后提示填写信息" class="headerlink" title="🛡️ 四、执行后提示填写信息"></a>🛡️ 四、执行后提示填写信息</h2><p>依次输入以下信息：</p>
-<ol>
-<li>密钥库口令（keystore password）</li>
-<li>姓名（Your first and last name）</li>
-<li>组织单位名（Organizational unit）</li>
-<li>组织名（Organization）</li>
-<li>城市名（City or Locality）</li>
-<li>省份名（State or Province）</li>
-<li>国家代码（Country Code，如 <code>CN</code>）</li>
-<li>确认信息是否正确（输入 <code>是</code> 或 <code>yes</code>）</li>
-<li>可选设置密钥口令（与 keystore 相同可直接回车）</li>
-</ol>
-<hr>
-<h2 id="✅-五、成功结果"><a href="#✅-五、成功结果" class="headerlink" title="✅ 五、成功结果"></a>✅ 五、成功结果</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[正在生成 2048 位 RSA 密钥对，证书采用 SHA256withRSA（有效期为 10000 天）]</span><br><span class="line">[已将密钥库保存到 my-release-key.keystore]</span><br></pre></td></tr></table></figure>
-
-<p>会在当前目录下生成签名文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">my-release-key.keystore</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="🧩-六、在-Qt-Creator-中配置签名"><a href="#🧩-六、在-Qt-Creator-中配置签名" class="headerlink" title="🧩 六、在 Qt Creator 中配置签名"></a>🧩 六、在 Qt Creator 中配置签名</h2><p>在「项目 → 构建与运行 → Android」中设置：</p>
-<ul>
-<li>Keystore 路径：<code>my-release-key.keystore</code></li>
-<li>Store password：刚输入的密钥库口令</li>
-<li>Key alias：<code>my-key-alias</code></li>
-<li>Key password：与密钥库口令一致或另设</li>
-</ul>
-<hr>
-<h2 id="⚠️-七、可选建议：转为-PKCS12-格式（官方建议）"><a href="#⚠️-七、可选建议：转为-PKCS12-格式（官方建议）" class="headerlink" title="⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）"></a>⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="📁-八、Keystore-文件保存建议"><a href="#📁-八、Keystore-文件保存建议" class="headerlink" title="📁 八、Keystore 文件保存建议"></a>📁 八、Keystore 文件保存建议</h2><p>建议将 keystore 文件统一保存至项目目录外安全位置，</p>
-<p>并备份到私密网盘或加密存储设备，防止丢失。</p>
-<hr>
-<p>生成日期：2025-07-21</p>
-]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>QT for Android</tag>
-        <tag>Android</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++ 与 Qt 宏机制详解与对比</title>
     <url>/2025/04/30/C++%20%E4%B8%8E%20Qt%20%E5%AE%8F%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AF%B9%E6%AF%94/</url>
     <content><![CDATA[<blockquote>
@@ -502,6 +399,109 @@
       </tags>
   </entry>
   <entry>
+    <title>Android 应用发布签名 Keystore 文件生成记录</title>
+    <url>/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<blockquote>
+<p>在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 <code>.keystore</code> 是发布阶段的必要步骤。</p>
+</blockquote>
+<hr>
+<h2 id="📌-一、Keystore-的作用"><a href="#📌-一、Keystore-的作用" class="headerlink" title="📌 一、Keystore 的作用"></a>📌 一、Keystore 的作用</h2><ul>
+<li>🔐 <strong>身份认证</strong>：签名表明这个 APK 来自你这个开发者。</li>
+<li>📦 <strong>应用升级绑定</strong>：以后该应用的所有版本必须使用同一个 keystore 签名，否则无法覆盖安装。</li>
+<li>🏪 <strong>应用商店要求</strong>：如 Google Play、华为应用市场等，均强制要求 Release APK 必须签名。</li>
+</ul>
+<hr>
+<h2 id="🧪-二、验证系统是否已安装-JDK-和-keytool"><a href="#🧪-二、验证系统是否已安装-JDK-和-keytool" class="headerlink" title="🧪 二、验证系统是否已安装 JDK 和 keytool"></a>🧪 二、验证系统是否已安装 JDK 和 keytool</h2><p>打开命令行（CMD 或 PowerShell），输入以下命令检查：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line">keytool -<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">java version &quot;1.8.0_331&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_331-b09)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.331-b09, mixed mode)</span><br><span class="line"></span><br><span class="line">keytool 选项:</span><br><span class="line">-certreq  生成证书签名请求 (CSR)</span><br><span class="line">-genkey    生成密钥对</span><br><span class="line">-help      显示帮助信息</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>keytool</code> 无法识别，请确认 JDK 安装路径是否已加入环境变量的 Path 中。</p>
+<hr>
+<h2 id="🧩-三、Keystore-生成命令"><a href="#🧩-三、Keystore-生成命令" class="headerlink" title="🧩 三、Keystore 生成命令"></a>🧩 三、Keystore 生成命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -<span class="built_in">alias</span> my-key-alias -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-genkey</code></td>
+<td>表示生成密钥对（key pair）</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>输出详细信息</td>
+</tr>
+<tr>
+<td><code>-keystore</code></td>
+<td>指定输出的 keystore 文件名</td>
+</tr>
+<tr>
+<td><code>-alias</code></td>
+<td>为密钥设置一个别名</td>
+</tr>
+<tr>
+<td><code>-keyalg RSA</code></td>
+<td>使用 RSA 加密算法生成密钥</td>
+</tr>
+<tr>
+<td><code>-keysize 2048</code></td>
+<td>密钥长度为 2048 位</td>
+</tr>
+<tr>
+<td><code>-validity 10000</code></td>
+<td>密钥有效期为 10000 天（约 27 年）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🛡️-四、执行后提示填写信息"><a href="#🛡️-四、执行后提示填写信息" class="headerlink" title="🛡️ 四、执行后提示填写信息"></a>🛡️ 四、执行后提示填写信息</h2><p>依次输入以下信息：</p>
+<ol>
+<li>密钥库口令（keystore password）</li>
+<li>姓名（Your first and last name）</li>
+<li>组织单位名（Organizational unit）</li>
+<li>组织名（Organization）</li>
+<li>城市名（City or Locality）</li>
+<li>省份名（State or Province）</li>
+<li>国家代码（Country Code，如 <code>CN</code>）</li>
+<li>确认信息是否正确（输入 <code>是</code> 或 <code>yes</code>）</li>
+<li>可选设置密钥口令（与 keystore 相同可直接回车）</li>
+</ol>
+<hr>
+<h2 id="✅-五、成功结果"><a href="#✅-五、成功结果" class="headerlink" title="✅ 五、成功结果"></a>✅ 五、成功结果</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[正在生成 2048 位 RSA 密钥对，证书采用 SHA256withRSA（有效期为 10000 天）]</span><br><span class="line">[已将密钥库保存到 my-release-key.keystore]</span><br></pre></td></tr></table></figure>
+
+<p>会在当前目录下生成签名文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">my-release-key.keystore</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧩-六、在-Qt-Creator-中配置签名"><a href="#🧩-六、在-Qt-Creator-中配置签名" class="headerlink" title="🧩 六、在 Qt Creator 中配置签名"></a>🧩 六、在 Qt Creator 中配置签名</h2><p>在「项目 → 构建与运行 → Android」中设置：</p>
+<ul>
+<li>Keystore 路径：<code>my-release-key.keystore</code></li>
+<li>Store password：刚输入的密钥库口令</li>
+<li>Key alias：<code>my-key-alias</code></li>
+<li>Key password：与密钥库口令一致或另设</li>
+</ul>
+<hr>
+<h2 id="⚠️-七、可选建议：转为-PKCS12-格式（官方建议）"><a href="#⚠️-七、可选建议：转为-PKCS12-格式（官方建议）" class="headerlink" title="⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）"></a>⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📁-八、Keystore-文件保存建议"><a href="#📁-八、Keystore-文件保存建议" class="headerlink" title="📁 八、Keystore 文件保存建议"></a>📁 八、Keystore 文件保存建议</h2><p>建议将 keystore 文件统一保存至项目目录外安全位置，</p>
+<p>并备份到私密网盘或加密存储设备，防止丢失。</p>
+<hr>
+<p>生成日期：2025-07-21</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>QT for Android</tag>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ 枚举类型的深入探究</title>
     <url>/2025/07/21/C++%20%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%A9%B6/</url>
     <content><![CDATA[<blockquote>
@@ -662,85 +662,6 @@
       </categories>
       <tags>
         <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>GitHub 项目创建与本地同步管理</title>
-    <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
-    <content><![CDATA[<blockquote>
-<p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
-</blockquote>
-<hr>
-<h2 id="🔧-准备工具"><a href="#🔧-准备工具" class="headerlink" title="🔧 准备工具"></a>🔧 准备工具</h2><p>在开始前，请确认你已具备以下工具环境：</p>
-<ul>
-<li><p>✅ 已注册 <a href="https://github.com/">GitHub</a> 账号</p>
-</li>
-<li><p>✅ 已安装 Git 工具（推荐安装 <a href="https://git-scm.com/download/win">Git for Windows</a>）</p>
-</li>
-<li><p>✅ 已安装 nodejs（推荐安装 <a href="https://nodejs.org/en/">nodejs</a>）(<a href="https://www.cnblogs.com/liuqiyun/p/8133904.html">Node.js安装及环境配置之Windows篇</a>)</p>
-</li>
-<li><p>✅ 管理员运行cmd，依次输入,完成环境验证</p>
-<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v（node安装后附带）</span><br><span class="line">git -v</span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<h2 id="一、GitHub-创建新仓库"><a href="#一、GitHub-创建新仓库" class="headerlink" title="一、GitHub 创建新仓库"></a>一、GitHub 创建新仓库</h2><ol>
-<li><p>登录 <a href="https://github.com/">GitHub</a></p>
-</li>
-<li><p>点击右上角 → <code>New repository</code></p>
-</li>
-<li><p>仓库名称填：<code>myProject</code></p>
-</li>
-<li><p>不勾选 <code>Initialize with a README</code>（保持为空仓库）</p>
-</li>
-<li><p>创建成功后会看到仓库地址：<br><code>https://github.com/GithubUserName/myGithubProject.git</code></p>
-</li>
-</ol>
-<hr>
-<h2 id="二、本地初始化-Git-项目并上传"><a href="#二、本地初始化-Git-项目并上传" class="headerlink" title="二、本地初始化 Git 项目并上传"></a>二、本地初始化 Git 项目并上传</h2><h3 id="在-Git-Bash-执行以下命令："><a href="#在-Git-Bash-执行以下命令：" class="headerlink" title="在 Git Bash 执行以下命令："></a>在 Git Bash 执行以下命令：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /项目本地存储的地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git 仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 README 文件（可选）(GitHub创建新仓库若勾选Initialize with a README无需该项)</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;# myGithubProject&quot;</span> &gt;&gt; README.md</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部文件添加到 Git 缓存区</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库，并为该次提交添加备注</span></span><br><span class="line">git commit -m <span class="string">&quot;初始化GitHub项目&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认分支为 main</span></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加远程仓库地址（SSH 方式）(需先为本机配置ssh密钥)</span></span><br><span class="line">git remote add origin git@github.com:GithubUserName/myGithubProject.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送到 GitHub（第一次）</span></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="三、配置-SSH-密钥（推荐）"><a href="#三、配置-SSH-密钥（推荐）" class="headerlink" title="三、配置 SSH 密钥（推荐）"></a>三、配置 SSH 密钥（推荐）</h2><p>避免每次 push 都输入密码，建议使用 SSH：</p>
-<h3 id="1-检查是否已有密钥："><a href="#1-检查是否已有密钥：" class="headerlink" title="1. 检查是否已有密钥："></a>1. 检查是否已有密钥：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> ~/.ssh</span><br></pre></td></tr></table></figure>
-
-<p>如有 <code>id_rsa</code> 和 <code>id_rsa.pub</code>，可跳过生成步骤。</p>
-<h3 id="2-生成新密钥（如无）："><a href="#2-生成新密钥（如无）：" class="headerlink" title="2. 生成新密钥（如无）："></a>2. 生成新密钥（如无）：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;邮箱地址&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>一路回车生成。</p>
-<h3 id="3-添加到-GitHub："><a href="#3-添加到-GitHub：" class="headerlink" title="3. 添加到 GitHub："></a>3. 添加到 GitHub：</h3><ul>
-<li>打开 GitHub → Settings → SSH and GPG Keys → New SSH Key</li>
-<li>将 <code>C:\Users\用户名\ .ssh/id_rsa.pub</code> 内容复制粘贴进去</li>
-</ul>
-<h3 id="4-测试连接是否成功："><a href="#4-测试连接是否成功：" class="headerlink" title="4. 测试连接是否成功："></a>4. 测试连接是否成功：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
-
-<p>输出成功即配置完成。</p>
-<hr>
-<h2 id="四、后续上传资源流程"><a href="#四、后续上传资源流程" class="headerlink" title="四、后续上传资源流程"></a>四、后续上传资源流程</h2><p>每次更新本地资源，只需执行：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;更新说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="五、可选：添加-gitignore-文件"><a href="#五、可选：添加-gitignore-文件" class="headerlink" title="五、可选：添加 .gitignore 文件"></a>五、可选：添加 .gitignore 文件</h2><p>为避免上传无用文件，可添加 <code>.gitignore</code> 文件内容如下：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">*.<span class="built_in">log</span>           <span class="comment"># 忽略所有 .log 结尾的日志文件</span></span><br><span class="line">node_modules/   <span class="comment"># 忽略 node_modules 目录（前端项目常用）</span></span><br><span class="line">.DS_Store       <span class="comment"># 忽略 macOS 系统的临时文件</span></span><br><span class="line">Thumbs.db       <span class="comment"># 忽略 Windows 系统缩略图缓存</span></span><br><span class="line">*.tmp           <span class="comment"># 忽略所有 .tmp 临时文件</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-小贴士"><a href="#✅-小贴士" class="headerlink" title="✅ 小贴士"></a>✅ 小贴士</h2><ul>
-<li><p>GitHub 上文件比本地多时，先执行：  </p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull --rebase origin main</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看远程仓库地址：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote -v</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看提交历史：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<p>以上就是完整的GitHub项目创建与管理流程</p>
-]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-        <tag>GitHub</tag>
       </tags>
   </entry>
   <entry>
@@ -1497,6 +1418,85 @@
       </tags>
   </entry>
   <entry>
+    <title>GitHub 项目创建与本地同步管理</title>
+    <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
+    <content><![CDATA[<blockquote>
+<p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
+</blockquote>
+<hr>
+<h2 id="🔧-准备工具"><a href="#🔧-准备工具" class="headerlink" title="🔧 准备工具"></a>🔧 准备工具</h2><p>在开始前，请确认你已具备以下工具环境：</p>
+<ul>
+<li><p>✅ 已注册 <a href="https://github.com/">GitHub</a> 账号</p>
+</li>
+<li><p>✅ 已安装 Git 工具（推荐安装 <a href="https://git-scm.com/download/win">Git for Windows</a>）</p>
+</li>
+<li><p>✅ 已安装 nodejs（推荐安装 <a href="https://nodejs.org/en/">nodejs</a>）(<a href="https://www.cnblogs.com/liuqiyun/p/8133904.html">Node.js安装及环境配置之Windows篇</a>)</p>
+</li>
+<li><p>✅ 管理员运行cmd，依次输入,完成环境验证</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v（node安装后附带）</span><br><span class="line">git -v</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="一、GitHub-创建新仓库"><a href="#一、GitHub-创建新仓库" class="headerlink" title="一、GitHub 创建新仓库"></a>一、GitHub 创建新仓库</h2><ol>
+<li><p>登录 <a href="https://github.com/">GitHub</a></p>
+</li>
+<li><p>点击右上角 → <code>New repository</code></p>
+</li>
+<li><p>仓库名称填：<code>myProject</code></p>
+</li>
+<li><p>不勾选 <code>Initialize with a README</code>（保持为空仓库）</p>
+</li>
+<li><p>创建成功后会看到仓库地址：<br><code>https://github.com/GithubUserName/myGithubProject.git</code></p>
+</li>
+</ol>
+<hr>
+<h2 id="二、本地初始化-Git-项目并上传"><a href="#二、本地初始化-Git-项目并上传" class="headerlink" title="二、本地初始化 Git 项目并上传"></a>二、本地初始化 Git 项目并上传</h2><h3 id="在-Git-Bash-执行以下命令："><a href="#在-Git-Bash-执行以下命令：" class="headerlink" title="在 Git Bash 执行以下命令："></a>在 Git Bash 执行以下命令：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /项目本地存储的地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git 仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 README 文件（可选）(GitHub创建新仓库若勾选Initialize with a README无需该项)</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;# myGithubProject&quot;</span> &gt;&gt; README.md</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部文件添加到 Git 缓存区</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库，并为该次提交添加备注</span></span><br><span class="line">git commit -m <span class="string">&quot;初始化GitHub项目&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认分支为 main</span></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加远程仓库地址（SSH 方式）(需先为本机配置ssh密钥)</span></span><br><span class="line">git remote add origin git@github.com:GithubUserName/myGithubProject.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送到 GitHub（第一次）</span></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、配置-SSH-密钥（推荐）"><a href="#三、配置-SSH-密钥（推荐）" class="headerlink" title="三、配置 SSH 密钥（推荐）"></a>三、配置 SSH 密钥（推荐）</h2><p>避免每次 push 都输入密码，建议使用 SSH：</p>
+<h3 id="1-检查是否已有密钥："><a href="#1-检查是否已有密钥：" class="headerlink" title="1. 检查是否已有密钥："></a>1. 检查是否已有密钥：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> ~/.ssh</span><br></pre></td></tr></table></figure>
+
+<p>如有 <code>id_rsa</code> 和 <code>id_rsa.pub</code>，可跳过生成步骤。</p>
+<h3 id="2-生成新密钥（如无）："><a href="#2-生成新密钥（如无）：" class="headerlink" title="2. 生成新密钥（如无）："></a>2. 生成新密钥（如无）：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;邮箱地址&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>一路回车生成。</p>
+<h3 id="3-添加到-GitHub："><a href="#3-添加到-GitHub：" class="headerlink" title="3. 添加到 GitHub："></a>3. 添加到 GitHub：</h3><ul>
+<li>打开 GitHub → Settings → SSH and GPG Keys → New SSH Key</li>
+<li>将 <code>C:\Users\用户名\ .ssh/id_rsa.pub</code> 内容复制粘贴进去</li>
+</ul>
+<h3 id="4-测试连接是否成功："><a href="#4-测试连接是否成功：" class="headerlink" title="4. 测试连接是否成功："></a>4. 测试连接是否成功：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p>输出成功即配置完成。</p>
+<hr>
+<h2 id="四、后续上传资源流程"><a href="#四、后续上传资源流程" class="headerlink" title="四、后续上传资源流程"></a>四、后续上传资源流程</h2><p>每次更新本地资源，只需执行：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;更新说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、可选：添加-gitignore-文件"><a href="#五、可选：添加-gitignore-文件" class="headerlink" title="五、可选：添加 .gitignore 文件"></a>五、可选：添加 .gitignore 文件</h2><p>为避免上传无用文件，可添加 <code>.gitignore</code> 文件内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">*.<span class="built_in">log</span>           <span class="comment"># 忽略所有 .log 结尾的日志文件</span></span><br><span class="line">node_modules/   <span class="comment"># 忽略 node_modules 目录（前端项目常用）</span></span><br><span class="line">.DS_Store       <span class="comment"># 忽略 macOS 系统的临时文件</span></span><br><span class="line">Thumbs.db       <span class="comment"># 忽略 Windows 系统缩略图缓存</span></span><br><span class="line">*.tmp           <span class="comment"># 忽略所有 .tmp 临时文件</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-小贴士"><a href="#✅-小贴士" class="headerlink" title="✅ 小贴士"></a>✅ 小贴士</h2><ul>
+<li><p>GitHub 上文件比本地多时，先执行：  </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull --rebase origin main</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看远程仓库地址：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote -v</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看提交历史：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<p>以上就是完整的GitHub项目创建与管理流程</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>GitHub</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Qt项目在Android系统环境下实现开机自启</title>
     <url>/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/</url>
     <content><![CDATA[<blockquote>
@@ -1573,8 +1573,8 @@
         <category>QT实例</category>
       </categories>
       <tags>
-        <tag>QT for Android</tag>
         <tag>QT</tag>
+        <tag>QT for Android</tag>
       </tags>
   </entry>
   <entry>
@@ -2349,8 +2349,8 @@
         <category>QT实例</category>
       </categories>
       <tags>
-        <tag>QT for Android</tag>
         <tag>QT</tag>
+        <tag>QT for Android</tag>
       </tags>
   </entry>
   <entry>
@@ -2435,8 +2435,8 @@
         <category>QT实例</category>
       </categories>
       <tags>
-        <tag>QT for Android</tag>
         <tag>QT</tag>
+        <tag>QT for Android</tag>
       </tags>
   </entry>
   <entry>
@@ -2895,6 +2895,113 @@
       </tags>
   </entry>
   <entry>
+    <title>Qt 中实现全局数据与函数的几种方式</title>
+    <url>/2025/04/24/qt_%E5%AE%9E%E7%8E%B0%E5%85%A8%E5%B1%80%E6%95%B0%E6%8D%AE%E4%B8%8E%E5%87%BD%E6%95%B0/</url>
+    <content><![CDATA[<blockquote>
+<p>在 Qt 或 C++ 开发中，全局状态管理是较常见的需求。本文将总结几种常见的全局数据与函数管理方式，并详细说明各自的使用场景、优缺点和示例。</p>
+</blockquote>
+<hr>
+<h2 id="✅-总览：Qt-中全局数据-函数的几种使用方式"><a href="#✅-总览：Qt-中全局数据-函数的几种使用方式" class="headerlink" title="✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式"></a>✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式</h2><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>说明</th>
+<th>是否线程安全</th>
+<th>是否推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1. <code>extern</code> 全局变量</td>
+<td>使用 <code>extern</code> 声明和定义</td>
+<td>❌ 手动加锁</td>
+<td>⚠️ 一般</td>
+</tr>
+<tr>
+<td>2. 静态类成员变量</td>
+<td><code>static</code> 成员归属类本身</td>
+<td>❌ 手动加锁</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>3. 单例模式（Singleton）</td>
+<td>控制对象唯一实例，全局访问</td>
+<td>✅ 可加锁</td>
+<td>✅ 强烈推荐</td>
+</tr>
+<tr>
+<td>4. <code>Q_GLOBAL_STATIC</code></td>
+<td>Qt 宏封装线程安全静态实例</td>
+<td>✅ 线程安全</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>5. <code>qApp</code> 全局访问</td>
+<td>在 QApplication 子类中挂载数据</td>
+<td>⚠️ 依赖 GUI</td>
+<td>⚠️ 有限</td>
+</tr>
+<tr>
+<td>6. 命名空间变量&#x2F;函数</td>
+<td>使用 <code>namespace</code> 组织函数&#x2F;变量</td>
+<td>❌ 手动加锁</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>7. 工具函数</td>
+<td>独立工具函数，Stateless 操作</td>
+<td>✅</td>
+<td>✅ 推荐</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="✅-1-使用-extern-声明全局变量-对象"><a href="#✅-1-使用-extern-声明全局变量-对象" class="headerlink" title="✅ 1. 使用 extern 声明全局变量&#x2F;对象"></a>✅ 1. 使用 <code>extern</code> 声明全局变量&#x2F;对象</h2><h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// globaldata.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;globalclass.h&quot;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> globalCounter; <span class="comment">//变量</span></span><br><span class="line"><span class="keyword">extern</span> GlobalClass *globalClass; <span class="comment">//自定义类类型</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// globaldata.cpp</span></span><br><span class="line"><span class="type">int</span> globalCounter = <span class="number">0</span>;</span><br><span class="line">GlobalClass* globalClass = <span class="keyword">new</span> GlobalClass;</span><br></pre></td></tr></table></figure>
+
+<p><code>extern</code> 声明的全局变量 <strong>不需要写在 <code>main()</code> 函数 文件所在位置</strong>，它可以出现在<strong>所有需要使用这个变量的文件中的全局作用域</strong>，变量的<strong>定义只能有一个</strong>，通常放在一个 <code>.cpp</code> 文件中。</p>
+<p>⚠️extern声明的全局变量是线程不安全的，尽量加锁使用</p>
+<hr>
+<h2 id="✅-2-静态类成员"><a href="#✅-2-静态类成员" class="headerlink" title="✅ 2. 静态类成员"></a>✅ 2. 静态类成员</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AppState</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> counter;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> AppState::counter = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">AppState::reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-3-单例模式（Singleton）"><a href="#✅-3-单例模式（Singleton）" class="headerlink" title="✅ 3. 单例模式（Singleton）"></a>✅ 3. 单例模式（Singleton）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GlobalManager</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> GlobalManager&amp; <span class="title">instance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> GlobalManager inst;</span><br><span class="line">        <span class="keyword">return</span> inst;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">GlobalManager</span>() &#123;&#125;</span><br><span class="line">    <span class="built_in">Q_DISABLE_COPY</span>(GlobalManager)</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">GlobalManager::<span class="built_in">instance</span>().counter++;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-4-使用-Qt-的-Q-GLOBAL-STATIC"><a href="#✅-4-使用-Qt-的-Q-GLOBAL-STATIC" class="headerlink" title="✅ 4. 使用 Qt 的 Q_GLOBAL_STATIC"></a>✅ 4. 使用 Qt 的 <code>Q_GLOBAL_STATIC</code></h2><p><code>Q_GLOBAL_STATIC</code> 是 Qt 提供的一个宏，用于 <strong>创建线程安全的、延迟初始化的全局单例对象</strong>。<br> 它可以在多个 <code>.cpp</code> 文件中安全使用，避免传统静态对象的初始化顺序问题。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(QMap&lt;QString, <span class="type">int</span>&gt;, globalMap)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line">(*<span class="built_in">globalMap</span>())[<span class="string">&quot;apple&quot;</span>] = <span class="number">5</span>; </span><br><span class="line"><span class="comment">//1：括号都是必须的，globalMap() 是一个函数调用，返回的是 QMap&lt;QString, int&gt;* 类型的指针。</span></span><br><span class="line"><span class="comment">//2：*globalMap() 把这个指针解引用，变成 QMap&lt;QString, int&gt;&amp;。</span></span><br><span class="line"><span class="comment">//3：外层括号 (*globalMap()) 是必须加的，否则会出错。</span></span><br><span class="line"><span class="comment">//4：(*globalMap())[&quot;apple&quot;] 访问或创建键 &quot;apple&quot; 的值。</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>⚠️<code>Q_GLOBAL_STATIC</code>创建对象时， <strong>不能附带构造函数参数</strong>，它只支持默认构造函数。如果需要附带参数初始化全局单例，应该用 <strong><code>Q_GLOBAL_STATIC_WITH_ARGS</code></strong>。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(GlobalClass, globalClass) <span class="comment">//GlobalClass 必须有默认构造函数。</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line"><span class="built_in">GlobalClass</span>()-&gt;<span class="built_in">myfunction</span>(<span class="string">&quot;实参&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-5-QApplication-子类-宏-方式"><a href="#✅-5-QApplication-子类-宏-方式" class="headerlink" title="✅ 5. QApplication 子类+宏 方式"></a>✅ 5. QApplication 子类+宏 方式</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//重写QApplication</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyQApplication</span> : <span class="keyword">public</span> QApplication &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    QString userToken;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//main函数初始化构造MyQApplication</span></span><br><span class="line"><span class="function">MyApp <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取当前项目唯一的 MyQApplication 实例 ,定义为宏</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> myApp (static_cast<span class="string">&lt;MyQApplication*&gt;</span>(QCoreApplication::instance()))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//使用宏全局调用</span></span><br><span class="line">myApp-&gt;userToken = <span class="string">&quot;abc123&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-6-命名空间方式"><a href="#✅-6-命名空间方式" class="headerlink" title="✅ 6. 命名空间方式"></a>✅ 6. 命名空间方式</h2><p>⚠️仅支持 C++17 及以上</p>
+<p><strong>inline variables</strong>（内联变量） —— 允许在头文件中定义且只会有一个实例。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Global &#123;</span><br><span class="line">    <span class="keyword">inline</span> <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Global::counter++;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-7-全局工具函数"><a href="#✅-7-全局工具函数" class="headerlink" title="✅ 7. 全局工具函数"></a>✅ 7. 全局工具函数</h2><p>⚠️仅支持 C++17 及以上</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Util &#123;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">log</span><span class="params">(<span class="type">const</span> QString&amp; msg)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;[LOG]&quot;</span> &lt;&lt; msg;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Util::<span class="built_in">log</span>(<span class="string">&quot;App started&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📌-总结建议"><a href="#📌-总结建议" class="headerlink" title="📌 总结建议"></a>📌 总结建议</h2><ul>
+<li>简单数据可用 <code>extern + QMutex</code>；</li>
+<li>多模块共享用 <code>static</code> 成员；</li>
+<li>全局复杂状态推荐用单例；</li>
+<li>轻量线程安全首选 <code>Q_GLOBAL_STATIC</code>；</li>
+<li>GUI 层次可在 QApplication 挂载；</li>
+<li>工具函数、常量组织建议用 <code>namespace</code>。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>QT_知识总结</category>
+      </categories>
+      <tags>
+        <tag>QT</tag>
+        <tag>C++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Qt 持久化配置文件方案总结</title>
     <url>/2025/07/01/qt_%E6%8C%81%E4%B9%85%E5%8C%96%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%96%B9%E6%A1%88/</url>
     <content><![CDATA[<blockquote>
@@ -3022,113 +3129,6 @@
 <td>系统标准配置路径（推荐用于正式部署）</td>
 </tr>
 </tbody></table>
-]]></content>
-      <categories>
-        <category>QT_知识总结</category>
-      </categories>
-      <tags>
-        <tag>QT</tag>
-        <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Qt 中实现全局数据与函数的几种方式</title>
-    <url>/2025/04/24/qt_%E5%AE%9E%E7%8E%B0%E5%85%A8%E5%B1%80%E6%95%B0%E6%8D%AE%E4%B8%8E%E5%87%BD%E6%95%B0/</url>
-    <content><![CDATA[<blockquote>
-<p>在 Qt 或 C++ 开发中，全局状态管理是较常见的需求。本文将总结几种常见的全局数据与函数管理方式，并详细说明各自的使用场景、优缺点和示例。</p>
-</blockquote>
-<hr>
-<h2 id="✅-总览：Qt-中全局数据-函数的几种使用方式"><a href="#✅-总览：Qt-中全局数据-函数的几种使用方式" class="headerlink" title="✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式"></a>✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式</h2><table>
-<thead>
-<tr>
-<th>方式</th>
-<th>说明</th>
-<th>是否线程安全</th>
-<th>是否推荐</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1. <code>extern</code> 全局变量</td>
-<td>使用 <code>extern</code> 声明和定义</td>
-<td>❌ 手动加锁</td>
-<td>⚠️ 一般</td>
-</tr>
-<tr>
-<td>2. 静态类成员变量</td>
-<td><code>static</code> 成员归属类本身</td>
-<td>❌ 手动加锁</td>
-<td>✅ 推荐</td>
-</tr>
-<tr>
-<td>3. 单例模式（Singleton）</td>
-<td>控制对象唯一实例，全局访问</td>
-<td>✅ 可加锁</td>
-<td>✅ 强烈推荐</td>
-</tr>
-<tr>
-<td>4. <code>Q_GLOBAL_STATIC</code></td>
-<td>Qt 宏封装线程安全静态实例</td>
-<td>✅ 线程安全</td>
-<td>✅ 推荐</td>
-</tr>
-<tr>
-<td>5. <code>qApp</code> 全局访问</td>
-<td>在 QApplication 子类中挂载数据</td>
-<td>⚠️ 依赖 GUI</td>
-<td>⚠️ 有限</td>
-</tr>
-<tr>
-<td>6. 命名空间变量&#x2F;函数</td>
-<td>使用 <code>namespace</code> 组织函数&#x2F;变量</td>
-<td>❌ 手动加锁</td>
-<td>✅ 推荐</td>
-</tr>
-<tr>
-<td>7. 工具函数</td>
-<td>独立工具函数，Stateless 操作</td>
-<td>✅</td>
-<td>✅ 推荐</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="✅-1-使用-extern-声明全局变量-对象"><a href="#✅-1-使用-extern-声明全局变量-对象" class="headerlink" title="✅ 1. 使用 extern 声明全局变量&#x2F;对象"></a>✅ 1. 使用 <code>extern</code> 声明全局变量&#x2F;对象</h2><h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// globaldata.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;globalclass.h&quot;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> globalCounter; <span class="comment">//变量</span></span><br><span class="line"><span class="keyword">extern</span> GlobalClass *globalClass; <span class="comment">//自定义类类型</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// globaldata.cpp</span></span><br><span class="line"><span class="type">int</span> globalCounter = <span class="number">0</span>;</span><br><span class="line">GlobalClass* globalClass = <span class="keyword">new</span> GlobalClass;</span><br></pre></td></tr></table></figure>
-
-<p><code>extern</code> 声明的全局变量 <strong>不需要写在 <code>main()</code> 函数 文件所在位置</strong>，它可以出现在<strong>所有需要使用这个变量的文件中的全局作用域</strong>，变量的<strong>定义只能有一个</strong>，通常放在一个 <code>.cpp</code> 文件中。</p>
-<p>⚠️extern声明的全局变量是线程不安全的，尽量加锁使用</p>
-<hr>
-<h2 id="✅-2-静态类成员"><a href="#✅-2-静态类成员" class="headerlink" title="✅ 2. 静态类成员"></a>✅ 2. 静态类成员</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AppState</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> counter;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> AppState::counter = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">AppState::reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-3-单例模式（Singleton）"><a href="#✅-3-单例模式（Singleton）" class="headerlink" title="✅ 3. 单例模式（Singleton）"></a>✅ 3. 单例模式（Singleton）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GlobalManager</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> GlobalManager&amp; <span class="title">instance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> GlobalManager inst;</span><br><span class="line">        <span class="keyword">return</span> inst;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">GlobalManager</span>() &#123;&#125;</span><br><span class="line">    <span class="built_in">Q_DISABLE_COPY</span>(GlobalManager)</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">GlobalManager::<span class="built_in">instance</span>().counter++;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-4-使用-Qt-的-Q-GLOBAL-STATIC"><a href="#✅-4-使用-Qt-的-Q-GLOBAL-STATIC" class="headerlink" title="✅ 4. 使用 Qt 的 Q_GLOBAL_STATIC"></a>✅ 4. 使用 Qt 的 <code>Q_GLOBAL_STATIC</code></h2><p><code>Q_GLOBAL_STATIC</code> 是 Qt 提供的一个宏，用于 <strong>创建线程安全的、延迟初始化的全局单例对象</strong>。<br> 它可以在多个 <code>.cpp</code> 文件中安全使用，避免传统静态对象的初始化顺序问题。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(QMap&lt;QString, <span class="type">int</span>&gt;, globalMap)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line">(*<span class="built_in">globalMap</span>())[<span class="string">&quot;apple&quot;</span>] = <span class="number">5</span>; </span><br><span class="line"><span class="comment">//1：括号都是必须的，globalMap() 是一个函数调用，返回的是 QMap&lt;QString, int&gt;* 类型的指针。</span></span><br><span class="line"><span class="comment">//2：*globalMap() 把这个指针解引用，变成 QMap&lt;QString, int&gt;&amp;。</span></span><br><span class="line"><span class="comment">//3：外层括号 (*globalMap()) 是必须加的，否则会出错。</span></span><br><span class="line"><span class="comment">//4：(*globalMap())[&quot;apple&quot;] 访问或创建键 &quot;apple&quot; 的值。</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>⚠️<code>Q_GLOBAL_STATIC</code>创建对象时， <strong>不能附带构造函数参数</strong>，它只支持默认构造函数。如果需要附带参数初始化全局单例，应该用 <strong><code>Q_GLOBAL_STATIC_WITH_ARGS</code></strong>。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(GlobalClass, globalClass) <span class="comment">//GlobalClass 必须有默认构造函数。</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line"><span class="built_in">GlobalClass</span>()-&gt;<span class="built_in">myfunction</span>(<span class="string">&quot;实参&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-5-QApplication-子类-宏-方式"><a href="#✅-5-QApplication-子类-宏-方式" class="headerlink" title="✅ 5. QApplication 子类+宏 方式"></a>✅ 5. QApplication 子类+宏 方式</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//重写QApplication</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyQApplication</span> : <span class="keyword">public</span> QApplication &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    QString userToken;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//main函数初始化构造MyQApplication</span></span><br><span class="line"><span class="function">MyApp <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取当前项目唯一的 MyQApplication 实例 ,定义为宏</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> myApp (static_cast<span class="string">&lt;MyQApplication*&gt;</span>(QCoreApplication::instance()))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//使用宏全局调用</span></span><br><span class="line">myApp-&gt;userToken = <span class="string">&quot;abc123&quot;</span>;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-6-命名空间方式"><a href="#✅-6-命名空间方式" class="headerlink" title="✅ 6. 命名空间方式"></a>✅ 6. 命名空间方式</h2><p>⚠️仅支持 C++17 及以上</p>
-<p><strong>inline variables</strong>（内联变量） —— 允许在头文件中定义且只会有一个实例。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Global &#123;</span><br><span class="line">    <span class="keyword">inline</span> <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Global::counter++;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-7-全局工具函数"><a href="#✅-7-全局工具函数" class="headerlink" title="✅ 7. 全局工具函数"></a>✅ 7. 全局工具函数</h2><p>⚠️仅支持 C++17 及以上</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Util &#123;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">log</span><span class="params">(<span class="type">const</span> QString&amp; msg)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;[LOG]&quot;</span> &lt;&lt; msg;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Util::<span class="built_in">log</span>(<span class="string">&quot;App started&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="📌-总结建议"><a href="#📌-总结建议" class="headerlink" title="📌 总结建议"></a>📌 总结建议</h2><ul>
-<li>简单数据可用 <code>extern + QMutex</code>；</li>
-<li>多模块共享用 <code>static</code> 成员；</li>
-<li>全局复杂状态推荐用单例；</li>
-<li>轻量线程安全首选 <code>Q_GLOBAL_STATIC</code>；</li>
-<li>GUI 层次可在 QApplication 挂载；</li>
-<li>工具函数、常量组织建议用 <code>namespace</code>。</li>
-</ul>
 ]]></content>
       <categories>
         <category>QT_知识总结</category>
