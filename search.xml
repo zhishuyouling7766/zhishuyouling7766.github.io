@@ -1,6 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Android 应用发布签名 Keystore 文件生成记录</title>
+    <url>/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<blockquote>
+<p>在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 <code>.keystore</code> 是发布阶段的必要步骤。</p>
+</blockquote>
+<hr>
+<h2 id="📌-一、Keystore-的作用"><a href="#📌-一、Keystore-的作用" class="headerlink" title="📌 一、Keystore 的作用"></a>📌 一、Keystore 的作用</h2><ul>
+<li>🔐 <strong>身份认证</strong>：签名表明这个 APK 来自你这个开发者。</li>
+<li>📦 <strong>应用升级绑定</strong>：以后该应用的所有版本必须使用同一个 keystore 签名，否则无法覆盖安装。</li>
+<li>🏪 <strong>应用商店要求</strong>：如 Google Play、华为应用市场等，均强制要求 Release APK 必须签名。</li>
+</ul>
+<hr>
+<h2 id="🧪-二、验证系统是否已安装-JDK-和-keytool"><a href="#🧪-二、验证系统是否已安装-JDK-和-keytool" class="headerlink" title="🧪 二、验证系统是否已安装 JDK 和 keytool"></a>🧪 二、验证系统是否已安装 JDK 和 keytool</h2><p>打开命令行（CMD 或 PowerShell），输入以下命令检查：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line">keytool -<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p>输出示例：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">java version &quot;1.8.0_331&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_331-b09)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.331-b09, mixed mode)</span><br><span class="line"></span><br><span class="line">keytool 选项:</span><br><span class="line">-certreq  生成证书签名请求 (CSR)</span><br><span class="line">-genkey    生成密钥对</span><br><span class="line">-help      显示帮助信息</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>keytool</code> 无法识别，请确认 JDK 安装路径是否已加入环境变量的 Path 中。</p>
+<hr>
+<h2 id="🧩-三、Keystore-生成命令"><a href="#🧩-三、Keystore-生成命令" class="headerlink" title="🧩 三、Keystore 生成命令"></a>🧩 三、Keystore 生成命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -<span class="built_in">alias</span> my-key-alias -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-genkey</code></td>
+<td>表示生成密钥对（key pair）</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>输出详细信息</td>
+</tr>
+<tr>
+<td><code>-keystore</code></td>
+<td>指定输出的 keystore 文件名</td>
+</tr>
+<tr>
+<td><code>-alias</code></td>
+<td>为密钥设置一个别名</td>
+</tr>
+<tr>
+<td><code>-keyalg RSA</code></td>
+<td>使用 RSA 加密算法生成密钥</td>
+</tr>
+<tr>
+<td><code>-keysize 2048</code></td>
+<td>密钥长度为 2048 位</td>
+</tr>
+<tr>
+<td><code>-validity 10000</code></td>
+<td>密钥有效期为 10000 天（约 27 年）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🛡️-四、执行后提示填写信息"><a href="#🛡️-四、执行后提示填写信息" class="headerlink" title="🛡️ 四、执行后提示填写信息"></a>🛡️ 四、执行后提示填写信息</h2><p>依次输入以下信息：</p>
+<ol>
+<li>密钥库口令（keystore password）</li>
+<li>姓名（Your first and last name）</li>
+<li>组织单位名（Organizational unit）</li>
+<li>组织名（Organization）</li>
+<li>城市名（City or Locality）</li>
+<li>省份名（State or Province）</li>
+<li>国家代码（Country Code，如 <code>CN</code>）</li>
+<li>确认信息是否正确（输入 <code>是</code> 或 <code>yes</code>）</li>
+<li>可选设置密钥口令（与 keystore 相同可直接回车）</li>
+</ol>
+<hr>
+<h2 id="✅-五、成功结果"><a href="#✅-五、成功结果" class="headerlink" title="✅ 五、成功结果"></a>✅ 五、成功结果</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[正在生成 2048 位 RSA 密钥对，证书采用 SHA256withRSA（有效期为 10000 天）]</span><br><span class="line">[已将密钥库保存到 my-release-key.keystore]</span><br></pre></td></tr></table></figure>
+
+<p>会在当前目录下生成签名文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">my-release-key.keystore</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧩-六、在-Qt-Creator-中配置签名"><a href="#🧩-六、在-Qt-Creator-中配置签名" class="headerlink" title="🧩 六、在 Qt Creator 中配置签名"></a>🧩 六、在 Qt Creator 中配置签名</h2><p>在「项目 → 构建与运行 → Android」中设置：</p>
+<ul>
+<li>Keystore 路径：<code>my-release-key.keystore</code></li>
+<li>Store password：刚输入的密钥库口令</li>
+<li>Key alias：<code>my-key-alias</code></li>
+<li>Key password：与密钥库口令一致或另设</li>
+</ul>
+<hr>
+<h2 id="⚠️-七、可选建议：转为-PKCS12-格式（官方建议）"><a href="#⚠️-七、可选建议：转为-PKCS12-格式（官方建议）" class="headerlink" title="⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）"></a>⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📁-八、Keystore-文件保存建议"><a href="#📁-八、Keystore-文件保存建议" class="headerlink" title="📁 八、Keystore 文件保存建议"></a>📁 八、Keystore 文件保存建议</h2><p>建议将 keystore 文件统一保存至项目目录外安全位置，</p>
+<p>并备份到私密网盘或加密存储设备，防止丢失。</p>
+<hr>
+<p>生成日期：2025-07-21</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>QT for Android</tag>
+        <tag>Android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ 与 Qt 宏机制详解与对比</title>
     <url>/2025/04/30/C++%20%E4%B8%8E%20Qt%20%E5%AE%8F%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AF%B9%E6%AF%94/</url>
     <content><![CDATA[<blockquote>
@@ -200,106 +303,444 @@
       </tags>
   </entry>
   <entry>
-    <title>Android 应用发布签名 Keystore 文件生成记录</title>
-    <url>/2025/03/02/Android_Keystore_%E7%94%9F%E6%88%90%E8%AE%B0%E5%BD%95/</url>
+    <title>C++ 函数类型汇总</title>
+    <url>/2025/07/18/C++%20%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E6%B1%87%E6%80%BB/</url>
     <content><![CDATA[<blockquote>
-<p>在 Android 系统中，每一个 APK 必须使用一个有效的签名密钥（Keystore）进行签名，系统才允许其安装与运行。对于 Qt 开发的 Android 应用，生成并配置 <code>.keystore</code> 是发布阶段的必要步骤。</p>
+<p>本文件整理了 C++ 中常见的各种函数类型，按照不同分类方式组织，方便查阅。</p>
 </blockquote>
 <hr>
-<h2 id="📌-一、Keystore-的作用"><a href="#📌-一、Keystore-的作用" class="headerlink" title="📌 一、Keystore 的作用"></a>📌 一、Keystore 的作用</h2><ul>
-<li>🔐 <strong>身份认证</strong>：签名表明这个 APK 来自你这个开发者。</li>
-<li>📦 <strong>应用升级绑定</strong>：以后该应用的所有版本必须使用同一个 keystore 签名，否则无法覆盖安装。</li>
-<li>🏪 <strong>应用商店要求</strong>：如 Google Play、华为应用市场等，均强制要求 Release APK 必须签名。</li>
+<h2 id="一、按函数的归属和作用域分类"><a href="#一、按函数的归属和作用域分类" class="headerlink" title="一、按函数的归属和作用域分类"></a>一、按函数的归属和作用域分类</h2><h3 id="1-普通-全局函数（自由函数）"><a href="#1-普通-全局函数（自由函数）" class="headerlink" title="1. 普通 全局函数（自由函数）"></a>1. 普通 全局函数（自由函数）</h3><ul>
+<li>定义在全局作用域中，与任何类无关：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//add.h</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>使用方法：</strong> 使用和定义在相同作用域下可直接调用；外部作用域需在.h文件提前声明。</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// .h</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> once <span class="comment">//头文件包含保护，QT创建新文件会自带保护宏</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span>; <span class="comment">//头文件的预处理指令处进行-&gt;声明</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;add.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> num = <span class="built_in">add</span>(<span class="number">1</span>,<span class="number">2</span>); </span><br></pre></td></tr></table></figure>
+<ul>
+<li>自由函数可以重载，只要函数的<strong>参数个数</strong>或<strong>参数类型</strong>不同，就构成重载（Overload）</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">add</span><span class="params">(<span class="type">double</span> a, <span class="type">double</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b, <span class="type">int</span> c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b + c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>注意：</strong> ❌ 不允许仅靠返回值重载</li>
+<li><strong>注意：</strong> ❌ 全局，更不可以出现相同的函数（参数和返回值和函数名均相同）！！！！</li>
+</ul>
+<h3 id="2-命名空间-全局函数（自由函数）"><a href="#2-命名空间-全局函数（自由函数）" class="headerlink" title="2. 命名空间 全局函数（自由函数）"></a>2. 命名空间 全局函数（自由函数）</h3><ul>
+<li>为了避免命名冲突，<strong>可将自由函数写入命名空间</strong>：</li>
+<li>不同命名空间中函数签名可以完全相同</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Math1 &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">namespace</span> Math2 &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a * b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用方式</span></span><br><span class="line"><span class="type">int</span> result1 = Math1::<span class="built_in">add</span>(<span class="number">2</span>, <span class="number">3</span>); <span class="comment">//result1 = 5</span></span><br><span class="line"><span class="type">int</span> result2 = Math2::<span class="built_in">add</span>(<span class="number">2</span>, <span class="number">3</span>); <span class="comment">//result2 = 6</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>使用方法：</strong> 外部作用域需在.h文件提前声明，注明命名空间</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// .h</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> once <span class="comment">//头文件包含保护，QT创建新文件会自带保护宏</span></span></span><br><span class="line"><span class="keyword">namespace</span> Math1 &#123;</span><br><span class="line">	<span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span>; <span class="comment">//头文件的预处理指令处进行-&gt;声明</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;add.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> num = Math1::<span class="built_in">add</span>(<span class="number">1</span>,<span class="number">2</span>); </span><br></pre></td></tr></table></figure>
+<h3 id="3-类成员函数"><a href="#3-类成员函数" class="headerlink" title="3. 类成员函数"></a>3. 类成员函数</h3><h4 id="普通成员函数"><a href="#普通成员函数" class="headerlink" title="普通成员函数"></a>普通成员函数</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">multiply</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">MyClass::multiply</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x * y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用：</span></span><br><span class="line">MyClass *myClass = <span class="keyword">new</span> <span class="built_in">MyClass</span>();</span><br><span class="line"><span class="type">int</span> num = myClass-&gt;<span class="built_in">multiply</span>(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//MyClass类内部、成员函数内调用另一个成员函数：</span></span><br><span class="line"><span class="type">int</span> num = <span class="built_in">multiply</span>(<span class="number">1</span>,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="静态成员函数"><a href="#静态成员函数" class="headerlink" title="静态成员函数"></a>静态成员函数</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">getCount</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">MyClass::getCount</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用：</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;MyClass.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> num = MyClass::<span class="built_in">getCount</span>();</span><br></pre></td></tr></table></figure>
+
+<h4 id="虚函数和纯虚函数"><a href="#虚函数和纯虚函数" class="headerlink" title="虚函数和纯虚函数"></a>虚函数和纯虚函数</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 抽象基类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span></span>;          <span class="comment">// 虚函数</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">pureVirtual</span><span class="params">()</span> </span>= <span class="number">0</span>;  <span class="comment">// 纯虚函数</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//派生类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 重写虚函数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Derived::func() 重写虚函数&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实现纯虚函数（必须实现，否则也是抽象类）</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">pureVirtual</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Derived::pureVirtual() 实现纯虚函数&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>纯虚函数和Java 接口（<code>interface</code>）类似</p>
+</li>
+<li><p>虚函数和Java 抽象类（<code>abstract class</code>）类似</p>
+</li>
+<li><p><code>virtual</code> 是<strong>让函数支持动态绑定</strong>的关键；</p>
+</li>
+<li><p>如果<strong>不添加 <code>virtual</code> 关键字</strong>，<code>C++</code><strong>可以“重写”函数的名字和参数列表</strong>，但是<strong>不会实现多态</strong>，子类实现的新函数只是语法上的“同名”函数，不具备多态；</p>
+</li>
+<li><p>推荐使用 <code>override</code> 关键字，可以防止拼写错误或参数不一致导致未正确重写。</p>
+</li>
+</ul>
+<h3 id="3-构造函数与析构函数"><a href="#3-构造函数与析构函数" class="headerlink" title="3. 构造函数与析构函数"></a>3. 构造函数与析构函数</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyClass</span>();   <span class="comment">// 构造函数</span></span><br><span class="line">    ~<span class="built_in">MyClass</span>();  <span class="comment">// 析构函数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、按函数的特性分类"><a href="#二、按函数的特性分类" class="headerlink" title="二、按函数的特性分类"></a>二、按函数的特性分类</h2><h3 id="1-内联函数（inline）"><a href="#1-内联函数（inline）" class="headerlink" title="1. 内联函数（inline）"></a>1. 内联函数（inline）</h3><p>内联函数是 C++ 中的一种优化机制，通常用于<strong>频繁调用但函数体较小的函数</strong>，以减少函数调用的开销。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">int</span> <span class="title">square</span><span class="params">(<span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x * x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>内联函数在编译时，会在调用处将函数的代码展开（替换），而不是跳转执行。</p>
+</li>
+<li><p>内联函数本质上就是一个“具备参数和类型检查的安全版宏替换”。</p>
+</li>
+<li><p>运行时没有函数调用的开销（如压栈、跳转、返回），可以提升性能、减少函数调用成本。</p>
+</li>
+<li><p>C++11 支持内联函数。</p>
+</li>
+</ul>
+<p>⚠️ 注意：<code>inline</code> 只是建议，即使你加了 <code>inline</code>，<strong>编译器不一定会采纳</strong>（例如函数太复杂时）。是否内联，<strong>最终是由编译器自行决定的优化行为</strong>。</p>
+<p>如果你希望<strong>强制内联</strong>，可以使用：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">__forceinline  <span class="comment">// MSVC</span></span><br><span class="line">__attribute__((always_inline))  <span class="comment">// GCC/Clang</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-模板函数"><a href="#2-模板函数" class="headerlink" title="2. 模板函数"></a>2. 模板函数</h3><p>模板函数的核心目的就是为了解决“参数类型不确定”的问题，也就是让<strong>一段通用的函数逻辑</strong>可以被<strong>多个不同类型的数据重用</strong>，无需重复写多个重载函数。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// 或 template&lt;class T&gt;</span></span><br><span class="line"><span class="function">T <span class="title">max</span><span class="params">(T a, T b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (a &gt; b) ? a : b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>template&lt;typename T&gt;</code>（或 <code>template&lt;class T&gt;</code>）的意义，是在函数定义前引入一个“模板类型参数” <code>T</code>，告诉编译器：</p>
+<p>​         这个函数里的某些类型是泛型的，等到使用（调用）这个函数时再具体确定类型。</p>
+<h3 id="3-constexpr-函数"><a href="#3-constexpr-函数" class="headerlink" title="3. constexpr 函数"></a>3. constexpr 函数</h3><p><code>constexpr</code>（<strong>常量表达式函数</strong>）是一个用于在<strong>编译期间求值</strong>的函数或变量修饰符。用于提升性能、简化代码并增强类型安全。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="type">int</span> <span class="title">factorial</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> n &lt;= <span class="number">1</span> ? <span class="number">1</span> : (n * <span class="built_in">factorial</span>(n - <span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>编译期求值</strong>：如果传入的是常量，编译器会在编译时计算结果；</li>
+<li><strong>运行期也可用</strong>：如果传入非常量，也可以在运行时执行；</li>
+<li><strong>必须只有一条 <code>return</code> 表达式（早期标准）</strong>，C++14 及以后  支持更复杂函数体。</li>
+</ul>
+<h3 id="4-Lambda-表达式"><a href="#4-Lambda-表达式" class="headerlink" title="4. Lambda 表达式"></a>4. Lambda 表达式</h3><p>Lambda 表达式（又称“匿名函数”）是 C++11 引入的一种简洁方式，用于定义临时的函数对象（functor），常用于 STL 算法、回调、事件处理等场景。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> lambda = [](<span class="type">int</span> a, <span class="type">int</span> b) -&gt; <span class="type">int</span> &#123; <span class="keyword">return</span> a + b; &#125;;</span><br><span class="line"><span class="type">int</span> result = <span class="built_in">lambda</span>(<span class="number">3</span>, <span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>[]</code>：捕获外部变量。</p>
+</li>
+<li><p><code>()</code>：参数列表，可省略。</p>
+</li>
+<li><p><code>-&gt;</code>：返回类型（可省略，自动推导）。</p>
+</li>
+<li><p><code>&#123;&#125;</code>：函数体。</p>
+</li>
+</ul>
+<h3 id="5-函数对象（仿函数）"><a href="#5-函数对象（仿函数）" class="headerlink" title="5. 函数对象（仿函数）"></a>5. 函数对象（仿函数）</h3><p>在 C++ 中，<strong>函数对象（Function Object）</strong>，又叫做<strong>仿函数（Functor）</strong>，是<strong>重载了 <code>operator()</code> 的类或结构体的对象</strong>。它的行为就像一个函数，可以像调用普通函数一样使用，但又具备类的优势，比如状态保存、模板参数等。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 一个简单的函数对象</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Add</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Add add;  <span class="comment">// 创建函数对象</span></span><br><span class="line">    cout &lt;&lt; <span class="built_in">add</span>(<span class="number">3</span>, <span class="number">4</span>) &lt;&lt; endl;  <span class="comment">// 使用函数对象，输出 7</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>❌<code>struct</code> 不是必须的，可以使用 class、struct 或 typedef 的任何类类型来定义函数对象。</p>
+</li>
+<li><p>✔<code>operator()</code>是必须的，如果你想让对象“像函数一样调用”。</p>
+</li>
+<li><p>❌<code>const</code> 不是必须的，加上 <code>const</code> 表示不会修改成员变量的状态，通常推荐加上。</p>
+</li>
 </ul>
 <hr>
-<h2 id="🧪-二、验证系统是否已安装-JDK-和-keytool"><a href="#🧪-二、验证系统是否已安装-JDK-和-keytool" class="headerlink" title="🧪 二、验证系统是否已安装 JDK 和 keytool"></a>🧪 二、验证系统是否已安装 JDK 和 keytool</h2><p>打开命令行（CMD 或 PowerShell），输入以下命令检查：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line">keytool -<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p>输出示例：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">java version &quot;1.8.0_331&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_331-b09)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.331-b09, mixed mode)</span><br><span class="line"></span><br><span class="line">keytool 选项:</span><br><span class="line">-certreq  生成证书签名请求 (CSR)</span><br><span class="line">-genkey    生成密钥对</span><br><span class="line">-help      显示帮助信息</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p>如果 <code>keytool</code> 无法识别，请确认 JDK 安装路径是否已加入环境变量的 Path 中。</p>
-<hr>
-<h2 id="🧩-三、Keystore-生成命令"><a href="#🧩-三、Keystore-生成命令" class="headerlink" title="🧩 三、Keystore 生成命令"></a>🧩 三、Keystore 生成命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -<span class="built_in">alias</span> my-key-alias -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
-
-<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><table>
+<h2 id="三、按调用约定或平台相关特性分类"><a href="#三、按调用约定或平台相关特性分类" class="headerlink" title="三、按调用约定或平台相关特性分类"></a>三、按调用约定或平台相关特性分类</h2><p>“调用约定函数” 通常是指使用**特定调用约定（Calling Convention）*<em>的函数，也就是在汇编层面上定义*<em>参数如何传递</em></em>、<strong>由谁负责清理堆栈</strong>等规则。</p>
+<ul>
+<li><h3 id="常见调用约定（以-Windows-平台为例）"><a href="#常见调用约定（以-Windows-平台为例）" class="headerlink" title="常见调用约定（以 Windows 平台为例）"></a>常见调用约定（以 Windows 平台为例）</h3></li>
+</ul>
+<table>
 <thead>
 <tr>
-<th>参数</th>
-<th>含义</th>
+<th>名称</th>
+<th>关键字</th>
+<th>参数顺序</th>
+<th>栈清理者</th>
+<th align="left">特点</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>-genkey</code></td>
-<td>表示生成密钥对（key pair）</td>
+<td>cdecl</td>
+<td><code>__cdecl</code></td>
+<td>从右到左</td>
+<td>调用者</td>
+<td align="left">C语言默认调用约定</td>
 </tr>
 <tr>
-<td><code>-v</code></td>
-<td>输出详细信息</td>
+<td>stdcall</td>
+<td><code>__stdcall</code></td>
+<td>从右到左</td>
+<td>被调用者</td>
+<td align="left">WinAPI 默认使用</td>
 </tr>
 <tr>
-<td><code>-keystore</code></td>
-<td>指定输出的 keystore 文件名</td>
+<td>fastcall</td>
+<td><code>__fastcall</code></td>
+<td>部分参数用寄存器</td>
+<td>被调用者</td>
+<td align="left">速度较快</td>
 </tr>
 <tr>
-<td><code>-alias</code></td>
-<td>为密钥设置一个别名</td>
+<td>thiscall</td>
+<td><code>__thiscall</code></td>
+<td>this 指针寄存器</td>
+<td>调用者</td>
+<td align="left">C++ 成员函数默认调用约定</td>
+</tr>
+</tbody></table>
+<ul>
+<li><h3 id="何时需要使用调用约定"><a href="#何时需要使用调用约定" class="headerlink" title="何时需要使用调用约定"></a>何时需要使用调用约定</h3></li>
+</ul>
+<ol>
+<li><strong>与 C 库 或 Windows API 对接</strong>（如 DLL 导出）</li>
+<li><strong>跨语言调用函数</strong>（C++&#x2F;C#&#x2F;Delphi等）</li>
+<li><strong>嵌入式开发</strong>或<strong>手写汇编优化</strong></li>
+<li><strong>实现 Hook 或注入 DLL</strong></li>
+</ol>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><table>
+<thead>
+<tr>
+<th>分类方式</th>
+<th>类型示例</th>
+<th>特点说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>作用域</td>
+<td>全局函数、成员函数</td>
+<td>是否属于类作用域</td>
 </tr>
 <tr>
-<td><code>-keyalg RSA</code></td>
-<td>使用 RSA 加密算法生成密钥</td>
+<td>特性</td>
+<td>inline、模板、Lambda、仿函数等</td>
+<td>编译优化、泛型、函数式编程支持等</td>
 </tr>
 <tr>
-<td><code>-keysize 2048</code></td>
-<td>密钥长度为 2048 位</td>
+<td>抽象层次</td>
+<td>虚函数、纯虚函数</td>
+<td>多态、继承</td>
 </tr>
 <tr>
-<td><code>-validity 10000</code></td>
-<td>密钥有效期为 10000 天（约 27 年）</td>
+<td>平台相关</td>
+<td>调用约定</td>
+<td>Windows API、C 接口交互时常涉及</td>
 </tr>
 </tbody></table>
 <hr>
-<h2 id="🛡️-四、执行后提示填写信息"><a href="#🛡️-四、执行后提示填写信息" class="headerlink" title="🛡️ 四、执行后提示填写信息"></a>🛡️ 四、执行后提示填写信息</h2><p>依次输入以下信息：</p>
-<ol>
-<li>密钥库口令（keystore password）</li>
-<li>姓名（Your first and last name）</li>
-<li>组织单位名（Organizational unit）</li>
-<li>组织名（Organization）</li>
-<li>城市名（City or Locality）</li>
-<li>省份名（State or Province）</li>
-<li>国家代码（Country Code，如 <code>CN</code>）</li>
-<li>确认信息是否正确（输入 <code>是</code> 或 <code>yes</code>）</li>
-<li>可选设置密钥口令（与 keystore 相同可直接回车）</li>
-</ol>
+]]></content>
+      <categories>
+        <category>C++_知识总结</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C++ 枚举类型的深入探究</title>
+    <url>/2025/07/21/C++%20%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%A9%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>本文件就 C++ 中的枚举类型 ，作以深入的探究和了解。（总结：枚举就是整型常量集合）</p>
+</blockquote>
 <hr>
-<h2 id="✅-五、成功结果"><a href="#✅-五、成功结果" class="headerlink" title="✅ 五、成功结果"></a>✅ 五、成功结果</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[正在生成 2048 位 RSA 密钥对，证书采用 SHA256withRSA（有效期为 10000 天）]</span><br><span class="line">[已将密钥库保存到 my-release-key.keystore]</span><br></pre></td></tr></table></figure>
+<h2 id="📌-一、基本定义"><a href="#📌-一、基本定义" class="headerlink" title="📌 一、基本定义"></a>📌 一、基本定义</h2><p>C++中的枚举类型（enum）是一种用户自定义的数据类型，用于表示一组具名的整型常量，可以提高代码的可读性和可维护性。</p>
+<h3 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum</span> 枚举名 &#123;</span><br><span class="line">    枚举值<span class="number">1</span>,</span><br><span class="line">    枚举值<span class="number">2</span>,</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">Color</span> &#123;</span><br><span class="line">    Red,    <span class="comment">// 默认从0开始</span></span><br><span class="line">    Green,  <span class="comment">// 1</span></span><br><span class="line">    Blue    <span class="comment">// 2</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="自定义起始值："><a href="#自定义起始值：" class="headerlink" title="自定义起始值："></a>自定义起始值：</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">Color</span> &#123;</span><br><span class="line">    Red = <span class="number">1</span>,</span><br><span class="line">    Green = <span class="number">3</span>,</span><br><span class="line">    Blue = <span class="number">5</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>⚠️枚举成员是编译期常量，默认从 0 开始，可提前赋予初值，但不可运行时更改。</p>
+<h3 id="枚举变量定义与使用"><a href="#枚举变量定义与使用" class="headerlink" title="枚举变量定义与使用"></a>枚举变量定义与使用</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Color myColor = Green;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (myColor == Green) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;It&#x27;s green!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>会在当前目录下生成签名文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">my-release-key.keystore</span><br></pre></td></tr></table></figure>
+<h3 id="枚举的本质"><a href="#枚举的本质" class="headerlink" title="枚举的本质"></a>枚举的本质</h3><p>枚举类型的每个成员在底层其实就是一个 <code>int</code> 常量。例如：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Red == <span class="number">0</span></span><br><span class="line">Green == <span class="number">1</span></span><br><span class="line">Blue == <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>⚠️只可以是整形，不可以是浮点数或其它类型。</p>
+<h3 id="枚举范围与冲突"><a href="#枚举范围与冲突" class="headerlink" title="枚举范围与冲突"></a>枚举范围与冲突</h3><p>同一<strong>作用域</strong>下，多个枚举可以有相同的值，但不可以有相同成员名，注意<strong>命名冲突</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">Fruit</span> &#123; Apple, Banana &#125;;</span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">Animal</span> &#123; Dog, Cat, Apple &#125;;  <span class="comment">// ⚠️ Apple 重复定义会报错</span></span><br></pre></td></tr></table></figure>
 
 <hr>
-<h2 id="🧩-六、在-Qt-Creator-中配置签名"><a href="#🧩-六、在-Qt-Creator-中配置签名" class="headerlink" title="🧩 六、在 Qt Creator 中配置签名"></a>🧩 六、在 Qt Creator 中配置签名</h2><p>在「项目 → 构建与运行 → Android」中设置：</p>
+<h2 id="✅-二、C-11：强类型枚举（enum-class）"><a href="#✅-二、C-11：强类型枚举（enum-class）" class="headerlink" title="✅ 二、C++11：强类型枚举（enum class）"></a>✅ 二、C++11：强类型枚举（enum class）</h2><h3 id="语法："><a href="#语法：" class="headerlink" title="语法："></a>语法：</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum class</span> <span class="title class_">Color</span> &#123;</span><br><span class="line">    Red,</span><br><span class="line">    Green,</span><br><span class="line">    Blue</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="特点："><a href="#特点：" class="headerlink" title="特点："></a>特点：</h3><ul>
+<li><p>作用域限制：成员必须通过作用域访问（Color::Red）。</p>
+</li>
+<li><p>类型安全：不会隐式转换为 int，可防止类型混淆。</p>
+</li>
+<li><p>避免命名冲突：支持多个枚举中有相同成员名。</p>
+</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum class</span> <span class="title class_">Fruit</span> &#123; Apple, Banana &#125;;</span><br><span class="line"><span class="keyword">enum class</span> <span class="title class_">Animal</span> &#123; Dog, Apple &#125;;  <span class="comment">// ✅ Apple 不冲突</span></span><br><span class="line"></span><br><span class="line">Fruit f = Fruit::Apple;</span><br><span class="line">Animal a = Animal::Apple;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="✅-三、赋值（转换）与比较（应用）"><a href="#✅-三、赋值（转换）与比较（应用）" class="headerlink" title="✅ 三、赋值（转换）与比较（应用）"></a>✅ 三、赋值（转换）与比较（应用）</h2><h3 id="枚举转换为整数："><a href="#枚举转换为整数：" class="headerlink" title="枚举转换为整数："></a>枚举转换为整数：</h3><ul>
+<li>普通枚举可以直接转换：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> x = Red;  <span class="comment">// ✅</span></span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>Keystore 路径：<code>my-release-key.keystore</code></li>
-<li>Store password：刚输入的密钥库口令</li>
-<li>Key alias：<code>my-key-alias</code></li>
-<li>Key password：与密钥库口令一致或另设</li>
+<li>强类型枚举需要强制转换：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="built_in">static_cast</span>&lt;<span class="type">int</span>&gt;(Color::Red);  <span class="comment">// ✅</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="⚠️为枚举类型变量赋值："><a href="#⚠️为枚举类型变量赋值：" class="headerlink" title="⚠️为枚举类型变量赋值："></a>⚠️为枚举类型变量赋值：</h3><ul>
+<li>❌ 不合法赋值（隐式 int → enum）：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Color c = <span class="number">3</span>;  <span class="comment">// ❌ 错误，需强制转换</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>✅ 正确写法：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Color c = <span class="built_in">static_cast</span>&lt;Color&gt;(<span class="number">3</span>);  <span class="comment">// ✅ 正确转换方式</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例：</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">Color</span> &#123;</span><br><span class="line">    Red = <span class="number">1</span>,</span><br><span class="line">    Green = <span class="number">2</span>,</span><br><span class="line">    Blue = <span class="number">3</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Color c = <span class="built_in">static_cast</span>&lt;Color&gt;(<span class="number">3</span>);  <span class="comment">// 将整数 3 转为 Color 类型</span></span><br><span class="line"><span class="type">int</span> x = c;                        <span class="comment">// 将枚举类型赋值给 int  ， x = 3</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>枚举类型变量存在的意义</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>🧠 可读性提升</td>
+<td>具名常量取代数字，让代码语义明确</td>
+</tr>
+<tr>
+<td>✅ 类型安全</td>
+<td>限制只能使用定义好的状态值</td>
+</tr>
+<tr>
+<td>🧱 结构清晰</td>
+<td>定义一组固定选项，提高逻辑完整性</td>
+</tr>
+<tr>
+<td>🚀 可维护性强</td>
+<td>修改值集中在枚举处，易于管理和调试</td>
+</tr>
+<tr>
+<td>🎯 支持工具分析</td>
+<td>IDE 可以补全、跳转、检查枚举</td>
+</tr>
+</tbody></table>
+<ul>
+<li>枚举类型变量Color c 与 整型变量int c 的区别</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>点</th>
+<th><code>int</code></th>
+<th><code>Color</code>（枚举）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>含义明确吗</td>
+<td>❌ 不明确</td>
+<td>✅ 具名常量，语义清晰</td>
+</tr>
+<tr>
+<td>限制值范围吗</td>
+<td>❌ 可随意赋</td>
+<td>⚠️ 普通 enum 不限制；<code>enum class</code> 限制更好</td>
+</tr>
+<tr>
+<td>类型检查</td>
+<td>❌ 无类型</td>
+<td>✅ 有类型检查</td>
+</tr>
+</tbody></table>
+<p>枚举类型变量是为了让程序更像人能读懂的语言模式，本质上仍是整形变量。</p>
+<h3 id="❌错误的赋值情况："><a href="#❌错误的赋值情况：" class="headerlink" title="❌错误的赋值情况："></a>❌错误的赋值情况：</h3><p>非法代码示例：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">Color</span> &#123;</span><br><span class="line">    Red = <span class="number">1</span>,</span><br><span class="line">    Green = <span class="number">2</span>,</span><br><span class="line">    Blue = <span class="number">3</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Color Red = <span class="number">4</span>;  <span class="comment">// ❌ 错误！</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>里试图声明一个变量名为 Red，而 Red 已经是一个枚举常量名。</li>
+<li>用已有的常量名 Red 当变量名，属于重定义错误。</li>
+</ul>
+<p>类比说明：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> Red = <span class="number">1</span>;  <span class="comment">// 枚举常量Red的类比效果</span></span><br><span class="line"><span class="type">int</span> Red = <span class="number">4</span>;  <span class="comment">// ❌ 错误的重定义  ❌你在尝试更改const标注的常量数据❌</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="⚠️-四、多个枚举成员-值相同-时的行为"><a href="#⚠️-四、多个枚举成员-值相同-时的行为" class="headerlink" title="⚠️ 四、多个枚举成员  值相同  时的行为"></a>⚠️ 四、多个枚举成员  值相同  时的行为</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">Color</span> &#123;</span><br><span class="line">    Red = <span class="number">3</span>,</span><br><span class="line">    Green = <span class="number">3</span>,</span><br><span class="line">    Blue = <span class="number">5</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Color c = <span class="built_in">static_cast</span>&lt;Color&gt;(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (c == Red) std::cout &lt;&lt; <span class="string">&quot;Red\n&quot;</span>;     <span class="comment">// ✅ true</span></span><br><span class="line"><span class="keyword">if</span> (c == Green) std::cout &lt;&lt; <span class="string">&quot;Green\n&quot;</span>; <span class="comment">// ✅ true</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Red</code> 和 <code>Green</code> 值相等，无法区分是哪一个。</li>
+<li><code>c</code> 只是个值为 <code>3</code> 的枚举变量，没有附带枚举名信息。</li>
+<li>⚠️Color枚举内的常量名不可以相同，但是各常量的值可以相同。</li>
 </ul>
 <hr>
-<h2 id="⚠️-七、可选建议：转为-PKCS12-格式（官方建议）"><a href="#⚠️-七、可选建议：转为-PKCS12-格式（官方建议）" class="headerlink" title="⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）"></a>⚠️ 七、可选建议：转为 PKCS12 格式（官方建议）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
+<h2 id="❗-五、浮点型赋值"><a href="#❗-五、浮点型赋值" class="headerlink" title="❗ 五、浮点型赋值"></a>❗ 五、浮点型赋值</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">Color c = <span class="built_in">static_cast</span>&lt;Color&gt;(<span class="number">2.5</span>);  <span class="comment">// ⚠️ 会被截断为 2，非安全行为</span></span><br></pre></td></tr></table></figure>
+
+<p>✅ 正确写法：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">float</span> f = <span class="number">2.5</span>;</span><br><span class="line">Color c = <span class="built_in">static_cast</span>&lt;Color&gt;(<span class="built_in">static_cast</span>&lt;<span class="type">int</span>&gt;(f));</span><br></pre></td></tr></table></figure>
 
 <hr>
-<h2 id="📁-八、Keystore-文件保存建议"><a href="#📁-八、Keystore-文件保存建议" class="headerlink" title="📁 八、Keystore 文件保存建议"></a>📁 八、Keystore 文件保存建议</h2><p>建议将 keystore 文件统一保存至项目目录外安全位置，</p>
-<p>并备份到私密网盘或加密存储设备，防止丢失。</p>
+<h2 id="⚠️-七、不同命名空间下的枚举类型"><a href="#⚠️-七、不同命名空间下的枚举类型" class="headerlink" title="⚠️ 七、不同命名空间下的枚举类型"></a>⚠️ 七、不同命名空间下的枚举类型</h2><p>使用不同的命名空间来定义枚举类型，可实现相同枚举常量名出现在同意作用域，且合法</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> A &#123;</span><br><span class="line">    <span class="keyword">enum</span> <span class="title class_">Color</span> &#123; Green = <span class="number">1</span> &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> B &#123;</span><br><span class="line">    <span class="keyword">enum</span> <span class="title class_">Fruit</span> &#123; Green = <span class="number">2</span> &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">A::Color a = A::Green;</span><br><span class="line">B::Fruit b = B::Green;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>Green 被隔离在 A 和 B 命名空间下，互不冲突。</p>
+</li>
+<li><p>缺点是调用时写法较繁琐，不如 enum class 语义明确。</p>
+</li>
+</ul>
 <hr>
-<p>生成日期：2025-07-21</p>
+<h2 id="✅-八、附加——C-中“作用域”的含义"><a href="#✅-八、附加——C-中“作用域”的含义" class="headerlink" title="✅ 八、附加——C++ 中“作用域”的含义"></a>✅ 八、附加——C++ 中“作用域”的含义</h2><p>👉 “作用域”指的是：同一命名空间、函数、类或全局块中的名字可见范围，它与“是否在同一个 .cpp &#x2F; .h 文件”或“是否在同一个线程”没有直接关系！</p>
+<h3 id="🧩-示例-1：不同-cpp-文件，通过include暴露"><a href="#🧩-示例-1：不同-cpp-文件，通过include暴露" class="headerlink" title="🧩 示例 1：不同 .cpp 文件，通过include暴露"></a>🧩 示例 1：不同 .cpp 文件，通过include暴露</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// color.h</span></span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">Color</span> &#123; Red, Green, Blue &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;color.h&quot;</span></span></span><br><span class="line">Color c = Green;  <span class="comment">// ✅ 合法（Green 已泄露到全局作用域）</span></span><br></pre></td></tr></table></figure>
+<p>✔️ 即使定义和使用不在同一个文件，只要通过 #include 暴露出来、且在同一个命名空间&#x2F;全局中，就属于<strong>同一作用域</strong>。</p>
+<h3 id="🧩-示例-2：不同-cpp-文件，尝试冲突定义"><a href="#🧩-示例-2：不同-cpp-文件，尝试冲突定义" class="headerlink" title="🧩 示例 2：不同 .cpp 文件，尝试冲突定义"></a>🧩 示例 2：不同 .cpp 文件，尝试冲突定义</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// color.h</span></span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">Color</span> &#123; Green = <span class="number">1</span> &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// fruit.h</span></span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">Fruit</span> &#123; Green = <span class="number">2</span> &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;color.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;fruit.h&quot;</span>  <span class="comment">// ❌ 一旦 include 同时存在就冲突</span></span></span><br></pre></td></tr></table></figure>
+
+<p>❌ 即便不是直接的在同一处<code>#include</code>相互暴露，而是间接产生联系，依旧会产生重定义错误。</p>
+]]></content>
+      <categories>
+        <category>C++_知识总结</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>GitHub 项目创建与本地同步管理</title>
+    <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
+    <content><![CDATA[<blockquote>
+<p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
+</blockquote>
+<hr>
+<h2 id="🔧-准备工具"><a href="#🔧-准备工具" class="headerlink" title="🔧 准备工具"></a>🔧 准备工具</h2><p>在开始前，请确认你已具备以下工具环境：</p>
+<ul>
+<li><p>✅ 已注册 <a href="https://github.com/">GitHub</a> 账号</p>
+</li>
+<li><p>✅ 已安装 Git 工具（推荐安装 <a href="https://git-scm.com/download/win">Git for Windows</a>）</p>
+</li>
+<li><p>✅ 已安装 nodejs（推荐安装 <a href="https://nodejs.org/en/">nodejs</a>）(<a href="https://www.cnblogs.com/liuqiyun/p/8133904.html">Node.js安装及环境配置之Windows篇</a>)</p>
+</li>
+<li><p>✅ 管理员运行cmd，依次输入,完成环境验证</p>
+<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v（node安装后附带）</span><br><span class="line">git -v</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="一、GitHub-创建新仓库"><a href="#一、GitHub-创建新仓库" class="headerlink" title="一、GitHub 创建新仓库"></a>一、GitHub 创建新仓库</h2><ol>
+<li><p>登录 <a href="https://github.com/">GitHub</a></p>
+</li>
+<li><p>点击右上角 → <code>New repository</code></p>
+</li>
+<li><p>仓库名称填：<code>myProject</code></p>
+</li>
+<li><p>不勾选 <code>Initialize with a README</code>（保持为空仓库）</p>
+</li>
+<li><p>创建成功后会看到仓库地址：<br><code>https://github.com/GithubUserName/myGithubProject.git</code></p>
+</li>
+</ol>
+<hr>
+<h2 id="二、本地初始化-Git-项目并上传"><a href="#二、本地初始化-Git-项目并上传" class="headerlink" title="二、本地初始化 Git 项目并上传"></a>二、本地初始化 Git 项目并上传</h2><h3 id="在-Git-Bash-执行以下命令："><a href="#在-Git-Bash-执行以下命令：" class="headerlink" title="在 Git Bash 执行以下命令："></a>在 Git Bash 执行以下命令：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /项目本地存储的地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git 仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 README 文件（可选）(GitHub创建新仓库若勾选Initialize with a README无需该项)</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;# myGithubProject&quot;</span> &gt;&gt; README.md</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部文件添加到 Git 缓存区</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库，并为该次提交添加备注</span></span><br><span class="line">git commit -m <span class="string">&quot;初始化GitHub项目&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认分支为 main</span></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加远程仓库地址（SSH 方式）(需先为本机配置ssh密钥)</span></span><br><span class="line">git remote add origin git@github.com:GithubUserName/myGithubProject.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送到 GitHub（第一次）</span></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、配置-SSH-密钥（推荐）"><a href="#三、配置-SSH-密钥（推荐）" class="headerlink" title="三、配置 SSH 密钥（推荐）"></a>三、配置 SSH 密钥（推荐）</h2><p>避免每次 push 都输入密码，建议使用 SSH：</p>
+<h3 id="1-检查是否已有密钥："><a href="#1-检查是否已有密钥：" class="headerlink" title="1. 检查是否已有密钥："></a>1. 检查是否已有密钥：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> ~/.ssh</span><br></pre></td></tr></table></figure>
+
+<p>如有 <code>id_rsa</code> 和 <code>id_rsa.pub</code>，可跳过生成步骤。</p>
+<h3 id="2-生成新密钥（如无）："><a href="#2-生成新密钥（如无）：" class="headerlink" title="2. 生成新密钥（如无）："></a>2. 生成新密钥（如无）：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;邮箱地址&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>一路回车生成。</p>
+<h3 id="3-添加到-GitHub："><a href="#3-添加到-GitHub：" class="headerlink" title="3. 添加到 GitHub："></a>3. 添加到 GitHub：</h3><ul>
+<li>打开 GitHub → Settings → SSH and GPG Keys → New SSH Key</li>
+<li>将 <code>C:\Users\用户名\ .ssh/id_rsa.pub</code> 内容复制粘贴进去</li>
+</ul>
+<h3 id="4-测试连接是否成功："><a href="#4-测试连接是否成功：" class="headerlink" title="4. 测试连接是否成功："></a>4. 测试连接是否成功：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p>输出成功即配置完成。</p>
+<hr>
+<h2 id="四、后续上传资源流程"><a href="#四、后续上传资源流程" class="headerlink" title="四、后续上传资源流程"></a>四、后续上传资源流程</h2><p>每次更新本地资源，只需执行：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;更新说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、可选：添加-gitignore-文件"><a href="#五、可选：添加-gitignore-文件" class="headerlink" title="五、可选：添加 .gitignore 文件"></a>五、可选：添加 .gitignore 文件</h2><p>为避免上传无用文件，可添加 <code>.gitignore</code> 文件内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">*.<span class="built_in">log</span>           <span class="comment"># 忽略所有 .log 结尾的日志文件</span></span><br><span class="line">node_modules/   <span class="comment"># 忽略 node_modules 目录（前端项目常用）</span></span><br><span class="line">.DS_Store       <span class="comment"># 忽略 macOS 系统的临时文件</span></span><br><span class="line">Thumbs.db       <span class="comment"># 忽略 Windows 系统缩略图缓存</span></span><br><span class="line">*.tmp           <span class="comment"># 忽略所有 .tmp 临时文件</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-小贴士"><a href="#✅-小贴士" class="headerlink" title="✅ 小贴士"></a>✅ 小贴士</h2><ul>
+<li><p>GitHub 上文件比本地多时，先执行：  </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull --rebase origin main</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看远程仓库地址：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote -v</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看提交历史：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<p>以上就是完整的GitHub项目创建与管理流程</p>
 ]]></content>
       <categories>
         <category>教程</category>
       </categories>
       <tags>
-        <tag>QT for Android</tag>
-        <tag>Android</tag>
+        <tag>Git</tag>
+        <tag>GitHub</tag>
       </tags>
   </entry>
   <entry>
@@ -1048,290 +1489,11 @@
 </tbody></table>
 ]]></content>
       <categories>
-        <category>C++_知识总结</category>
         <category>QT_知识总结</category>
       </categories>
       <tags>
         <tag>QT</tag>
         <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C++ 函数类型汇总</title>
-    <url>/2025/07/18/C++%20%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E6%B1%87%E6%80%BB/</url>
-    <content><![CDATA[<blockquote>
-<p>本文件整理了 C++ 中常见的各种函数类型，按照不同分类方式组织，方便查阅。</p>
-</blockquote>
-<hr>
-<h2 id="一、按函数的归属和作用域分类"><a href="#一、按函数的归属和作用域分类" class="headerlink" title="一、按函数的归属和作用域分类"></a>一、按函数的归属和作用域分类</h2><h3 id="1-普通-全局函数（自由函数）"><a href="#1-普通-全局函数（自由函数）" class="headerlink" title="1. 普通 全局函数（自由函数）"></a>1. 普通 全局函数（自由函数）</h3><ul>
-<li>定义在全局作用域中，与任何类无关：</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//add.h</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>使用方法：</strong> 使用和定义在相同作用域下可直接调用；外部作用域需在.h文件提前声明。</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// .h</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> once <span class="comment">//头文件包含保护，QT创建新文件会自带保护宏</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span>; <span class="comment">//头文件的预处理指令处进行-&gt;声明</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;add.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> num = <span class="built_in">add</span>(<span class="number">1</span>,<span class="number">2</span>); </span><br></pre></td></tr></table></figure>
-<ul>
-<li>自由函数可以重载，只要函数的<strong>参数个数</strong>或<strong>参数类型</strong>不同，就构成重载（Overload）</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">add</span><span class="params">(<span class="type">double</span> a, <span class="type">double</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b, <span class="type">int</span> c)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b + c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong>注意：</strong> ❌ 不允许仅靠返回值重载</li>
-<li><strong>注意：</strong> ❌ 全局，更不可以出现相同的函数（参数和返回值和函数名均相同）！！！！</li>
-</ul>
-<h3 id="2-命名空间-全局函数（自由函数）"><a href="#2-命名空间-全局函数（自由函数）" class="headerlink" title="2. 命名空间 全局函数（自由函数）"></a>2. 命名空间 全局函数（自由函数）</h3><ul>
-<li>为了避免命名冲突，<strong>可将自由函数写入命名空间</strong>：</li>
-<li>不同命名空间中函数签名可以完全相同</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Math1 &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">namespace</span> Math2 &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a * b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用方式</span></span><br><span class="line"><span class="type">int</span> result1 = Math1::<span class="built_in">add</span>(<span class="number">2</span>, <span class="number">3</span>); <span class="comment">//result1 = 5</span></span><br><span class="line"><span class="type">int</span> result2 = Math2::<span class="built_in">add</span>(<span class="number">2</span>, <span class="number">3</span>); <span class="comment">//result2 = 6</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>使用方法：</strong> 外部作用域需在.h文件提前声明，注明命名空间</li>
-</ul>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// .h</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> once <span class="comment">//头文件包含保护，QT创建新文件会自带保护宏</span></span></span><br><span class="line"><span class="keyword">namespace</span> Math1 &#123;</span><br><span class="line">	<span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span>; <span class="comment">//头文件的预处理指令处进行-&gt;声明</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;add.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> num = Math1::<span class="built_in">add</span>(<span class="number">1</span>,<span class="number">2</span>); </span><br></pre></td></tr></table></figure>
-<h3 id="3-类成员函数"><a href="#3-类成员函数" class="headerlink" title="3. 类成员函数"></a>3. 类成员函数</h3><h4 id="普通成员函数"><a href="#普通成员函数" class="headerlink" title="普通成员函数"></a>普通成员函数</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">multiply</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">MyClass::multiply</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x * y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用：</span></span><br><span class="line">MyClass *myClass = <span class="keyword">new</span> <span class="built_in">MyClass</span>();</span><br><span class="line"><span class="type">int</span> num = myClass-&gt;<span class="built_in">multiply</span>(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//MyClass类内部、成员函数内调用另一个成员函数：</span></span><br><span class="line"><span class="type">int</span> num = <span class="built_in">multiply</span>(<span class="number">1</span>,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
-
-<h4 id="静态成员函数"><a href="#静态成员函数" class="headerlink" title="静态成员函数"></a>静态成员函数</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">getCount</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">MyClass::getCount</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用：</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;MyClass.h&quot;</span></span></span><br><span class="line"><span class="type">int</span> num = MyClass::<span class="built_in">getCount</span>();</span><br></pre></td></tr></table></figure>
-
-<h4 id="虚函数和纯虚函数"><a href="#虚函数和纯虚函数" class="headerlink" title="虚函数和纯虚函数"></a>虚函数和纯虚函数</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 抽象基类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">func</span><span class="params">()</span></span>;          <span class="comment">// 虚函数</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">pureVirtual</span><span class="params">()</span> </span>= <span class="number">0</span>;  <span class="comment">// 纯虚函数</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//派生类</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span> : <span class="keyword">public</span> Base &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 重写虚函数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">func</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Derived::func() 重写虚函数&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实现纯虚函数（必须实现，否则也是抽象类）</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">pureVirtual</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Derived::pureVirtual() 实现纯虚函数&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>纯虚函数和Java 接口（<code>interface</code>）类似</p>
-</li>
-<li><p>虚函数和Java 抽象类（<code>abstract class</code>）类似</p>
-</li>
-<li><p><code>virtual</code> 是<strong>让函数支持动态绑定</strong>的关键；</p>
-</li>
-<li><p>如果<strong>不添加 <code>virtual</code> 关键字</strong>，<code>C++</code><strong>可以“重写”函数的名字和参数列表</strong>，但是<strong>不会实现多态</strong>，子类实现的新函数只是语法上的“同名”函数，不具备多态；</p>
-</li>
-<li><p>推荐使用 <code>override</code> 关键字，可以防止拼写错误或参数不一致导致未正确重写。</p>
-</li>
-</ul>
-<h3 id="3-构造函数与析构函数"><a href="#3-构造函数与析构函数" class="headerlink" title="3. 构造函数与析构函数"></a>3. 构造函数与析构函数</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyClass</span>();   <span class="comment">// 构造函数</span></span><br><span class="line">    ~<span class="built_in">MyClass</span>();  <span class="comment">// 析构函数</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="二、按函数的特性分类"><a href="#二、按函数的特性分类" class="headerlink" title="二、按函数的特性分类"></a>二、按函数的特性分类</h2><h3 id="1-内联函数（inline）"><a href="#1-内联函数（inline）" class="headerlink" title="1. 内联函数（inline）"></a>1. 内联函数（inline）</h3><p>内联函数是 C++ 中的一种优化机制，通常用于<strong>频繁调用但函数体较小的函数</strong>，以减少函数调用的开销。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">int</span> <span class="title">square</span><span class="params">(<span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x * x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>内联函数在编译时，会在调用处将函数的代码展开（替换），而不是跳转执行。</p>
-</li>
-<li><p>内联函数本质上就是一个“具备参数和类型检查的安全版宏替换”。</p>
-</li>
-<li><p>运行时没有函数调用的开销（如压栈、跳转、返回），可以提升性能、减少函数调用成本。</p>
-</li>
-<li><p>C++11 支持内联函数。</p>
-</li>
-</ul>
-<p>⚠️ 注意：<code>inline</code> 只是建议，即使你加了 <code>inline</code>，<strong>编译器不一定会采纳</strong>（例如函数太复杂时）。是否内联，<strong>最终是由编译器自行决定的优化行为</strong>。</p>
-<p>如果你希望<strong>强制内联</strong>，可以使用：</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">__forceinline  <span class="comment">// MSVC</span></span><br><span class="line">__attribute__((always_inline))  <span class="comment">// GCC/Clang</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-模板函数"><a href="#2-模板函数" class="headerlink" title="2. 模板函数"></a>2. 模板函数</h3><p>模板函数的核心目的就是为了解决“参数类型不确定”的问题，也就是让<strong>一段通用的函数逻辑</strong>可以被<strong>多个不同类型的数据重用</strong>，无需重复写多个重载函数。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="comment">// 或 template&lt;class T&gt;</span></span><br><span class="line"><span class="function">T <span class="title">max</span><span class="params">(T a, T b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (a &gt; b) ? a : b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>template&lt;typename T&gt;</code>（或 <code>template&lt;class T&gt;</code>）的意义，是在函数定义前引入一个“模板类型参数” <code>T</code>，告诉编译器：</p>
-<p>​         这个函数里的某些类型是泛型的，等到使用（调用）这个函数时再具体确定类型。</p>
-<h3 id="3-constexpr-函数"><a href="#3-constexpr-函数" class="headerlink" title="3. constexpr 函数"></a>3. constexpr 函数</h3><p><code>constexpr</code>（<strong>常量表达式函数</strong>）是一个用于在<strong>编译期间求值</strong>的函数或变量修饰符。用于提升性能、简化代码并增强类型安全。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="type">int</span> <span class="title">factorial</span><span class="params">(<span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> n &lt;= <span class="number">1</span> ? <span class="number">1</span> : (n * <span class="built_in">factorial</span>(n - <span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>编译期求值</strong>：如果传入的是常量，编译器会在编译时计算结果；</li>
-<li><strong>运行期也可用</strong>：如果传入非常量，也可以在运行时执行；</li>
-<li><strong>必须只有一条 <code>return</code> 表达式（早期标准）</strong>，C++14 及以后  支持更复杂函数体。</li>
-</ul>
-<h3 id="4-Lambda-表达式"><a href="#4-Lambda-表达式" class="headerlink" title="4. Lambda 表达式"></a>4. Lambda 表达式</h3><p>Lambda 表达式（又称“匿名函数”）是 C++11 引入的一种简洁方式，用于定义临时的函数对象（functor），常用于 STL 算法、回调、事件处理等场景。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> lambda = [](<span class="type">int</span> a, <span class="type">int</span> b) -&gt; <span class="type">int</span> &#123; <span class="keyword">return</span> a + b; &#125;;</span><br><span class="line"><span class="type">int</span> result = <span class="built_in">lambda</span>(<span class="number">3</span>, <span class="number">4</span>);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p><code>[]</code>：捕获外部变量。</p>
-</li>
-<li><p><code>()</code>：参数列表，可省略。</p>
-</li>
-<li><p><code>-&gt;</code>：返回类型（可省略，自动推导）。</p>
-</li>
-<li><p><code>&#123;&#125;</code>：函数体。</p>
-</li>
-</ul>
-<h3 id="5-函数对象（仿函数）"><a href="#5-函数对象（仿函数）" class="headerlink" title="5. 函数对象（仿函数）"></a>5. 函数对象（仿函数）</h3><p>在 C++ 中，<strong>函数对象（Function Object）</strong>，又叫做<strong>仿函数（Functor）</strong>，是<strong>重载了 <code>operator()</code> 的类或结构体的对象</strong>。它的行为就像一个函数，可以像调用普通函数一样使用，但又具备类的优势，比如状态保存、模板参数等。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 一个简单的函数对象</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Add</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Add add;  <span class="comment">// 创建函数对象</span></span><br><span class="line">    cout &lt;&lt; <span class="built_in">add</span>(<span class="number">3</span>, <span class="number">4</span>) &lt;&lt; endl;  <span class="comment">// 使用函数对象，输出 7</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>❌<code>struct</code> 不是必须的，可以使用 class、struct 或 typedef 的任何类类型来定义函数对象。</p>
-</li>
-<li><p>✔<code>operator()</code>是必须的，如果你想让对象“像函数一样调用”。</p>
-</li>
-<li><p>❌<code>const</code> 不是必须的，加上 <code>const</code> 表示不会修改成员变量的状态，通常推荐加上。</p>
-</li>
-</ul>
-<hr>
-<h2 id="三、按调用约定或平台相关特性分类"><a href="#三、按调用约定或平台相关特性分类" class="headerlink" title="三、按调用约定或平台相关特性分类"></a>三、按调用约定或平台相关特性分类</h2><p>“调用约定函数” 通常是指使用**特定调用约定（Calling Convention）*<em>的函数，也就是在汇编层面上定义*<em>参数如何传递</em></em>、<strong>由谁负责清理堆栈</strong>等规则。</p>
-<ul>
-<li><h3 id="常见调用约定（以-Windows-平台为例）"><a href="#常见调用约定（以-Windows-平台为例）" class="headerlink" title="常见调用约定（以 Windows 平台为例）"></a>常见调用约定（以 Windows 平台为例）</h3></li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>关键字</th>
-<th>参数顺序</th>
-<th>栈清理者</th>
-<th align="left">特点</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>cdecl</td>
-<td><code>__cdecl</code></td>
-<td>从右到左</td>
-<td>调用者</td>
-<td align="left">C语言默认调用约定</td>
-</tr>
-<tr>
-<td>stdcall</td>
-<td><code>__stdcall</code></td>
-<td>从右到左</td>
-<td>被调用者</td>
-<td align="left">WinAPI 默认使用</td>
-</tr>
-<tr>
-<td>fastcall</td>
-<td><code>__fastcall</code></td>
-<td>部分参数用寄存器</td>
-<td>被调用者</td>
-<td align="left">速度较快</td>
-</tr>
-<tr>
-<td>thiscall</td>
-<td><code>__thiscall</code></td>
-<td>this 指针寄存器</td>
-<td>调用者</td>
-<td align="left">C++ 成员函数默认调用约定</td>
-</tr>
-</tbody></table>
-<ul>
-<li><h3 id="何时需要使用调用约定"><a href="#何时需要使用调用约定" class="headerlink" title="何时需要使用调用约定"></a>何时需要使用调用约定</h3></li>
-</ul>
-<ol>
-<li><strong>与 C 库 或 Windows API 对接</strong>（如 DLL 导出）</li>
-<li><strong>跨语言调用函数</strong>（C++&#x2F;C#&#x2F;Delphi等）</li>
-<li><strong>嵌入式开发</strong>或<strong>手写汇编优化</strong></li>
-<li><strong>实现 Hook 或注入 DLL</strong></li>
-</ol>
-<hr>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><table>
-<thead>
-<tr>
-<th>分类方式</th>
-<th>类型示例</th>
-<th>特点说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>作用域</td>
-<td>全局函数、成员函数</td>
-<td>是否属于类作用域</td>
-</tr>
-<tr>
-<td>特性</td>
-<td>inline、模板、Lambda、仿函数等</td>
-<td>编译优化、泛型、函数式编程支持等</td>
-</tr>
-<tr>
-<td>抽象层次</td>
-<td>虚函数、纯虚函数</td>
-<td>多态、继承</td>
-</tr>
-<tr>
-<td>平台相关</td>
-<td>调用约定</td>
-<td>Windows API、C 接口交互时常涉及</td>
-</tr>
-</tbody></table>
-<hr>
-]]></content>
-      <categories>
-        <category>C++_知识总结</category>
-      </categories>
-      <tags>
-        <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>GitHub 项目创建与本地同步管理</title>
-    <url>/2025/02/18/GitHub%E9%A1%B9%E7%9B%AE%E5%88%9B%E5%BB%BA%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
-    <content><![CDATA[<blockquote>
-<p>本文记录如何将创建 GitHub 仓库，并进行本地同步与管理。</p>
-</blockquote>
-<hr>
-<h2 id="🔧-准备工具"><a href="#🔧-准备工具" class="headerlink" title="🔧 准备工具"></a>🔧 准备工具</h2><p>在开始前，请确认你已具备以下工具环境：</p>
-<ul>
-<li><p>✅ 已注册 <a href="https://github.com/">GitHub</a> 账号</p>
-</li>
-<li><p>✅ 已安装 Git 工具（推荐安装 <a href="https://git-scm.com/download/win">Git for Windows</a>）</p>
-</li>
-<li><p>✅ 已安装 nodejs（推荐安装 <a href="https://nodejs.org/en/">nodejs</a>）(<a href="https://www.cnblogs.com/liuqiyun/p/8133904.html">Node.js安装及环境配置之Windows篇</a>)</p>
-</li>
-<li><p>✅ 管理员运行cmd，依次输入,完成环境验证</p>
-<figure class="highlight cmd"><table><tr><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v（node安装后附带）</span><br><span class="line">git -v</span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<h2 id="一、GitHub-创建新仓库"><a href="#一、GitHub-创建新仓库" class="headerlink" title="一、GitHub 创建新仓库"></a>一、GitHub 创建新仓库</h2><ol>
-<li><p>登录 <a href="https://github.com/">GitHub</a></p>
-</li>
-<li><p>点击右上角 → <code>New repository</code></p>
-</li>
-<li><p>仓库名称填：<code>myProject</code></p>
-</li>
-<li><p>不勾选 <code>Initialize with a README</code>（保持为空仓库）</p>
-</li>
-<li><p>创建成功后会看到仓库地址：<br><code>https://github.com/GithubUserName/myGithubProject.git</code></p>
-</li>
-</ol>
-<hr>
-<h2 id="二、本地初始化-Git-项目并上传"><a href="#二、本地初始化-Git-项目并上传" class="headerlink" title="二、本地初始化 Git 项目并上传"></a>二、本地初始化 Git 项目并上传</h2><h3 id="在-Git-Bash-执行以下命令："><a href="#在-Git-Bash-执行以下命令：" class="headerlink" title="在 Git Bash 执行以下命令："></a>在 Git Bash 执行以下命令：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /项目本地存储的地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git 仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 README 文件（可选）(GitHub创建新仓库若勾选Initialize with a README无需该项)</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;# myGithubProject&quot;</span> &gt;&gt; README.md</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部文件添加到 Git 缓存区</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库，并为该次提交添加备注</span></span><br><span class="line">git commit -m <span class="string">&quot;初始化GitHub项目&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认分支为 main</span></span><br><span class="line">git branch -M main</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加远程仓库地址（SSH 方式）(需先为本机配置ssh密钥)</span></span><br><span class="line">git remote add origin git@github.com:GithubUserName/myGithubProject.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送到 GitHub（第一次）</span></span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="三、配置-SSH-密钥（推荐）"><a href="#三、配置-SSH-密钥（推荐）" class="headerlink" title="三、配置 SSH 密钥（推荐）"></a>三、配置 SSH 密钥（推荐）</h2><p>避免每次 push 都输入密码，建议使用 SSH：</p>
-<h3 id="1-检查是否已有密钥："><a href="#1-检查是否已有密钥：" class="headerlink" title="1. 检查是否已有密钥："></a>1. 检查是否已有密钥：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">ls</span> ~/.ssh</span><br></pre></td></tr></table></figure>
-
-<p>如有 <code>id_rsa</code> 和 <code>id_rsa.pub</code>，可跳过生成步骤。</p>
-<h3 id="2-生成新密钥（如无）："><a href="#2-生成新密钥（如无）：" class="headerlink" title="2. 生成新密钥（如无）："></a>2. 生成新密钥（如无）：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;邮箱地址&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>一路回车生成。</p>
-<h3 id="3-添加到-GitHub："><a href="#3-添加到-GitHub：" class="headerlink" title="3. 添加到 GitHub："></a>3. 添加到 GitHub：</h3><ul>
-<li>打开 GitHub → Settings → SSH and GPG Keys → New SSH Key</li>
-<li>将 <code>C:\Users\用户名\ .ssh/id_rsa.pub</code> 内容复制粘贴进去</li>
-</ul>
-<h3 id="4-测试连接是否成功："><a href="#4-测试连接是否成功：" class="headerlink" title="4. 测试连接是否成功："></a>4. 测试连接是否成功：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
-
-<p>输出成功即配置完成。</p>
-<hr>
-<h2 id="四、后续上传资源流程"><a href="#四、后续上传资源流程" class="headerlink" title="四、后续上传资源流程"></a>四、后续上传资源流程</h2><p>每次更新本地资源，只需执行：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;更新说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="五、可选：添加-gitignore-文件"><a href="#五、可选：添加-gitignore-文件" class="headerlink" title="五、可选：添加 .gitignore 文件"></a>五、可选：添加 .gitignore 文件</h2><p>为避免上传无用文件，可添加 <code>.gitignore</code> 文件内容如下：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">*.<span class="built_in">log</span>           <span class="comment"># 忽略所有 .log 结尾的日志文件</span></span><br><span class="line">node_modules/   <span class="comment"># 忽略 node_modules 目录（前端项目常用）</span></span><br><span class="line">.DS_Store       <span class="comment"># 忽略 macOS 系统的临时文件</span></span><br><span class="line">Thumbs.db       <span class="comment"># 忽略 Windows 系统缩略图缓存</span></span><br><span class="line">*.tmp           <span class="comment"># 忽略所有 .tmp 临时文件</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-小贴士"><a href="#✅-小贴士" class="headerlink" title="✅ 小贴士"></a>✅ 小贴士</h2><ul>
-<li><p>GitHub 上文件比本地多时，先执行：  </p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git pull --rebase origin main</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看远程仓库地址：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote -v</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看提交历史：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-<hr>
-<p>以上就是完整的GitHub项目创建与管理流程</p>
-]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-        <tag>GitHub</tag>
       </tags>
   </entry>
   <entry>
@@ -1411,9 +1573,27 @@
         <category>QT实例</category>
       </categories>
       <tags>
-        <tag>QT</tag>
         <tag>QT for Android</tag>
+        <tag>QT</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2025/02/16/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>Hexo 博客部署 GitHub 失败解决方案</title>
@@ -1495,24 +1675,6 @@
       <tags>
         <tag>GitHub</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2025/02/16/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
   <entry>
     <title>qmake CMake 项目配置分析</title>
@@ -1817,8 +1979,69 @@
       </tags>
   </entry>
   <entry>
+    <title>Qt UI 界面无操作超时自动返回首页</title>
+    <url>/2025/04/05/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5/</url>
+    <content><![CDATA[<blockquote>
+<p>本文档介绍如何在 Qt 应用程序中实现“无操作一段时间后自动返回首页”的功能，适用于工业终端、信息展示屏等场景。</p>
+</blockquote>
+<hr>
+<h2 id="🧠-实现原理"><a href="#🧠-实现原理" class="headerlink" title="🧠 实现原理"></a>🧠 实现原理</h2><p>通过自定义 <code>QApplication</code> 类，重载 <code>notify()</code> 方法来监听全局用户操作（如鼠标点击、键盘按键等），每次操作后重置一个计时器。当计时器超时后，触发槽函数自动返回主界面或首页。</p>
+<hr>
+<h2 id="🔧-步骤一：自定义-MyApplication-类"><a href="#🔧-步骤一：自定义-MyApplication-类" class="headerlink" title="🔧 步骤一：自定义 MyApplication 类"></a>🔧 步骤一：自定义 MyApplication 类</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 自定义 QApplication 类，添加全局鼠标点击触发器</span></span><br><span class="line">class <span class="attribute">MyApplication</span> : public <span class="title">QApplication</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="attribute">public</span>:</span><br><span class="line">    MyApplication(<span class="built_in">int</span>&amp; argc, char** argv) : QApplication(argc, argv) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">bool</span> notify(QObject* receiver, QEvent* event) <span class="title">override</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (event-&gt;type() == <span class="attribute">QEvent</span>::MouseButtonPress) &#123; <span class="comment">// 检测鼠标按下事件</span></span><br><span class="line">            QMouseEvent* mouseEvent = static_cast&lt;QMouseEvent*&gt;(event);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果是左键点击事件，重置计时器</span></span><br><span class="line">            <span class="keyword">if</span> (mouseEvent-&gt;buttons() &amp; <span class="attribute">Qt</span>::LeftButton) &#123;</span><br><span class="line">                <span class="keyword">if</span>(overallTimer != nullptr)</span><br><span class="line">                    overallTimer-&gt;start(); <span class="comment">// 重置计时器</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 继续传递事件给父类的 notify() 函数进行处理</span></span><br><span class="line">        <span class="keyword">return</span> <span class="attribute">QApplication</span>::notify(receiver, event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧷-步骤二：main-函数中初始化计时器"><a href="#🧷-步骤二：main-函数中初始化计时器" class="headerlink" title="🧷 步骤二：main 函数中初始化计时器"></a>🧷 步骤二：main 函数中初始化计时器</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line"><span class="comment">//#include &quot;main.h&quot;</span></span><br><span class="line"><span class="comment">//extern QTimer* overallTimer;</span></span><br><span class="line"></span><br><span class="line">QTimer* overallTimer = nullptr; <span class="comment">// 固定时间跳转至首页的计时器</span></span><br><span class="line"><span class="built_in">int</span> main(<span class="built_in">int</span> argc, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    MyApplication app(argc, argv);</span><br><span class="line">    MainWindow w;</span><br><span class="line">    w.show();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化计时器并挂到 app 对象上</span></span><br><span class="line">    overallTimer = <span class="keyword">new</span> QTimer(&amp;app);</span><br><span class="line">    overallTimer-&gt;start(<span class="number">5</span> * <span class="number">60</span> * <span class="number">1000</span>);  <span class="comment">// 启动定时器：5分钟</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 连接超时信号到主窗口的返回首页槽函数</span></span><br><span class="line">    <span class="attribute">QObject</span>::connect(overallTimer, &amp;<span class="attribute">QTimer</span>::timeout, &amp;w, &amp;<span class="attribute">MainWindow</span>::backHomePage);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.exec();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📌-backHomePage-示例（MainWindow-内）"><a href="#📌-backHomePage-示例（MainWindow-内）" class="headerlink" title="📌 backHomePage 示例（MainWindow 内）"></a>📌 backHomePage 示例（MainWindow 内）</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="attribute">MainWindow</span>::backHomePage() &#123;</span><br><span class="line">    <span class="comment">// 获取所有顶层窗口</span></span><br><span class="line">    <span class="keyword">const</span> auto widgets = <span class="attribute">QApplication</span>::topLevelWidgets();</span><br><span class="line">    <span class="keyword">for</span> (QWidget *<span class="attribute">widget</span> : widgets) &#123;</span><br><span class="line">        <span class="comment">// 判断是否为 QDialog 类型</span></span><br><span class="line">        <span class="keyword">if</span> (QDialog *dialog = qobject_cast&lt;QDialog *&gt;(widget)) &#123;</span><br><span class="line">            qDebug() &lt;&lt; <span class="string">&quot;Closing dialog:&quot;</span> &lt;&lt; dialog-&gt;objectName();</span><br><span class="line">            dialog-&gt;close(); <span class="comment">// 关闭对话框</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 实现返回主界面的逻辑</span></span><br><span class="line">    ui-&gt;stackedWidget-&gt;setCurrentIndex(<span class="number">0</span>);</span><br><span class="line">    qDebug() &lt;&lt; <span class="string">&quot;长时间无操作，已返回首页&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-效果总结"><a href="#✅-效果总结" class="headerlink" title="✅ 效果总结"></a>✅ 效果总结</h2><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自动检测</td>
+<td>鼠标、键盘、触摸等输入</td>
+</tr>
+<tr>
+<td>自动重置</td>
+<td>每次交互后自动重置定时器</td>
+</tr>
+<tr>
+<td>超时触发</td>
+<td>一段时间无操作后调用返回首页槽函数</td>
+</tr>
+<tr>
+<td>应用场景</td>
+<td>工控界面、自动售卖机、展览终端等</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="📌-可拓展点"><a href="#📌-可拓展点" class="headerlink" title="📌 可拓展点"></a>📌 可拓展点</h2><ul>
+<li>支持自定义超时时间、配置项持久化</li>
+<li>支持动态阻止自动跳转（如播放视频时暂停倒计时）</li>
+<li>集成状态栏提示“x秒后返回首页”等</li>
+</ul>
+<hr>
+<blockquote>
+<p>本功能适用于 Qt 5&#x2F;6 全平台，推荐用于工业控制和人机交互系统中提升用户体验。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>QT_UI配置</category>
+      </categories>
+      <tags>
+        <tag>QT</tag>
+        <tag>QT_UI</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）</title>
-    <url>/2025/07/25/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F/</url>
+    <url>/2025/05/25/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F/</url>
     <content><![CDATA[<blockquote>
 <p>本说明整理了如何在 Qt Designer 界面中设置首页顶部导航 QMenu 与 QAction，以及它们的关系和属性设置。</p>
 </blockquote>
@@ -2126,141 +2349,8 @@
         <category>QT实例</category>
       </categories>
       <tags>
-        <tag>QT</tag>
         <tag>QT for Android</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Qt UI 界面无操作超时自动返回首页</title>
-    <url>/2025/04/05/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5/</url>
-    <content><![CDATA[<blockquote>
-<p>本文档介绍如何在 Qt 应用程序中实现“无操作一段时间后自动返回首页”的功能，适用于工业终端、信息展示屏等场景。</p>
-</blockquote>
-<hr>
-<h2 id="🧠-实现原理"><a href="#🧠-实现原理" class="headerlink" title="🧠 实现原理"></a>🧠 实现原理</h2><p>通过自定义 <code>QApplication</code> 类，重载 <code>notify()</code> 方法来监听全局用户操作（如鼠标点击、键盘按键等），每次操作后重置一个计时器。当计时器超时后，触发槽函数自动返回主界面或首页。</p>
-<hr>
-<h2 id="🔧-步骤一：自定义-MyApplication-类"><a href="#🔧-步骤一：自定义-MyApplication-类" class="headerlink" title="🔧 步骤一：自定义 MyApplication 类"></a>🔧 步骤一：自定义 MyApplication 类</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 自定义 QApplication 类，添加全局鼠标点击触发器</span></span><br><span class="line">class <span class="attribute">MyApplication</span> : public <span class="title">QApplication</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="attribute">public</span>:</span><br><span class="line">    MyApplication(<span class="built_in">int</span>&amp; argc, char** argv) : QApplication(argc, argv) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">bool</span> notify(QObject* receiver, QEvent* event) <span class="title">override</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (event-&gt;type() == <span class="attribute">QEvent</span>::MouseButtonPress) &#123; <span class="comment">// 检测鼠标按下事件</span></span><br><span class="line">            QMouseEvent* mouseEvent = static_cast&lt;QMouseEvent*&gt;(event);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果是左键点击事件，重置计时器</span></span><br><span class="line">            <span class="keyword">if</span> (mouseEvent-&gt;buttons() &amp; <span class="attribute">Qt</span>::LeftButton) &#123;</span><br><span class="line">                <span class="keyword">if</span>(overallTimer != nullptr)</span><br><span class="line">                    overallTimer-&gt;start(); <span class="comment">// 重置计时器</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 继续传递事件给父类的 notify() 函数进行处理</span></span><br><span class="line">        <span class="keyword">return</span> <span class="attribute">QApplication</span>::notify(receiver, event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="🧷-步骤二：main-函数中初始化计时器"><a href="#🧷-步骤二：main-函数中初始化计时器" class="headerlink" title="🧷 步骤二：main 函数中初始化计时器"></a>🧷 步骤二：main 函数中初始化计时器</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line"><span class="comment">//#include &quot;main.h&quot;</span></span><br><span class="line"><span class="comment">//extern QTimer* overallTimer;</span></span><br><span class="line"></span><br><span class="line">QTimer* overallTimer = nullptr; <span class="comment">// 固定时间跳转至首页的计时器</span></span><br><span class="line"><span class="built_in">int</span> main(<span class="built_in">int</span> argc, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    MyApplication app(argc, argv);</span><br><span class="line">    MainWindow w;</span><br><span class="line">    w.show();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化计时器并挂到 app 对象上</span></span><br><span class="line">    overallTimer = <span class="keyword">new</span> QTimer(&amp;app);</span><br><span class="line">    overallTimer-&gt;start(<span class="number">5</span> * <span class="number">60</span> * <span class="number">1000</span>);  <span class="comment">// 启动定时器：5分钟</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 连接超时信号到主窗口的返回首页槽函数</span></span><br><span class="line">    <span class="attribute">QObject</span>::connect(overallTimer, &amp;<span class="attribute">QTimer</span>::timeout, &amp;w, &amp;<span class="attribute">MainWindow</span>::backHomePage);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> app.exec();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="📌-backHomePage-示例（MainWindow-内）"><a href="#📌-backHomePage-示例（MainWindow-内）" class="headerlink" title="📌 backHomePage 示例（MainWindow 内）"></a>📌 backHomePage 示例（MainWindow 内）</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="attribute">MainWindow</span>::backHomePage() &#123;</span><br><span class="line">    <span class="comment">// 获取所有顶层窗口</span></span><br><span class="line">    <span class="keyword">const</span> auto widgets = <span class="attribute">QApplication</span>::topLevelWidgets();</span><br><span class="line">    <span class="keyword">for</span> (QWidget *<span class="attribute">widget</span> : widgets) &#123;</span><br><span class="line">        <span class="comment">// 判断是否为 QDialog 类型</span></span><br><span class="line">        <span class="keyword">if</span> (QDialog *dialog = qobject_cast&lt;QDialog *&gt;(widget)) &#123;</span><br><span class="line">            qDebug() &lt;&lt; <span class="string">&quot;Closing dialog:&quot;</span> &lt;&lt; dialog-&gt;objectName();</span><br><span class="line">            dialog-&gt;close(); <span class="comment">// 关闭对话框</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 实现返回主界面的逻辑</span></span><br><span class="line">    ui-&gt;stackedWidget-&gt;setCurrentIndex(<span class="number">0</span>);</span><br><span class="line">    qDebug() &lt;&lt; <span class="string">&quot;长时间无操作，已返回首页&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-效果总结"><a href="#✅-效果总结" class="headerlink" title="✅ 效果总结"></a>✅ 效果总结</h2><table>
-<thead>
-<tr>
-<th>功能</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>自动检测</td>
-<td>鼠标、键盘、触摸等输入</td>
-</tr>
-<tr>
-<td>自动重置</td>
-<td>每次交互后自动重置定时器</td>
-</tr>
-<tr>
-<td>超时触发</td>
-<td>一段时间无操作后调用返回首页槽函数</td>
-</tr>
-<tr>
-<td>应用场景</td>
-<td>工控界面、自动售卖机、展览终端等</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="📌-可拓展点"><a href="#📌-可拓展点" class="headerlink" title="📌 可拓展点"></a>📌 可拓展点</h2><ul>
-<li>支持自定义超时时间、配置项持久化</li>
-<li>支持动态阻止自动跳转（如播放视频时暂停倒计时）</li>
-<li>集成状态栏提示“x秒后返回首页”等</li>
-</ul>
-<hr>
-<blockquote>
-<p>本功能适用于 Qt 5&#x2F;6 全平台，推荐用于工业控制和人机交互系统中提升用户体验。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>QT_UI配置</category>
-      </categories>
-      <tags>
         <tag>QT</tag>
-        <tag>QT_UI</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结</title>
-    <url>/2025/07/03/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B/</url>
-    <content><![CDATA[<blockquote>
-<p>本文档总结如何在 Qt 项目中集成 <code>yaml-cpp</code> 并实现配置文件读取过程中遇到的问题及解决方案，适用于 Windows 构建环境，也适用于部署到 Linux&#x2F;Android 等嵌入式平台。</p>
-</blockquote>
-<hr>
-<p>⚠️项目需以CMake配置。</p>
-<p>（qmake配置的情况下，win\linux\android各平台需要不同配置，无法做到同质化适配）</p>
-<hr>
-<h2 id="✅-项目目标"><a href="#✅-项目目标" class="headerlink" title="✅ 项目目标"></a>✅ 项目目标</h2><ul>
-<li>将 <code>yaml-cpp</code> 源码集成进 Qt 项目，无需额外安装库</li>
-<li>从 <code>config.yaml</code> 文件中读取配置项（如 username）</li>
-<li>将构建输出的可执行文件放入 <code>bin/</code> 目录</li>
-<li>保证 Qt 项目在 MinGW、MSVC两种编译器下构建成功</li>
-<li>实现路径跨平台兼容、异常安全</li>
-</ul>
-<hr>
-<h2 id="📁-工程结构推荐"><a href="#📁-工程结构推荐" class="headerlink" title="📁 工程结构推荐"></a>📁 工程结构推荐</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">untitled_project/</span><br><span class="line">├── CMakeLists.txt</span><br><span class="line">├── main.cpp</span><br><span class="line">├── mainwindow.cpp/h/ui</span><br><span class="line">├── yaml-cpp/               # 第三方库源码（文件夹）</span><br><span class="line">└── bin/                    # 可执行文件输出目录</span><br><span class="line">	└── config.yaml             # YAML 配置文件</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="🔧-1-CMake-配置重点"><a href="#🔧-1-CMake-配置重点" class="headerlink" title="🔧 1. CMake 配置重点"></a>🔧 1. CMake 配置重点</h2><h3 id="✅-设置可执行文件输出到-bin"><a href="#✅-设置可执行文件输出到-bin" class="headerlink" title="✅ 设置可执行文件输出到 bin&#x2F;"></a>✅ 设置可执行文件输出到 bin&#x2F;</h3><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_RUNTIME_OUTPUT_DIRECTORY <span class="variable">$&#123;CMAKE_SOURCE_DIR&#125;</span>/bin)</span><br></pre></td></tr></table></figure>
-
-<h3 id="✅-将从github上下载到的项目文件夹去掉多于后缀，更名为yaml-cpp"><a href="#✅-将从github上下载到的项目文件夹去掉多于后缀，更名为yaml-cpp" class="headerlink" title="✅ 将从github上下载到的项目文件夹去掉多于后缀，更名为yaml-cpp"></a>✅ 将从github上下载到的项目文件夹去掉多于后缀，更名为<code>yaml-cpp</code></h3><h3 id="✅-添加-yaml-cpp-子目录并链接"><a href="#✅-添加-yaml-cpp-子目录并链接" class="headerlink" title="✅ 添加 yaml-cpp 子目录并链接"></a>✅ 添加 yaml-cpp 子目录并链接</h3><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 添加 yaml-cpp 子目录</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(yaml-cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment">#添加yaml-cpp</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span></span><br><span class="line">    Qt<span class="variable">$&#123;QT_VERSION_MAJOR&#125;</span>::Widgets</span><br><span class="line">    yaml-cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 包含 yaml-cpp 头文件</span></span><br><span class="line"><span class="keyword">target_include_directories</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span></span><br><span class="line">    PRIVATE yaml-cpp/<span class="keyword">include</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="📦-2-推荐使用的稳定版本"><a href="#📦-2-推荐使用的稳定版本" class="headerlink" title="📦 2. 推荐使用的稳定版本"></a>📦 2. 推荐使用的稳定版本</h2><p>为避免与某些 MSVC 编译器不兼容，推荐使用 yaml-cpp 的稳定版本：</p>
-<ul>
-<li>🔗 <strong>yaml-cpp v0.7.0</strong> 下载地址：<br><a href="https://github.com/jbeder/yaml-cpp/releases/tag/yaml-cpp-0.7.0">https://github.com/jbeder/yaml-cpp/releases/tag/yaml-cpp-0.7.0</a></li>
-</ul>
-<hr>
-<h2 id="🧠-3-路径处理推荐写法"><a href="#🧠-3-路径处理推荐写法" class="headerlink" title="🧠 3. 路径处理推荐写法"></a>🧠 3. 路径处理推荐写法</h2><h3 id="✅-使用-applicationDirPath-获取-exe-所在目录"><a href="#✅-使用-applicationDirPath-获取-exe-所在目录" class="headerlink" title="✅ 使用 applicationDirPath 获取 .exe 所在目录"></a>✅ 使用 applicationDirPath 获取 .exe 所在目录</h3><p>将<code>config.yaml</code>放置入bin目录，以程序运行相对路径获取<code>.yaml</code>路径</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QString path = QCoreApplication::<span class="built_in">applicationDirPath</span>() + <span class="string">&quot;/config.yaml&quot;</span>;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="📄-4-完成上述所有配置后，QT-C-示例代码"><a href="#📄-4-完成上述所有配置后，QT-C-示例代码" class="headerlink" title="📄 4. 完成上述所有配置后，QT C++示例代码"></a>📄 4. 完成上述所有配置后，QT C++示例代码</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//如果出现 YAML文件不存在 YAML文件格式错误 访问了不存在的字段</span></span><br><span class="line"><span class="comment">//可能会出现报错弹窗： Microsoft Visual C++ Runtime Library 抛出的 运行时崩溃错误 abort()报错</span></span><br><span class="line"><span class="comment">//需要以try catch包裹代码</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line"> <span class="comment">//程序执行文件所在目录,把 / 转换成当前系统的分隔符</span></span><br><span class="line"> QString appDir = QDir::<span class="built_in">toNativeSeparators</span>(QCoreApplication::<span class="built_in">applicationDirPath</span>() + <span class="string">&quot;/&quot;</span>);</span><br><span class="line"> <span class="comment">//配置.yaml文件地址</span></span><br><span class="line"> QString filePath = appDir + <span class="string">&quot;config.yaml&quot;</span>;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;配置文件路径:&quot;</span> &lt;&lt; filePath;</span><br><span class="line"> <span class="comment">//使用 YAML-CPP 库来加载一个 YAML 配置文件，并将其解析为一个 YAML::Node 节点对象</span></span><br><span class="line"> YAML::Node config = YAML::<span class="built_in">LoadFile</span>(filePath.<span class="built_in">toStdString</span>());</span><br><span class="line">    </span><br><span class="line"> <span class="comment">//通过YAML::Node 节点对象获取数据       </span></span><br><span class="line"> QString username = QString::<span class="built_in">fromStdString</span>(config[<span class="string">&quot;username&quot;</span>].<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line"> QString password = QString::<span class="built_in">fromStdString</span>(config[<span class="string">&quot;password&quot;</span>].<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line"> QString host = QString::<span class="built_in">fromStdString</span>(config[<span class="string">&quot;server&quot;</span>][<span class="string">&quot;host&quot;</span>].<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line"> <span class="type">int</span> port = config[<span class="string">&quot;server&quot;</span>][<span class="string">&quot;port&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">int</span>&gt;();</span><br><span class="line"></span><br><span class="line"> <span class="type">bool</span> logging = config[<span class="string">&quot;features&quot;</span>][<span class="string">&quot;enable_logging&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">bool</span>&gt;();</span><br><span class="line"> <span class="type">bool</span> cache = config[<span class="string">&quot;features&quot;</span>][<span class="string">&quot;enable_cache&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">bool</span>&gt;();</span><br><span class="line"></span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;用户名:&quot;</span> &lt;&lt; username;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;密码:&quot;</span> &lt;&lt; password;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;服务器地址:&quot;</span> &lt;&lt; host &lt;&lt; <span class="string">&quot;:&quot;</span> &lt;&lt; port;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;是否启用日志:&quot;</span> &lt;&lt; logging;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;是否启用缓存:&quot;</span> &lt;&lt; cache;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; roleNode : config[<span class="string">&quot;roles&quot;</span>]) &#123;</span><br><span class="line">  QString role = QString::<span class="built_in">fromStdString</span>(roleNode.<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line">  <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;角色:&quot;</span> &lt;&lt; role;</span><br><span class="line"> &#125;</span><br><span class="line">        </span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;读取配置失败:&quot;</span> &lt;&lt; e.<span class="built_in">what</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="⚠️-常见问题汇总"><a href="#⚠️-常见问题汇总" class="headerlink" title="⚠️ 常见问题汇总"></a>⚠️ 常见问题汇总</h2><table>
-<thead>
-<tr>
-<th>问题</th>
-<th>解决方案</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>no viable conversion from QString to std::string</code></td>
-<td>使用 <code>toStdString()</code></td>
-</tr>
-<tr>
-<td><code>is_in_range</code> 模板报错（MSVC）</td>
-<td>使用低版本稳定版 <code>yaml-cpp</code> 或改用 MinGW</td>
-</tr>
-<tr>
-<td>YAML::Load 崩溃或异常</td>
-<td>加上 <code>try-catch</code> 捕获错误</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="✅-示例-config-yaml"><a href="#✅-示例-config-yaml" class="headerlink" title="✅ 示例 config.yaml"></a>✅ 示例 config.yaml</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">username:</span> <span class="string">zhangbh</span></span><br><span class="line"><span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">host:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line"><span class="attr">features:</span></span><br><span class="line">  <span class="attr">enable_logging:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">enable_cache:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">roles:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">admin</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">user</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>如需部署到 Linux&#x2F;Android，只需切换工具链后重新构建即可。</p>
-]]></content>
-      <categories>
-        <category>QT_配置</category>
-      </categories>
-      <tags>
-        <tag>QT</tag>
-        <tag>C++</tag>
       </tags>
   </entry>
   <entry>
@@ -2345,8 +2435,80 @@
         <category>QT实例</category>
       </categories>
       <tags>
-        <tag>QT</tag>
         <tag>QT for Android</tag>
+        <tag>QT</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结</title>
+    <url>/2025/07/03/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B/</url>
+    <content><![CDATA[<blockquote>
+<p>本文档总结如何在 Qt 项目中集成 <code>yaml-cpp</code> 并实现配置文件读取过程中遇到的问题及解决方案，适用于 Windows 构建环境，也适用于部署到 Linux&#x2F;Android 等嵌入式平台。</p>
+</blockquote>
+<hr>
+<p>⚠️项目需以CMake配置。</p>
+<p>（qmake配置的情况下，win\linux\android各平台需要不同配置，无法做到同质化适配）</p>
+<hr>
+<h2 id="✅-项目目标"><a href="#✅-项目目标" class="headerlink" title="✅ 项目目标"></a>✅ 项目目标</h2><ul>
+<li>将 <code>yaml-cpp</code> 源码集成进 Qt 项目，无需额外安装库</li>
+<li>从 <code>config.yaml</code> 文件中读取配置项（如 username）</li>
+<li>将构建输出的可执行文件放入 <code>bin/</code> 目录</li>
+<li>保证 Qt 项目在 MinGW、MSVC两种编译器下构建成功</li>
+<li>实现路径跨平台兼容、异常安全</li>
+</ul>
+<hr>
+<h2 id="📁-工程结构推荐"><a href="#📁-工程结构推荐" class="headerlink" title="📁 工程结构推荐"></a>📁 工程结构推荐</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">untitled_project/</span><br><span class="line">├── CMakeLists.txt</span><br><span class="line">├── main.cpp</span><br><span class="line">├── mainwindow.cpp/h/ui</span><br><span class="line">├── yaml-cpp/               # 第三方库源码（文件夹）</span><br><span class="line">└── bin/                    # 可执行文件输出目录</span><br><span class="line">	└── config.yaml             # YAML 配置文件</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🔧-1-CMake-配置重点"><a href="#🔧-1-CMake-配置重点" class="headerlink" title="🔧 1. CMake 配置重点"></a>🔧 1. CMake 配置重点</h2><h3 id="✅-设置可执行文件输出到-bin"><a href="#✅-设置可执行文件输出到-bin" class="headerlink" title="✅ 设置可执行文件输出到 bin&#x2F;"></a>✅ 设置可执行文件输出到 bin&#x2F;</h3><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_RUNTIME_OUTPUT_DIRECTORY <span class="variable">$&#123;CMAKE_SOURCE_DIR&#125;</span>/bin)</span><br></pre></td></tr></table></figure>
+
+<h3 id="✅-将从github上下载到的项目文件夹去掉多于后缀，更名为yaml-cpp"><a href="#✅-将从github上下载到的项目文件夹去掉多于后缀，更名为yaml-cpp" class="headerlink" title="✅ 将从github上下载到的项目文件夹去掉多于后缀，更名为yaml-cpp"></a>✅ 将从github上下载到的项目文件夹去掉多于后缀，更名为<code>yaml-cpp</code></h3><h3 id="✅-添加-yaml-cpp-子目录并链接"><a href="#✅-添加-yaml-cpp-子目录并链接" class="headerlink" title="✅ 添加 yaml-cpp 子目录并链接"></a>✅ 添加 yaml-cpp 子目录并链接</h3><figure class="highlight cmake"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 添加 yaml-cpp 子目录</span></span><br><span class="line"><span class="keyword">add_subdirectory</span>(yaml-cpp)</span><br><span class="line"></span><br><span class="line"><span class="comment">#添加yaml-cpp</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span></span><br><span class="line">    Qt<span class="variable">$&#123;QT_VERSION_MAJOR&#125;</span>::Widgets</span><br><span class="line">    yaml-cpp</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 包含 yaml-cpp 头文件</span></span><br><span class="line"><span class="keyword">target_include_directories</span>(<span class="variable">$&#123;PROJECT_NAME&#125;</span></span><br><span class="line">    PRIVATE yaml-cpp/<span class="keyword">include</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📦-2-推荐使用的稳定版本"><a href="#📦-2-推荐使用的稳定版本" class="headerlink" title="📦 2. 推荐使用的稳定版本"></a>📦 2. 推荐使用的稳定版本</h2><p>为避免与某些 MSVC 编译器不兼容，推荐使用 yaml-cpp 的稳定版本：</p>
+<ul>
+<li>🔗 <strong>yaml-cpp v0.7.0</strong> 下载地址：<br><a href="https://github.com/jbeder/yaml-cpp/releases/tag/yaml-cpp-0.7.0">https://github.com/jbeder/yaml-cpp/releases/tag/yaml-cpp-0.7.0</a></li>
+</ul>
+<hr>
+<h2 id="🧠-3-路径处理推荐写法"><a href="#🧠-3-路径处理推荐写法" class="headerlink" title="🧠 3. 路径处理推荐写法"></a>🧠 3. 路径处理推荐写法</h2><h3 id="✅-使用-applicationDirPath-获取-exe-所在目录"><a href="#✅-使用-applicationDirPath-获取-exe-所在目录" class="headerlink" title="✅ 使用 applicationDirPath 获取 .exe 所在目录"></a>✅ 使用 applicationDirPath 获取 .exe 所在目录</h3><p>将<code>config.yaml</code>放置入bin目录，以程序运行相对路径获取<code>.yaml</code>路径</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">QString path = QCoreApplication::<span class="built_in">applicationDirPath</span>() + <span class="string">&quot;/config.yaml&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📄-4-完成上述所有配置后，QT-C-示例代码"><a href="#📄-4-完成上述所有配置后，QT-C-示例代码" class="headerlink" title="📄 4. 完成上述所有配置后，QT C++示例代码"></a>📄 4. 完成上述所有配置后，QT C++示例代码</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//如果出现 YAML文件不存在 YAML文件格式错误 访问了不存在的字段</span></span><br><span class="line"><span class="comment">//可能会出现报错弹窗： Microsoft Visual C++ Runtime Library 抛出的 运行时崩溃错误 abort()报错</span></span><br><span class="line"><span class="comment">//需要以try catch包裹代码</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line"> <span class="comment">//程序执行文件所在目录,把 / 转换成当前系统的分隔符</span></span><br><span class="line"> QString appDir = QDir::<span class="built_in">toNativeSeparators</span>(QCoreApplication::<span class="built_in">applicationDirPath</span>() + <span class="string">&quot;/&quot;</span>);</span><br><span class="line"> <span class="comment">//配置.yaml文件地址</span></span><br><span class="line"> QString filePath = appDir + <span class="string">&quot;config.yaml&quot;</span>;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;配置文件路径:&quot;</span> &lt;&lt; filePath;</span><br><span class="line"> <span class="comment">//使用 YAML-CPP 库来加载一个 YAML 配置文件，并将其解析为一个 YAML::Node 节点对象</span></span><br><span class="line"> YAML::Node config = YAML::<span class="built_in">LoadFile</span>(filePath.<span class="built_in">toStdString</span>());</span><br><span class="line">    </span><br><span class="line"> <span class="comment">//通过YAML::Node 节点对象获取数据       </span></span><br><span class="line"> QString username = QString::<span class="built_in">fromStdString</span>(config[<span class="string">&quot;username&quot;</span>].<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line"> QString password = QString::<span class="built_in">fromStdString</span>(config[<span class="string">&quot;password&quot;</span>].<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line"> QString host = QString::<span class="built_in">fromStdString</span>(config[<span class="string">&quot;server&quot;</span>][<span class="string">&quot;host&quot;</span>].<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line"> <span class="type">int</span> port = config[<span class="string">&quot;server&quot;</span>][<span class="string">&quot;port&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">int</span>&gt;();</span><br><span class="line"></span><br><span class="line"> <span class="type">bool</span> logging = config[<span class="string">&quot;features&quot;</span>][<span class="string">&quot;enable_logging&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">bool</span>&gt;();</span><br><span class="line"> <span class="type">bool</span> cache = config[<span class="string">&quot;features&quot;</span>][<span class="string">&quot;enable_cache&quot;</span>].<span class="built_in">as</span>&lt;<span class="type">bool</span>&gt;();</span><br><span class="line"></span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;用户名:&quot;</span> &lt;&lt; username;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;密码:&quot;</span> &lt;&lt; password;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;服务器地址:&quot;</span> &lt;&lt; host &lt;&lt; <span class="string">&quot;:&quot;</span> &lt;&lt; port;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;是否启用日志:&quot;</span> &lt;&lt; logging;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;是否启用缓存:&quot;</span> &lt;&lt; cache;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; roleNode : config[<span class="string">&quot;roles&quot;</span>]) &#123;</span><br><span class="line">  QString role = QString::<span class="built_in">fromStdString</span>(roleNode.<span class="built_in">as</span>&lt;std::string&gt;());</span><br><span class="line">  <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;角色:&quot;</span> &lt;&lt; role;</span><br><span class="line"> &#125;</span><br><span class="line">        </span><br><span class="line">&#125; <span class="built_in">catch</span> (<span class="type">const</span> std::exception&amp; e) &#123;</span><br><span class="line"> <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;读取配置失败:&quot;</span> &lt;&lt; e.<span class="built_in">what</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="⚠️-常见问题汇总"><a href="#⚠️-常见问题汇总" class="headerlink" title="⚠️ 常见问题汇总"></a>⚠️ 常见问题汇总</h2><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>no viable conversion from QString to std::string</code></td>
+<td>使用 <code>toStdString()</code></td>
+</tr>
+<tr>
+<td><code>is_in_range</code> 模板报错（MSVC）</td>
+<td>使用低版本稳定版 <code>yaml-cpp</code> 或改用 MinGW</td>
+</tr>
+<tr>
+<td>YAML::Load 崩溃或异常</td>
+<td>加上 <code>try-catch</code> 捕获错误</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="✅-示例-config-yaml"><a href="#✅-示例-config-yaml" class="headerlink" title="✅ 示例 config.yaml"></a>✅ 示例 config.yaml</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">username:</span> <span class="string">zhangbh</span></span><br><span class="line"><span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">host:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line"><span class="attr">features:</span></span><br><span class="line">  <span class="attr">enable_logging:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">enable_cache:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">roles:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">admin</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">user</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>如需部署到 Linux&#x2F;Android，只需切换工具链后重新构建即可。</p>
+]]></content>
+      <categories>
+        <category>QT_配置</category>
+      </categories>
+      <tags>
+        <tag>QT</tag>
+        <tag>C++</tag>
       </tags>
   </entry>
   <entry>
@@ -2733,113 +2895,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Qt 中实现全局数据与函数的几种方式</title>
-    <url>/2025/04/24/qt_%E5%AE%9E%E7%8E%B0%E5%85%A8%E5%B1%80%E6%95%B0%E6%8D%AE%E4%B8%8E%E5%87%BD%E6%95%B0/</url>
-    <content><![CDATA[<blockquote>
-<p>在 Qt 或 C++ 开发中，全局状态管理是较常见的需求。本文将总结几种常见的全局数据与函数管理方式，并详细说明各自的使用场景、优缺点和示例。</p>
-</blockquote>
-<hr>
-<h2 id="✅-总览：Qt-中全局数据-函数的几种使用方式"><a href="#✅-总览：Qt-中全局数据-函数的几种使用方式" class="headerlink" title="✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式"></a>✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式</h2><table>
-<thead>
-<tr>
-<th>方式</th>
-<th>说明</th>
-<th>是否线程安全</th>
-<th>是否推荐</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1. <code>extern</code> 全局变量</td>
-<td>使用 <code>extern</code> 声明和定义</td>
-<td>❌ 手动加锁</td>
-<td>⚠️ 一般</td>
-</tr>
-<tr>
-<td>2. 静态类成员变量</td>
-<td><code>static</code> 成员归属类本身</td>
-<td>❌ 手动加锁</td>
-<td>✅ 推荐</td>
-</tr>
-<tr>
-<td>3. 单例模式（Singleton）</td>
-<td>控制对象唯一实例，全局访问</td>
-<td>✅ 可加锁</td>
-<td>✅ 强烈推荐</td>
-</tr>
-<tr>
-<td>4. <code>Q_GLOBAL_STATIC</code></td>
-<td>Qt 宏封装线程安全静态实例</td>
-<td>✅ 线程安全</td>
-<td>✅ 推荐</td>
-</tr>
-<tr>
-<td>5. <code>qApp</code> 全局访问</td>
-<td>在 QApplication 子类中挂载数据</td>
-<td>⚠️ 依赖 GUI</td>
-<td>⚠️ 有限</td>
-</tr>
-<tr>
-<td>6. 命名空间变量&#x2F;函数</td>
-<td>使用 <code>namespace</code> 组织函数&#x2F;变量</td>
-<td>❌ 手动加锁</td>
-<td>✅ 推荐</td>
-</tr>
-<tr>
-<td>7. 工具函数</td>
-<td>独立工具函数，Stateless 操作</td>
-<td>✅</td>
-<td>✅ 推荐</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="✅-1-使用-extern-声明全局变量-对象"><a href="#✅-1-使用-extern-声明全局变量-对象" class="headerlink" title="✅ 1. 使用 extern 声明全局变量&#x2F;对象"></a>✅ 1. 使用 <code>extern</code> 声明全局变量&#x2F;对象</h2><h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// globaldata.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;globalclass.h&quot;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> globalCounter; <span class="comment">//变量</span></span><br><span class="line"><span class="keyword">extern</span> GlobalClass *globalClass; <span class="comment">//自定义类类型</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// globaldata.cpp</span></span><br><span class="line"><span class="type">int</span> globalCounter = <span class="number">0</span>;</span><br><span class="line">GlobalClass* globalClass = <span class="keyword">new</span> GlobalClass;</span><br></pre></td></tr></table></figure>
-
-<p><code>extern</code> 声明的全局变量 <strong>不需要写在 <code>main()</code> 函数 文件所在位置</strong>，它可以出现在<strong>所有需要使用这个变量的文件中的全局作用域</strong>，变量的<strong>定义只能有一个</strong>，通常放在一个 <code>.cpp</code> 文件中。</p>
-<p>⚠️extern声明的全局变量是线程不安全的，尽量加锁使用</p>
-<hr>
-<h2 id="✅-2-静态类成员"><a href="#✅-2-静态类成员" class="headerlink" title="✅ 2. 静态类成员"></a>✅ 2. 静态类成员</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AppState</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> counter;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> AppState::counter = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">AppState::reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-3-单例模式（Singleton）"><a href="#✅-3-单例模式（Singleton）" class="headerlink" title="✅ 3. 单例模式（Singleton）"></a>✅ 3. 单例模式（Singleton）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GlobalManager</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> GlobalManager&amp; <span class="title">instance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> GlobalManager inst;</span><br><span class="line">        <span class="keyword">return</span> inst;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">GlobalManager</span>() &#123;&#125;</span><br><span class="line">    <span class="built_in">Q_DISABLE_COPY</span>(GlobalManager)</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">GlobalManager::<span class="built_in">instance</span>().counter++;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-4-使用-Qt-的-Q-GLOBAL-STATIC"><a href="#✅-4-使用-Qt-的-Q-GLOBAL-STATIC" class="headerlink" title="✅ 4. 使用 Qt 的 Q_GLOBAL_STATIC"></a>✅ 4. 使用 Qt 的 <code>Q_GLOBAL_STATIC</code></h2><p><code>Q_GLOBAL_STATIC</code> 是 Qt 提供的一个宏，用于 <strong>创建线程安全的、延迟初始化的全局单例对象</strong>。<br> 它可以在多个 <code>.cpp</code> 文件中安全使用，避免传统静态对象的初始化顺序问题。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(QMap&lt;QString, <span class="type">int</span>&gt;, globalMap)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line">(*<span class="built_in">globalMap</span>())[<span class="string">&quot;apple&quot;</span>] = <span class="number">5</span>; </span><br><span class="line"><span class="comment">//1：括号都是必须的，globalMap() 是一个函数调用，返回的是 QMap&lt;QString, int&gt;* 类型的指针。</span></span><br><span class="line"><span class="comment">//2：*globalMap() 把这个指针解引用，变成 QMap&lt;QString, int&gt;&amp;。</span></span><br><span class="line"><span class="comment">//3：外层括号 (*globalMap()) 是必须加的，否则会出错。</span></span><br><span class="line"><span class="comment">//4：(*globalMap())[&quot;apple&quot;] 访问或创建键 &quot;apple&quot; 的值。</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>⚠️<code>Q_GLOBAL_STATIC</code>创建对象时， <strong>不能附带构造函数参数</strong>，它只支持默认构造函数。如果需要附带参数初始化全局单例，应该用 <strong><code>Q_GLOBAL_STATIC_WITH_ARGS</code></strong>。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(GlobalClass, globalClass) <span class="comment">//GlobalClass 必须有默认构造函数。</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line"><span class="built_in">GlobalClass</span>()-&gt;<span class="built_in">myfunction</span>(<span class="string">&quot;实参&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-5-QApplication-子类-宏-方式"><a href="#✅-5-QApplication-子类-宏-方式" class="headerlink" title="✅ 5. QApplication 子类+宏 方式"></a>✅ 5. QApplication 子类+宏 方式</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//重写QApplication</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyQApplication</span> : <span class="keyword">public</span> QApplication &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    QString userToken;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//main函数初始化构造MyQApplication</span></span><br><span class="line"><span class="function">MyApp <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取当前项目唯一的 MyQApplication 实例 ,定义为宏</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> myApp (static_cast<span class="string">&lt;MyQApplication*&gt;</span>(QCoreApplication::instance()))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//使用宏全局调用</span></span><br><span class="line">myApp-&gt;userToken = <span class="string">&quot;abc123&quot;</span>;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-6-命名空间方式"><a href="#✅-6-命名空间方式" class="headerlink" title="✅ 6. 命名空间方式"></a>✅ 6. 命名空间方式</h2><p>⚠️仅支持 C++17 及以上</p>
-<p><strong>inline variables</strong>（内联变量） —— 允许在头文件中定义且只会有一个实例。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Global &#123;</span><br><span class="line">    <span class="keyword">inline</span> <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Global::counter++;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="✅-7-全局工具函数"><a href="#✅-7-全局工具函数" class="headerlink" title="✅ 7. 全局工具函数"></a>✅ 7. 全局工具函数</h2><p>⚠️仅支持 C++17 及以上</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Util &#123;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">log</span><span class="params">(<span class="type">const</span> QString&amp; msg)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;[LOG]&quot;</span> &lt;&lt; msg;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Util::<span class="built_in">log</span>(<span class="string">&quot;App started&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="📌-总结建议"><a href="#📌-总结建议" class="headerlink" title="📌 总结建议"></a>📌 总结建议</h2><ul>
-<li>简单数据可用 <code>extern + QMutex</code>；</li>
-<li>多模块共享用 <code>static</code> 成员；</li>
-<li>全局复杂状态推荐用单例；</li>
-<li>轻量线程安全首选 <code>Q_GLOBAL_STATIC</code>；</li>
-<li>GUI 层次可在 QApplication 挂载；</li>
-<li>工具函数、常量组织建议用 <code>namespace</code>。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>QT_知识总结</category>
-      </categories>
-      <tags>
-        <tag>QT</tag>
-        <tag>C++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Qt 持久化配置文件方案总结</title>
     <url>/2025/07/01/qt_%E6%8C%81%E4%B9%85%E5%8C%96%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%96%B9%E6%A1%88/</url>
     <content><![CDATA[<blockquote>
@@ -2967,6 +3022,113 @@
 <td>系统标准配置路径（推荐用于正式部署）</td>
 </tr>
 </tbody></table>
+]]></content>
+      <categories>
+        <category>QT_知识总结</category>
+      </categories>
+      <tags>
+        <tag>QT</tag>
+        <tag>C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Qt 中实现全局数据与函数的几种方式</title>
+    <url>/2025/04/24/qt_%E5%AE%9E%E7%8E%B0%E5%85%A8%E5%B1%80%E6%95%B0%E6%8D%AE%E4%B8%8E%E5%87%BD%E6%95%B0/</url>
+    <content><![CDATA[<blockquote>
+<p>在 Qt 或 C++ 开发中，全局状态管理是较常见的需求。本文将总结几种常见的全局数据与函数管理方式，并详细说明各自的使用场景、优缺点和示例。</p>
+</blockquote>
+<hr>
+<h2 id="✅-总览：Qt-中全局数据-函数的几种使用方式"><a href="#✅-总览：Qt-中全局数据-函数的几种使用方式" class="headerlink" title="✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式"></a>✅ 总览：Qt 中全局数据&#x2F;函数的几种使用方式</h2><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>说明</th>
+<th>是否线程安全</th>
+<th>是否推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1. <code>extern</code> 全局变量</td>
+<td>使用 <code>extern</code> 声明和定义</td>
+<td>❌ 手动加锁</td>
+<td>⚠️ 一般</td>
+</tr>
+<tr>
+<td>2. 静态类成员变量</td>
+<td><code>static</code> 成员归属类本身</td>
+<td>❌ 手动加锁</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>3. 单例模式（Singleton）</td>
+<td>控制对象唯一实例，全局访问</td>
+<td>✅ 可加锁</td>
+<td>✅ 强烈推荐</td>
+</tr>
+<tr>
+<td>4. <code>Q_GLOBAL_STATIC</code></td>
+<td>Qt 宏封装线程安全静态实例</td>
+<td>✅ 线程安全</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>5. <code>qApp</code> 全局访问</td>
+<td>在 QApplication 子类中挂载数据</td>
+<td>⚠️ 依赖 GUI</td>
+<td>⚠️ 有限</td>
+</tr>
+<tr>
+<td>6. 命名空间变量&#x2F;函数</td>
+<td>使用 <code>namespace</code> 组织函数&#x2F;变量</td>
+<td>❌ 手动加锁</td>
+<td>✅ 推荐</td>
+</tr>
+<tr>
+<td>7. 工具函数</td>
+<td>独立工具函数，Stateless 操作</td>
+<td>✅</td>
+<td>✅ 推荐</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="✅-1-使用-extern-声明全局变量-对象"><a href="#✅-1-使用-extern-声明全局变量-对象" class="headerlink" title="✅ 1. 使用 extern 声明全局变量&#x2F;对象"></a>✅ 1. 使用 <code>extern</code> 声明全局变量&#x2F;对象</h2><h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// globaldata.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;globalclass.h&quot;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> globalCounter; <span class="comment">//变量</span></span><br><span class="line"><span class="keyword">extern</span> GlobalClass *globalClass; <span class="comment">//自定义类类型</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// globaldata.cpp</span></span><br><span class="line"><span class="type">int</span> globalCounter = <span class="number">0</span>;</span><br><span class="line">GlobalClass* globalClass = <span class="keyword">new</span> GlobalClass;</span><br></pre></td></tr></table></figure>
+
+<p><code>extern</code> 声明的全局变量 <strong>不需要写在 <code>main()</code> 函数 文件所在位置</strong>，它可以出现在<strong>所有需要使用这个变量的文件中的全局作用域</strong>，变量的<strong>定义只能有一个</strong>，通常放在一个 <code>.cpp</code> 文件中。</p>
+<p>⚠️extern声明的全局变量是线程不安全的，尽量加锁使用</p>
+<hr>
+<h2 id="✅-2-静态类成员"><a href="#✅-2-静态类成员" class="headerlink" title="✅ 2. 静态类成员"></a>✅ 2. 静态类成员</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">AppState</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> counter;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> AppState::counter = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">AppState::reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-3-单例模式（Singleton）"><a href="#✅-3-单例模式（Singleton）" class="headerlink" title="✅ 3. 单例模式（Singleton）"></a>✅ 3. 单例模式（Singleton）</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">GlobalManager</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> GlobalManager&amp; <span class="title">instance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> GlobalManager inst;</span><br><span class="line">        <span class="keyword">return</span> inst;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">GlobalManager</span>() &#123;&#125;</span><br><span class="line">    <span class="built_in">Q_DISABLE_COPY</span>(GlobalManager)</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">GlobalManager::<span class="built_in">instance</span>().counter++;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-4-使用-Qt-的-Q-GLOBAL-STATIC"><a href="#✅-4-使用-Qt-的-Q-GLOBAL-STATIC" class="headerlink" title="✅ 4. 使用 Qt 的 Q_GLOBAL_STATIC"></a>✅ 4. 使用 Qt 的 <code>Q_GLOBAL_STATIC</code></h2><p><code>Q_GLOBAL_STATIC</code> 是 Qt 提供的一个宏，用于 <strong>创建线程安全的、延迟初始化的全局单例对象</strong>。<br> 它可以在多个 <code>.cpp</code> 文件中安全使用，避免传统静态对象的初始化顺序问题。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(QMap&lt;QString, <span class="type">int</span>&gt;, globalMap)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line">(*<span class="built_in">globalMap</span>())[<span class="string">&quot;apple&quot;</span>] = <span class="number">5</span>; </span><br><span class="line"><span class="comment">//1：括号都是必须的，globalMap() 是一个函数调用，返回的是 QMap&lt;QString, int&gt;* 类型的指针。</span></span><br><span class="line"><span class="comment">//2：*globalMap() 把这个指针解引用，变成 QMap&lt;QString, int&gt;&amp;。</span></span><br><span class="line"><span class="comment">//3：外层括号 (*globalMap()) 是必须加的，否则会出错。</span></span><br><span class="line"><span class="comment">//4：(*globalMap())[&quot;apple&quot;] 访问或创建键 &quot;apple&quot; 的值。</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>⚠️<code>Q_GLOBAL_STATIC</code>创建对象时， <strong>不能附带构造函数参数</strong>，它只支持默认构造函数。如果需要附带参数初始化全局单例，应该用 <strong><code>Q_GLOBAL_STATIC_WITH_ARGS</code></strong>。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Q_GLOBAL_STATIC</span>(GlobalClass, globalClass) <span class="comment">//GlobalClass 必须有默认构造函数。</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">// 使用时</span></span><br><span class="line"><span class="built_in">GlobalClass</span>()-&gt;<span class="built_in">myfunction</span>(<span class="string">&quot;实参&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-5-QApplication-子类-宏-方式"><a href="#✅-5-QApplication-子类-宏-方式" class="headerlink" title="✅ 5. QApplication 子类+宏 方式"></a>✅ 5. QApplication 子类+宏 方式</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">//重写QApplication</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyQApplication</span> : <span class="keyword">public</span> QApplication &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    QString userToken;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//main函数初始化构造MyQApplication</span></span><br><span class="line"><span class="function">MyApp <span class="title">app</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取当前项目唯一的 MyQApplication 实例 ,定义为宏</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> myApp (static_cast<span class="string">&lt;MyQApplication*&gt;</span>(QCoreApplication::instance()))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//使用宏全局调用</span></span><br><span class="line">myApp-&gt;userToken = <span class="string">&quot;abc123&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-6-命名空间方式"><a href="#✅-6-命名空间方式" class="headerlink" title="✅ 6. 命名空间方式"></a>✅ 6. 命名空间方式</h2><p>⚠️仅支持 C++17 及以上</p>
+<p><strong>inline variables</strong>（内联变量） —— 允许在头文件中定义且只会有一个实例。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Global &#123;</span><br><span class="line">    <span class="keyword">inline</span> <span class="type">int</span> counter = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123; counter = <span class="number">0</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Global::counter++;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-7-全局工具函数"><a href="#✅-7-全局工具函数" class="headerlink" title="✅ 7. 全局工具函数"></a>✅ 7. 全局工具函数</h2><p>⚠️仅支持 C++17 及以上</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">namespace</span> Util &#123;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">log</span><span class="params">(<span class="type">const</span> QString&amp; msg)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">qDebug</span>() &lt;&lt; <span class="string">&quot;[LOG]&quot;</span> &lt;&lt; msg;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Util::<span class="built_in">log</span>(<span class="string">&quot;App started&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="📌-总结建议"><a href="#📌-总结建议" class="headerlink" title="📌 总结建议"></a>📌 总结建议</h2><ul>
+<li>简单数据可用 <code>extern + QMutex</code>；</li>
+<li>多模块共享用 <code>static</code> 成员；</li>
+<li>全局复杂状态推荐用单例；</li>
+<li>轻量线程安全首选 <code>Q_GLOBAL_STATIC</code>；</li>
+<li>GUI 层次可在 QApplication 挂载；</li>
+<li>工具函数、常量组织建议用 <code>namespace</code>。</li>
+</ul>
 ]]></content>
       <categories>
         <category>QT_知识总结</category>
@@ -3120,6 +3282,115 @@
       <tags>
         <tag>QT</tag>
         <tag>C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>多线程中的线程安全策略详解</title>
+    <url>/2025/06/14/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%AD%96%E7%95%A5%E8%AF%A6%E8%A7%A3/</url>
+    <content><![CDATA[<blockquote>
+<p>本文详细整理了保证线程安全的各种常用手段，包括加锁、原子操作、线程间通信、设计模式等，适合 C++ &#x2F; Qt 开发者参考使用。</p>
+</blockquote>
+<hr>
+<h2 id="一、同步机制（保护共享资源）"><a href="#一、同步机制（保护共享资源）" class="headerlink" title="一、同步机制（保护共享资源）"></a>一、同步机制（保护共享资源）</h2><h3 id="1-加锁（Mutex）"><a href="#1-加锁（Mutex）" class="headerlink" title="1. 加锁（Mutex）"></a>1. 加锁（Mutex）</h3><blockquote>
+<p>最常见，也是最通用的线程同步手段。</p>
+</blockquote>
+<ul>
+<li>C++: <code>std::mutex</code> &#x2F; <code>std::recursive_mutex</code> &#x2F; <code>std::shared_mutex</code></li>
+<li>Qt: <code>QMutex</code> &#x2F; <code>QReadWriteLock</code></li>
+</ul>
+<h4 id="示例（C-11）："><a href="#示例（C-11）：" class="headerlink" title="示例（C++11）："></a>示例（C++11）：</h4><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::mutex mtx;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadSafeFunc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mtx.<span class="built_in">lock</span>();</span><br><span class="line">    <span class="comment">// 临界区</span></span><br><span class="line">    mtx.<span class="built_in">unlock</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="推荐使用-RAII-写法："><a href="#推荐使用-RAII-写法：" class="headerlink" title="推荐使用 RAII 写法："></a>推荐使用 RAII 写法：</h4><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mtx)</span></span>; <span class="comment">// 自动加锁和解锁</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Qt-中推荐使用："><a href="#Qt-中推荐使用：" class="headerlink" title="Qt 中推荐使用："></a>Qt 中推荐使用：</h4><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">QMutexLocker locker(&amp;m_mutex); <span class="comment">// 自动加锁/解锁</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-原子操作（Atomic）"><a href="#2-原子操作（Atomic）" class="headerlink" title="2. 原子操作（Atomic）"></a>2. 原子操作（Atomic）</h3><p>用于<strong>无需加锁的简单变量</strong>操作，性能更好。</p>
+<ul>
+<li>Qt: <code>QAtomicInt</code>, <code>QAtomicPointer</code></li>
+<li>C++: <code>std::atomic</code></li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::atomic&lt;<span class="type">int</span>&gt; counter = <span class="number">0</span>;</span><br><span class="line">counter++;</span><br></pre></td></tr></table></figure>
+
+<p>适用于：计数器、自增ID等场景。</p>
+<hr>
+<h3 id="3-条件变量（Condition-Variable）"><a href="#3-条件变量（Condition-Variable）" class="headerlink" title="3. 条件变量（Condition Variable）"></a>3. 条件变量（Condition Variable）</h3><p>用于线程间协作，<strong>一个线程等待条件达成后继续执行</strong>。</p>
+<ul>
+<li>C++: <code>std::condition_variable</code></li>
+<li>Qt: <code>QWaitCondition</code></li>
+</ul>
+<hr>
+<h2 id="二、线程间通信机制"><a href="#二、线程间通信机制" class="headerlink" title="二、线程间通信机制"></a>二、线程间通信机制</h2><h3 id="1-Qt-信号槽机制（推荐）"><a href="#1-Qt-信号槽机制（推荐）" class="headerlink" title="1. Qt 信号槽机制（推荐）"></a>1. Qt 信号槽机制（推荐）</h3><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">connect(worker, &amp;<span class="attribute">Worker</span>::finished, <span class="keyword">this</span>, &amp;<span class="attribute">MainWindow</span>::onWorkerDone, <span class="attribute">Qt</span>::QueuedConnection);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>跨线程使用 <code>Qt::QueuedConnection</code>，自动排队处理，<strong>避免并发冲突</strong>。</li>
+</ul>
+<hr>
+<h3 id="2-消息队列-环形缓冲区"><a href="#2-消息队列-环形缓冲区" class="headerlink" title="2. 消息队列 &#x2F; 环形缓冲区"></a>2. 消息队列 &#x2F; 环形缓冲区</h3><ul>
+<li>自定义线程安全队列（带锁或无锁）</li>
+<li>用于：生产者-消费者模型，数据采集、任务队列</li>
+</ul>
+<hr>
+<h2 id="三、设计层面策略"><a href="#三、设计层面策略" class="headerlink" title="三、设计层面策略"></a>三、设计层面策略</h2><h3 id="1-线程封闭（Thread-Confinement）"><a href="#1-线程封闭（Thread-Confinement）" class="headerlink" title="1. 线程封闭（Thread Confinement）"></a>1. 线程封闭（Thread Confinement）</h3><blockquote>
+<p>保证某资源只由一个线程访问，<strong>不共享</strong>，自然线程安全。</p>
+</blockquote>
+<p>例如：每个线程拥有独立数据库连接、日志文件句柄等。</p>
+<hr>
+<h3 id="2-不可变对象（Immutable）"><a href="#2-不可变对象（Immutable）" class="headerlink" title="2. 不可变对象（Immutable）"></a>2. 不可变对象（Immutable）</h3><p>不可变对象在多线程环境下可以安全共享：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">const</span> QString config = <span class="string">&quot;setting.conf&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-拷贝而非共享（Copy-on-write）"><a href="#3-拷贝而非共享（Copy-on-write）" class="headerlink" title="3. 拷贝而非共享（Copy-on-write）"></a>3. 拷贝而非共享（Copy-on-write）</h3><p>Qt 容器和 QString 默认实现了写时复制（隐式共享），如：</p>
+<figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">QString a = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">QString b = a; <span class="comment">// 实际未复制，直到 b 修改时才复制</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、现代语言机制支持"><a href="#四、现代语言机制支持" class="headerlink" title="四、现代语言机制支持"></a>四、现代语言机制支持</h2><h3 id="1-std-future-std-promise（C-11）"><a href="#1-std-future-std-promise（C-11）" class="headerlink" title="1. std::future &#x2F; std::promise（C++11）"></a>1. <code>std::future</code> &#x2F; <code>std::promise</code>（C++11）</h3><p>支持线程返回值、异步等待：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::future&lt;<span class="type">int</span>&gt; result = std::<span class="built_in">async</span>([]()&#123; <span class="keyword">return</span> <span class="number">42</span>; &#125;);</span><br><span class="line"><span class="type">int</span> value = result.<span class="built_in">get</span>(); <span class="comment">// 等待并获取结果</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-QtConcurrent（高级并行框架）"><a href="#2-QtConcurrent（高级并行框架）" class="headerlink" title="2. QtConcurrent（高级并行框架）"></a>2. QtConcurrent（高级并行框架）</h3><p>适用于并行处理容器、图像数据等：</p>
+<figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">QFuture&lt;<span class="built_in">int</span>&gt; future = <span class="attribute">QtConcurrent</span>::run(myFunction);</span><br></pre></td></tr></table></figure>
+
+<p>通过 <code>QFutureWatcher</code> 接收回调。</p>
+<hr>
+<h2 id="五、其他辅助建议"><a href="#五、其他辅助建议" class="headerlink" title="五、其他辅助建议"></a>五、其他辅助建议</h2><table>
+<thead>
+<tr>
+<th>建议</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>✅ 缩小锁粒度</td>
+<td>尽量缩小加锁代码范围，提升性能</td>
+</tr>
+<tr>
+<td>✅ 避免死锁</td>
+<td>保证加锁顺序一致，少用嵌套锁</td>
+</tr>
+<tr>
+<td>✅ 多用值传递，少用共享</td>
+<td>倾向局部变量，减少共享资源</td>
+</tr>
+<tr>
+<td>✅ 使用线程池</td>
+<td>避免频繁创建&#x2F;销毁线程，统一管理资源</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、典型线程安全写法（Qt）"><a href="#六、典型线程安全写法（Qt）" class="headerlink" title="六、典型线程安全写法（Qt）"></a>六、典型线程安全写法（Qt）</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">class <span class="title">MyClass</span> &#123;</span><br><span class="line"><span class="attribute">private</span>:</span><br><span class="line">    QMutex m_mutex;</span><br><span class="line">    <span class="built_in">int</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="attribute">public</span>:</span><br><span class="line">    <span class="keyword">void</span> increment() &#123;</span><br><span class="line">        QMutexLocker locker(&amp;m_mutex);</span><br><span class="line">        counter++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>线程安全的目标是：<strong>多个线程访问共享资源时不发生冲突</strong>。加锁只是手段之一，合理的架构设计、并发模型和工具选择也非常关键。</p>
+<p>如有更复杂的线程需求，如线程池、异步通信、跨线程 GUI 操作等，建议结合 QtConcurrent &#x2F; QThread &#x2F; QMetaObject::invokeMethod 进一步扩展。</p>
+]]></content>
+      <categories>
+        <category>QT_知识总结</category>
+      </categories>
+      <tags>
+        <tag>QT</tag>
+        <tag>C++</tag>
+        <tag>线程</tag>
       </tags>
   </entry>
   <entry>
@@ -3344,115 +3615,6 @@
 <li>注意死锁、性能、调试成本问题</li>
 </ul>
 <p>如需更高级的并发模型，还可以考虑 Qt Concurrent、线程池（<code>QThreadPool</code>）、任务队列等方式。</p>
-]]></content>
-      <categories>
-        <category>QT_知识总结</category>
-      </categories>
-      <tags>
-        <tag>QT</tag>
-        <tag>C++</tag>
-        <tag>线程</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>多线程中的线程安全策略详解</title>
-    <url>/2025/06/14/%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%AD%96%E7%95%A5%E8%AF%A6%E8%A7%A3/</url>
-    <content><![CDATA[<blockquote>
-<p>本文详细整理了保证线程安全的各种常用手段，包括加锁、原子操作、线程间通信、设计模式等，适合 C++ &#x2F; Qt 开发者参考使用。</p>
-</blockquote>
-<hr>
-<h2 id="一、同步机制（保护共享资源）"><a href="#一、同步机制（保护共享资源）" class="headerlink" title="一、同步机制（保护共享资源）"></a>一、同步机制（保护共享资源）</h2><h3 id="1-加锁（Mutex）"><a href="#1-加锁（Mutex）" class="headerlink" title="1. 加锁（Mutex）"></a>1. 加锁（Mutex）</h3><blockquote>
-<p>最常见，也是最通用的线程同步手段。</p>
-</blockquote>
-<ul>
-<li>C++: <code>std::mutex</code> &#x2F; <code>std::recursive_mutex</code> &#x2F; <code>std::shared_mutex</code></li>
-<li>Qt: <code>QMutex</code> &#x2F; <code>QReadWriteLock</code></li>
-</ul>
-<h4 id="示例（C-11）："><a href="#示例（C-11）：" class="headerlink" title="示例（C++11）："></a>示例（C++11）：</h4><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::mutex mtx;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">threadSafeFunc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mtx.<span class="built_in">lock</span>();</span><br><span class="line">    <span class="comment">// 临界区</span></span><br><span class="line">    mtx.<span class="built_in">unlock</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="推荐使用-RAII-写法："><a href="#推荐使用-RAII-写法：" class="headerlink" title="推荐使用 RAII 写法："></a>推荐使用 RAII 写法：</h4><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="function">std::lock_guard&lt;std::mutex&gt; <span class="title">lock</span><span class="params">(mtx)</span></span>; <span class="comment">// 自动加锁和解锁</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="Qt-中推荐使用："><a href="#Qt-中推荐使用：" class="headerlink" title="Qt 中推荐使用："></a>Qt 中推荐使用：</h4><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">QMutexLocker locker(&amp;m_mutex); <span class="comment">// 自动加锁/解锁</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="2-原子操作（Atomic）"><a href="#2-原子操作（Atomic）" class="headerlink" title="2. 原子操作（Atomic）"></a>2. 原子操作（Atomic）</h3><p>用于<strong>无需加锁的简单变量</strong>操作，性能更好。</p>
-<ul>
-<li>Qt: <code>QAtomicInt</code>, <code>QAtomicPointer</code></li>
-<li>C++: <code>std::atomic</code></li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::atomic&lt;<span class="type">int</span>&gt; counter = <span class="number">0</span>;</span><br><span class="line">counter++;</span><br></pre></td></tr></table></figure>
-
-<p>适用于：计数器、自增ID等场景。</p>
-<hr>
-<h3 id="3-条件变量（Condition-Variable）"><a href="#3-条件变量（Condition-Variable）" class="headerlink" title="3. 条件变量（Condition Variable）"></a>3. 条件变量（Condition Variable）</h3><p>用于线程间协作，<strong>一个线程等待条件达成后继续执行</strong>。</p>
-<ul>
-<li>C++: <code>std::condition_variable</code></li>
-<li>Qt: <code>QWaitCondition</code></li>
-</ul>
-<hr>
-<h2 id="二、线程间通信机制"><a href="#二、线程间通信机制" class="headerlink" title="二、线程间通信机制"></a>二、线程间通信机制</h2><h3 id="1-Qt-信号槽机制（推荐）"><a href="#1-Qt-信号槽机制（推荐）" class="headerlink" title="1. Qt 信号槽机制（推荐）"></a>1. Qt 信号槽机制（推荐）</h3><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">connect(worker, &amp;<span class="attribute">Worker</span>::finished, <span class="keyword">this</span>, &amp;<span class="attribute">MainWindow</span>::onWorkerDone, <span class="attribute">Qt</span>::QueuedConnection);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>跨线程使用 <code>Qt::QueuedConnection</code>，自动排队处理，<strong>避免并发冲突</strong>。</li>
-</ul>
-<hr>
-<h3 id="2-消息队列-环形缓冲区"><a href="#2-消息队列-环形缓冲区" class="headerlink" title="2. 消息队列 &#x2F; 环形缓冲区"></a>2. 消息队列 &#x2F; 环形缓冲区</h3><ul>
-<li>自定义线程安全队列（带锁或无锁）</li>
-<li>用于：生产者-消费者模型，数据采集、任务队列</li>
-</ul>
-<hr>
-<h2 id="三、设计层面策略"><a href="#三、设计层面策略" class="headerlink" title="三、设计层面策略"></a>三、设计层面策略</h2><h3 id="1-线程封闭（Thread-Confinement）"><a href="#1-线程封闭（Thread-Confinement）" class="headerlink" title="1. 线程封闭（Thread Confinement）"></a>1. 线程封闭（Thread Confinement）</h3><blockquote>
-<p>保证某资源只由一个线程访问，<strong>不共享</strong>，自然线程安全。</p>
-</blockquote>
-<p>例如：每个线程拥有独立数据库连接、日志文件句柄等。</p>
-<hr>
-<h3 id="2-不可变对象（Immutable）"><a href="#2-不可变对象（Immutable）" class="headerlink" title="2. 不可变对象（Immutable）"></a>2. 不可变对象（Immutable）</h3><p>不可变对象在多线程环境下可以安全共享：</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">const</span> QString config = <span class="string">&quot;setting.conf&quot;</span>;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="3-拷贝而非共享（Copy-on-write）"><a href="#3-拷贝而非共享（Copy-on-write）" class="headerlink" title="3. 拷贝而非共享（Copy-on-write）"></a>3. 拷贝而非共享（Copy-on-write）</h3><p>Qt 容器和 QString 默认实现了写时复制（隐式共享），如：</p>
-<figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">QString a = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">QString b = a; <span class="comment">// 实际未复制，直到 b 修改时才复制</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="四、现代语言机制支持"><a href="#四、现代语言机制支持" class="headerlink" title="四、现代语言机制支持"></a>四、现代语言机制支持</h2><h3 id="1-std-future-std-promise（C-11）"><a href="#1-std-future-std-promise（C-11）" class="headerlink" title="1. std::future &#x2F; std::promise（C++11）"></a>1. <code>std::future</code> &#x2F; <code>std::promise</code>（C++11）</h3><p>支持线程返回值、异步等待：</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line">std::future&lt;<span class="type">int</span>&gt; result = std::<span class="built_in">async</span>([]()&#123; <span class="keyword">return</span> <span class="number">42</span>; &#125;);</span><br><span class="line"><span class="type">int</span> value = result.<span class="built_in">get</span>(); <span class="comment">// 等待并获取结果</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="2-QtConcurrent（高级并行框架）"><a href="#2-QtConcurrent（高级并行框架）" class="headerlink" title="2. QtConcurrent（高级并行框架）"></a>2. QtConcurrent（高级并行框架）</h3><p>适用于并行处理容器、图像数据等：</p>
-<figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">QFuture&lt;<span class="built_in">int</span>&gt; future = <span class="attribute">QtConcurrent</span>::run(myFunction);</span><br></pre></td></tr></table></figure>
-
-<p>通过 <code>QFutureWatcher</code> 接收回调。</p>
-<hr>
-<h2 id="五、其他辅助建议"><a href="#五、其他辅助建议" class="headerlink" title="五、其他辅助建议"></a>五、其他辅助建议</h2><table>
-<thead>
-<tr>
-<th>建议</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>✅ 缩小锁粒度</td>
-<td>尽量缩小加锁代码范围，提升性能</td>
-</tr>
-<tr>
-<td>✅ 避免死锁</td>
-<td>保证加锁顺序一致，少用嵌套锁</td>
-</tr>
-<tr>
-<td>✅ 多用值传递，少用共享</td>
-<td>倾向局部变量，减少共享资源</td>
-</tr>
-<tr>
-<td>✅ 使用线程池</td>
-<td>避免频繁创建&#x2F;销毁线程，统一管理资源</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="六、典型线程安全写法（Qt）"><a href="#六、典型线程安全写法（Qt）" class="headerlink" title="六、典型线程安全写法（Qt）"></a>六、典型线程安全写法（Qt）</h2><figure class="highlight qt"><table><tr><td class="code"><pre><span class="line">class <span class="title">MyClass</span> &#123;</span><br><span class="line"><span class="attribute">private</span>:</span><br><span class="line">    QMutex m_mutex;</span><br><span class="line">    <span class="built_in">int</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="attribute">public</span>:</span><br><span class="line">    <span class="keyword">void</span> increment() &#123;</span><br><span class="line">        QMutexLocker locker(&amp;m_mutex);</span><br><span class="line">        counter++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>线程安全的目标是：<strong>多个线程访问共享资源时不发生冲突</strong>。加锁只是手段之一，合理的架构设计、并发模型和工具选择也非常关键。</p>
-<p>如有更复杂的线程需求，如线程池、异步通信、跨线程 GUI 操作等，建议结合 QtConcurrent &#x2F; QThread &#x2F; QMetaObject::invokeMethod 进一步扩展。</p>
 ]]></content>
       <categories>
         <category>QT_知识总结</category>
