@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Qt （QPainter） 绘图系统详解 | 浮生往事留痕</title><meta name="author" content="张博豪"><meta name="copyright" content="张博豪"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文介绍了QT的图形绘制机制，针对于QPainter画家对象的使用进行详细示例。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qt （QPainter） 绘图系统详解">
+<meta property="og:url" content="http://example.com/2025/07/28/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="浮生往事留痕">
+<meta property="og:description" content="本文介绍了QT的图形绘制机制，针对于QPainter画家对象的使用进行详细示例。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3.png">
+<meta property="article:published_time" content="2025-07-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-07-27T16:00:00.000Z">
+<meta property="article:author" content="张博豪">
+<meta property="article:tag" content="QT">
+<meta property="article:tag" content="QT_UI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Qt （QPainter） 绘图系统详解",
+  "url": "http://example.com/2025/07/28/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3/",
+  "image": "http://example.com/img/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3.png",
+  "datePublished": "2025-07-27T16:00:00.000Z",
+  "dateModified": "2025-07-27T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "张博豪",
+      "url": "https://zhishuyouling7766.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/bogFavicon.png"><link rel="canonical" href="http://example.com/2025/07/28/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":500,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-center"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Qt （QPainter） 绘图系统详解',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/%E4%B8%BB%E9%A1%B5%E8%83%8C%E6%99%AF.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">25</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">浮生往事留痕</span></a><a class="nav-page-title" href="/"><span class="site-name">Qt （QPainter） 绘图系统详解</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Qt （QPainter） 绘图系统详解</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-07-27T16:00:00.000Z" title="发表于 2025-07-28 00:00:00">2025-07-28</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-07-27T16:00:00.000Z" title="更新于 2025-07-28 00:00:00">2025-07-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/QT-UI%E9%85%8D%E7%BD%AE/">QT_UI配置</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>本文介绍了QT的图形绘制机制，针对于QPainter画家对象的使用进行详细示例。</p>
+</blockquote>
+<hr>
+<h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><p>Qt 的绘图系统是 Qt GUI 的核心组成部分之一，支持高质量的 2D 图形绘制，适用于图形界面、图形编辑器、图表、图像处理等众多应用场景。它围绕几个关键类展开，包括 <code>QPainter</code>、<code>QPaintDevice</code>、<code>QPaintEvent</code>，以及一系列辅助类如 <code>QPen</code>、<code>QBrush</code>、<code>QColor</code>、<code>QPixmap</code> 等。</p>
+<h2 id="二、绘图核心概念"><a href="#二、绘图核心概念" class="headerlink" title="二、绘图核心概念"></a>二、绘图核心概念</h2><ol>
+<li><code>QPainter</code> —— 画家对象<br>绘制行为的核心类，用来在指定设备（如 <code>QWidget</code>、<code>QPixmap</code>、<code>QImage</code> 等）上绘制形状、文字、图像。</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QPainter <span class="title">painter</span><span class="params">(<span class="keyword">this</span>)</span></span>;  <span class="comment">// this 是 QWidget*</span></span><br><span class="line">painter.<span class="built_in">drawLine</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">100</span>);</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li><p><code>QPaintDevice</code> —— 绘图目标<br>Qt 中所有能被绘制的对象都继承自 <code>QPaintDevice</code>，例如 <code>QWidget</code>、<code>QPixmap</code>、<code>QImage</code>、<code>QPicture</code>、<code>QPrinter</code> 等。</p>
+</li>
+<li><p><code>QPaintEvent</code> —— 重绘事件<br>系统或用户触发的绘制事件，Qt 会自动调用控件的 <code>paintEvent(QPaintEvent*) </code>函数进行绘制。</p>
+</li>
+</ol>
+<h2 id="三、绘图的标准流程"><a href="#三、绘图的标准流程" class="headerlink" title="三、绘图的标准流程"></a>三、绘图的标准流程</h2><p>以*** <code>QWidget</code>*** 为例，自定义绘图流程如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">MyWidget::paintEvent</span><span class="params">(QPaintEvent *event)</span> </span>&#123;</span><br><span class="line">    <span class="function">QPainter <span class="title">painter</span><span class="params">(<span class="keyword">this</span>)</span></span>;  <span class="comment">// 绘图目标是当前窗口</span></span><br><span class="line">    painter.<span class="built_in">setPen</span>(Qt::black);</span><br><span class="line">    painter.<span class="built_in">setBrush</span>(Qt::green);</span><br><span class="line">    painter.<span class="built_in">drawRect</span>(<span class="number">10</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">50</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="1、paintEvent-QPaintEvent-event-什么时候触发？"><a href="#1、paintEvent-QPaintEvent-event-什么时候触发？" class="headerlink" title="1、paintEvent(QPaintEvent *event) 什么时候触发？"></a>1、paintEvent(QPaintEvent *event) 什么时候触发？</h3><p>**<code>paintEvent(QPaintEvent *event)</code>**是 <strong>QWidget 的虚函数</strong>，属于 Qt <strong>事件驱动机制</strong>中处理“绘图请求”的核心接口。 在Qt 的生命周期管理中，它是 窗口需要绘制时 Qt 自动调用的一环。</p>
+<ol>
+<li><p>控件<strong>第一次显示</strong><br>当窗口或控件第一次被显示时，系统会自动触发一次 <code>paintEvent()</code>。</p>
+</li>
+<li><p>控件被<strong>遮挡&#x2F;还原&#x2F;移动</strong><br>用户操作导致控件部分内容需要刷新时（如被遮挡后恢复、移出屏幕又移回），Qt 会重新绘制该区域。</p>
+</li>
+<li><p>调用了以下函数（手动请求重绘）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">widget-&gt;update();      // 请求在下一事件循环中重绘（推荐）</span><br><span class="line">widget-&gt;repaint();     // 立即重绘（不推荐频繁使用）</span><br></pre></td></tr></table></figure></li>
+<li><p>控件大小改变（触发 resizeEvent() 后通常也会触发 paintEvent()）</p>
+</li>
+</ol>
+<h3 id="2、-窗口绘制生命周期（简化流程）"><a href="#2、-窗口绘制生命周期（简化流程）" class="headerlink" title="2、 窗口绘制生命周期（简化流程）"></a>2、 窗口绘制生命周期（简化流程）</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">构造函数 → <span class="built_in">showEvent</span>() → <span class="built_in">paintEvent</span>() → <span class="built_in">resizeEvent</span>() → mouse/key/事件 → <span class="built_in">closeEvent</span>()</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、-局部临时变量-QPainter-painter-this-的存在逻辑"><a href="#3、-局部临时变量-QPainter-painter-this-的存在逻辑" class="headerlink" title="3、 局部临时变量 QPainter painter(this)的存在逻辑"></a>3、 局部临时变量 <code>QPainter painter(this)</code>的存在逻辑</h3><p>🧠 <strong>问：为什么在<code>paintEvent()</code> 里创建一个临时的 <code>QPainter painter(this)</code>，这不就是个普通局部变量吗？它和 <code>paintEvent</code> 的绘图机制到底有什么联系？</strong></p>
+<ul>
+<li><p>首先，要了解绘制系统的底层流程（Windows 为例）</p>
+<p>当窗口需要重绘时，<strong>操作系统发出 <code>WM_PAINT</code> 消息</strong>，Qt 内部会进行如下操作：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">QWidget::event</span><span class="params">(QEvent *event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (event-&gt;<span class="built_in">type</span>() == QEvent::Paint)</span><br><span class="line">        <span class="built_in">paintEvent</span>(<span class="built_in">static_cast</span>&lt;QPaintEvent*&gt;(event));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在调用 <code>paintEvent()</code> 前，<strong>Qt 内部已经设置好了绘图的上下文（HDC）</strong>，可以理解为：</p>
+<blockquote>
+<p>“纸张已经铺好，墨水准备好了，只等你拿画笔画画”。</p>
+</blockquote>
+<p>而这个“纸张”和“墨水”的接口是私有的，<strong>你只能在 <code>paintEvent()</code> 这时候接触它！</strong></p>
+</li>
+<li><p>此时Qt 内部已经 <strong>begin()</strong> 了一个设备上下文（如 Windows 的 <code>BeginPaint()</code>）；</p>
+<p>系统只允许你<strong>在这个时间段</strong>绘图；</p>
+<p>Qt 只允许你通过 <strong><code>QPainter painter(this)</code></strong> 的方式<strong>短暂持有该上下文</strong>。</p>
+</li>
+<li><p>所以，表面上是：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QPainter <span class="title">painter</span><span class="params">(<span class="keyword">this</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>但实际内部是：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">QPainter painter;</span><br><span class="line">painter.<span class="built_in">begin</span>(<span class="keyword">this</span>); <span class="comment">// 获取绘图上下文</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">painter.<span class="built_in">end</span>(); <span class="comment">// 释放绘图上下文（等效于系统的 EndPaint）</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>⚠️<strong>你只是在 paintEvent 有权限获得这个设备上下文</strong>；</p>
+<p><code>QPainter</code> 析构时自动调用 <code>end()</code>，完成绘图、释放资源。</p>
+</li>
+</ul>
+<h2 id="三、获取画家对象painter-this-后可以进行的操作"><a href="#三、获取画家对象painter-this-后可以进行的操作" class="headerlink" title="三、获取画家对象painter(this)后可以进行的操作"></a>三、获取画家对象<code>painter(this)</code>后可以进行的操作</h2><h3 id="1、基础绘制操作"><a href="#1、基础绘制操作" class="headerlink" title="1、基础绘制操作"></a>1、基础绘制操作</h3><ul>
+<li><h4 id="绘制基本图形"><a href="#绘制基本图形" class="headerlink" title="绘制基本图形"></a>绘制基本图形</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">painter.<span class="built_in">drawLine</span>(x1, y1, x2, y2);         <span class="comment">// 起点 (x1, y1)，终点 (x2, y2)，画一条直线</span></span><br><span class="line">painter.<span class="built_in">drawRect</span>(x, y, w, h);             <span class="comment">// 左上角 (x, y)，宽 w，高 h，画一个矩形</span></span><br><span class="line">painter.<span class="built_in">drawEllipse</span>(x, y, w, h);          <span class="comment">// 左上角 (x, y)，宽 w，高 h，画椭圆</span></span><br><span class="line">painter.<span class="built_in">drawPoint</span>(x, y);                  <span class="comment">// 坐标 (x, y)，绘制一个像素点</span></span><br><span class="line"></span><br><span class="line">QPolygon poly;</span><br><span class="line">poly &lt;&lt; <span class="built_in">QPoint</span>(<span class="number">10</span>,<span class="number">10</span>) &lt;&lt; <span class="built_in">QPoint</span>(<span class="number">100</span>,<span class="number">10</span>) &lt;&lt; <span class="built_in">QPoint</span>(<span class="number">100</span>,<span class="number">100</span>);</span><br><span class="line">painter.<span class="built_in">drawPolygon</span>(poly);            <span class="comment">// 用 QPolygon 指定的多个点绘制闭合多边形</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//外接矩形 (x, y, w, h)，起始角 startAngle，跨度角 spanAngle（单位为 1/16°）画弧线</span></span><br><span class="line">painter.<span class="built_in">drawArc</span>(x, y, w, h, startAngle, spanAngle);   <span class="comment">// 画弧线</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="绘制文本"><a href="#绘制文本" class="headerlink" title="绘制文本"></a>绘制文本</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line">painter.<span class="built_in">drawText</span>(x, y, <span class="string">&quot;text&quot;</span>);       <span class="comment">// 在指定位置画文字</span></span><br><span class="line"><span class="comment">// 文本绘制的起始位置（基线左下角）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//2</span></span><br><span class="line">painter.<span class="built_in">drawText</span>(QRect, alignment, <span class="string">&quot;text&quot;</span>); <span class="comment">// 在矩形内按对齐方式绘制</span></span><br><span class="line"><span class="comment">//QRect	文本绘制的矩形区域</span></span><br><span class="line">	<span class="comment">//QRect(int x, int y, int w, int h)	指定位置 (x, y) 和大小 (w, h)</span></span><br><span class="line">	<span class="comment">//QRect(QPoint topLeft, QPoint bottomRight)	通过两个点构造</span></span><br><span class="line"><span class="comment">//alignment	对齐方式</span></span><br><span class="line">    <span class="comment">//Qt::AlignLeft	左对齐</span></span><br><span class="line">    <span class="comment">//Qt::AlignRight	右对齐</span></span><br><span class="line">    <span class="comment">//Qt::AlignHCenter	水平居中</span></span><br><span class="line">    <span class="comment">//Qt::AlignTop	顶部对齐</span></span><br><span class="line">    <span class="comment">//Qt::AlignBottom	底部对齐</span></span><br><span class="line">    <span class="comment">//Qt::AlignVCenter	垂直居中</span></span><br><span class="line">    <span class="comment">//Qt::AlignCenter	水平+垂直都居中（相当于 HCenter + VCenter）</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><h4 id="绘制图片"><a href="#绘制图片" class="headerlink" title="绘制图片"></a>绘制图片</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QPixmap <span class="title">pix</span><span class="params">(<span class="string">&quot;:/image.png&quot;</span>)</span></span>;</span><br><span class="line">painter.<span class="built_in">drawPixmap</span>(x, y, pix);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="2、设置绘图属性"><a href="#2、设置绘图属性" class="headerlink" title="2、设置绘图属性"></a>2、设置绘图属性</h3><ul>
+<li><h4 id="设置画笔-QPen（用于边线）"><a href="#设置画笔-QPen（用于边线）" class="headerlink" title="设置画笔 QPen（用于边线）"></a>设置画笔 QPen（用于边线）</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QPen <span class="title">pen</span><span class="params">(Qt::red, <span class="number">3</span>, Qt::DashLine)</span></span>; <span class="comment">// 红色、3像素、虚线</span></span><br><span class="line">painter.<span class="built_in">setPen</span>(pen);</span><br><span class="line"></span><br><span class="line"><span class="comment">//Qt::NoPen	无线条，不绘制任何线	</span></span><br><span class="line"><span class="comment">//Qt::SolidLine	实线	━━━━━━━━━━</span></span><br><span class="line"><span class="comment">//Qt::DashLine	虚线（短划线）	─ ─ ─ ─ ─</span></span><br><span class="line"><span class="comment">//Qt::DotLine	点线	· · · · ·</span></span><br><span class="line"><span class="comment">//Qt::DashDotLine	虚线 + 点交替	─ · ─ · ─</span></span><br><span class="line"><span class="comment">//Qt::DashDotDotLine	虚线 + 两点交替	─ ·· ─ ·· ─</span></span><br><span class="line"><span class="comment">//Qt::CustomDashLine	自定义虚线样式（需设置 pattern）</span></span><br></pre></td></tr></table></figure>
+
+</li>
+<li><h4 id="设置画刷-QBrush（用于填充）"><a href="#设置画刷-QBrush（用于填充）" class="headerlink" title="设置画刷 QBrush（用于填充）"></a>设置画刷 QBrush（用于填充）</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QBrush <span class="title">brush</span><span class="params">(Qt::blue, Qt::Dense4Pattern)</span></span>; <span class="comment">// 蓝色、填充图案</span></span><br><span class="line">painter.<span class="built_in">setBrush</span>(brush);</span><br><span class="line"></span><br><span class="line"><span class="comment">// (颜色替代方案)</span></span><br><span class="line">	<span class="comment">//QColor myColor(0, 0, 255, 128);  //半透明蓝</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//Qt::NoBrush	无填充	不进行填充，仅绘制边框	</span></span><br><span class="line"><span class="comment">//Qt::SolidPattern	实心填充	使用纯色填充	█████████</span></span><br><span class="line"><span class="comment">//Qt::Dense1Pattern	密度图案1	非常密集的斜线填充	≈█████████</span></span><br><span class="line"><span class="comment">//Qt::Dense2Pattern	密度图案2	较密的斜线填充	≈███████</span></span><br><span class="line"><span class="comment">//Qt::Dense3Pattern	密度图案3	中等密度	≈█████</span></span><br><span class="line"><span class="comment">//Qt::Dense4Pattern	密度图案4	适中密度，类似点阵斜线	≈███</span></span><br><span class="line"><span class="comment">//Qt::Dense5Pattern	密度图案5	稍稀疏	≈██</span></span><br><span class="line"><span class="comment">//Qt::Dense6Pattern	密度图案6	更稀疏	≈█</span></span><br><span class="line"><span class="comment">//Qt::Dense7Pattern	密度图案7	极其稀疏	≈</span></span><br><span class="line"><span class="comment">//Qt::HorPattern	水平线	水平条纹	―――――――</span></span><br><span class="line"><span class="comment">//Qt::VerPattern	垂直线	垂直条纹	</span></span><br><span class="line"><span class="comment">//Qt::CrossPattern	十字交叉线	垂直+水平线	+++++++</span></span><br><span class="line"><span class="comment">//Qt::BDiagPattern	反斜线	左下到右上的斜线填充	////////</span></span><br><span class="line"><span class="comment">//Qt::FDiagPattern	正斜线	左上到右下的斜线填充	\\\\</span></span><br><span class="line"><span class="comment">//Qt::DiagCrossPattern	斜十字线	两方向斜线交叉	xxxx</span></span><br><span class="line"><span class="comment">//Qt::TexturePattern	纹理贴图	使用图片纹理填充（需配合 QPixmap）	自定义图案</span></span><br></pre></td></tr></table></figure>
+
+</li>
+<li><h4 id="设置字体-QFont"><a href="#设置字体-QFont" class="headerlink" title="设置字体 QFont"></a>设置字体 QFont</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QFont <span class="title">font</span><span class="params">(<span class="string">&quot;Arial&quot;</span>, <span class="number">12</span>, QFont::Bold)</span></span>; </span><br><span class="line"><span class="comment">//字体名称	&quot;Arial&quot;	字体族名，需系统中安装该字体</span></span><br><span class="line"><span class="comment">//字号大小	12	字号大小，单位为点（pt）</span></span><br><span class="line"><span class="comment">//字重（weight）	QFont::Bold ≈ 75  (可以使用整数代替该枚举类 0 ~ 99)  </span></span><br><span class="line">painter.<span class="built_in">setFont</span>(font);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="3、变换与坐标系统"><a href="#3、变换与坐标系统" class="headerlink" title="3、变换与坐标系统"></a>3、变换与坐标系统</h3><ul>
+<li><h4 id="平移、旋转、缩放"><a href="#平移、旋转、缩放" class="headerlink" title="平移、旋转、缩放"></a>平移、旋转、缩放</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">painter.<span class="built_in">translate</span>(dx, dy);      <span class="comment">// 移动坐标原点</span></span><br><span class="line">painter.<span class="built_in">rotate</span>(<span class="number">45</span>);             <span class="comment">// 旋转45度</span></span><br><span class="line">painter.<span class="built_in">scale</span>(<span class="number">1.5</span>, <span class="number">1.5</span>);        <span class="comment">// 缩放</span></span><br></pre></td></tr></table></figure></li>
+<li><h4 id="保存与恢复状态"><a href="#保存与恢复状态" class="headerlink" title="保存与恢复状态"></a>保存与恢复状态</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">painter.<span class="built_in">save</span>();</span><br><span class="line"><span class="comment">// 做一些变换或临时设置</span></span><br><span class="line">painter.<span class="built_in">restore</span>();</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="4、抗锯齿与渲染优化"><a href="#4、抗锯齿与渲染优化" class="headerlink" title="4、抗锯齿与渲染优化"></a>4、抗锯齿与渲染优化</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">painter.<span class="built_in">setRenderHint</span>(QPainter::Antialiasing);         <span class="comment">// 抗锯齿</span></span><br><span class="line">painter.<span class="built_in">setRenderHint</span>(QPainter::TextAntialiasing);     <span class="comment">// 文字抗锯齿</span></span><br><span class="line">painter.<span class="built_in">setRenderHint</span>(QPainter::SmoothPixmapTransform);<span class="comment">// 图片平滑</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5、剪裁区域（限制绘图区域）"><a href="#5、剪裁区域（限制绘图区域）" class="headerlink" title="5、剪裁区域（限制绘图区域）"></a>5、剪裁区域（限制绘图区域）</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">painter.<span class="built_in">setClipRect</span>(<span class="built_in">QRect</span>(...));   <span class="comment">// 设置剪裁区域</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6、复杂路径绘制（QPainterPath）"><a href="#6、复杂路径绘制（QPainterPath）" class="headerlink" title="6、复杂路径绘制（QPainterPath）"></a>6、复杂路径绘制（QPainterPath）</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">QPainterPath path;</span><br><span class="line">path.<span class="built_in">moveTo</span>(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">path.<span class="built_in">cubicTo</span>(...);</span><br><span class="line">painter.<span class="built_in">drawPath</span>(path);</span><br></pre></td></tr></table></figure>
+
+<h3 id="7、渐变填充"><a href="#7、渐变填充" class="headerlink" title="7、渐变填充"></a>7、渐变填充</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QLinearGradient <span class="title">gradient</span><span class="params">(x1, y1, x2, y2)</span></span>;</span><br><span class="line">gradient.<span class="built_in">setColorAt</span>(<span class="number">0</span>, Qt::white);</span><br><span class="line">gradient.<span class="built_in">setColorAt</span>(<span class="number">1</span>, Qt::black);</span><br><span class="line">painter.<span class="built_in">setBrush</span>(gradient);</span><br><span class="line">painter.<span class="built_in">drawRect</span>(...);</span><br></pre></td></tr></table></figure>
+
+<h3 id="8、组合模式（混合效果）"><a href="#8、组合模式（混合效果）" class="headerlink" title="8、组合模式（混合效果）"></a>8、组合模式（混合效果）</h3><p><strong>混合模式（合成模式）</strong>，它会改变后续绘图操作中**源图像（新画的内容）和目标图像（原有内容）*<em>之间的*<em>混合方式</em></em>。</p>
+<p><code>CompositionMode</code> 是 <code>QPainter</code> 中用于定义 <strong>像素如何叠加混合</strong> 的枚举，类似于 Photoshop 或其他图像编辑软件中的图层混合模式。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">QPainter <span class="title">painter</span><span class="params">(<span class="keyword">this</span>)</span></span>;</span><br><span class="line">painter.<span class="built_in">setCompositionMode</span>(QPainter::CompositionMode_Multiply);</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 绘制半透明红色背景</span></span><br><span class="line">painter.<span class="built_in">fillRect</span>(<span class="built_in">rect</span>(), <span class="built_in">QColor</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">150</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 绘制半透明蓝色图层</span></span><br><span class="line">painter.<span class="built_in">fillRect</span>(<span class="built_in">QRect</span>(<span class="number">50</span>, <span class="number">50</span>, <span class="number">100</span>, <span class="number">100</span>), <span class="built_in">QColor</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>, <span class="number">150</span>));</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>枚举值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>CompositionMode_SourceOver</code></td>
+<td>默认：源图绘制在目标图上方</td>
+</tr>
+<tr>
+<td><code>CompositionMode_DestinationOver</code></td>
+<td>目标图在源图之上</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Clear</code></td>
+<td>清除目标图对应区域</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Source</code></td>
+<td>只保留源图像像素</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Destination</code></td>
+<td>只保留目标图像像素</td>
+</tr>
+<tr>
+<td><code>CompositionMode_SourceIn</code></td>
+<td>仅目标区域显示源图</td>
+</tr>
+<tr>
+<td><code>CompositionMode_SourceOut</code></td>
+<td>目标区域之外显示源图</td>
+</tr>
+<tr>
+<td><code>CompositionMode_DestinationIn</code></td>
+<td>仅源区域显示目标图</td>
+</tr>
+<tr>
+<td><code>CompositionMode_DestinationOut</code></td>
+<td>源区域之外显示目标图</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Xor</code></td>
+<td>显示源和目标中互相不重叠部分</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Multiply</code></td>
+<td>颜色相乘，暗化效果</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Screen</code></td>
+<td>颜色反转乘积，变亮</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Overlay</code></td>
+<td>混合 Multiply + Screen</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Darken</code></td>
+<td>取每个像素的较暗值</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Lighten</code></td>
+<td>取每个像素的较亮值</td>
+</tr>
+<tr>
+<td><code>CompositionMode_ColorDodge</code></td>
+<td>淡化颜色</td>
+</tr>
+<tr>
+<td><code>CompositionMode_ColorBurn</code></td>
+<td>加深颜色</td>
+</tr>
+<tr>
+<td><code>CompositionMode_HardLight</code></td>
+<td>由源图主导的明暗混合</td>
+</tr>
+<tr>
+<td><code>CompositionMode_SoftLight</code></td>
+<td>柔和混合</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Difference</code></td>
+<td>取差值</td>
+</tr>
+<tr>
+<td><code>CompositionMode_Exclusion</code></td>
+<td>排除混合，类似差值但更柔和</td>
+</tr>
+</tbody></table>
+<h2 id="四、🖼️-控件显示-≠-实际“大小”"><a href="#四、🖼️-控件显示-≠-实际“大小”" class="headerlink" title="四、🖼️ 控件显示 ≠ 实际“大小”"></a>四、🖼️ 控件显示 ≠ 实际“大小”</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>是否受 <code>paintEvent</code> 影响</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>控件的大小（width&#x2F;height）</td>
+<td>❌</td>
+<td>由 <code>setFixedSize</code> &#x2F; 布局控制</td>
+</tr>
+<tr>
+<td>鼠标响应区域</td>
+<td>❌</td>
+<td>由控件的几何边界（<code>geometry()</code>）决定</td>
+</tr>
+<tr>
+<td>是否显示滚动条</td>
+<td>❌</td>
+<td>由布局容器或 <code>QScrollArea</code> 管理</td>
+</tr>
+<tr>
+<td>实际视觉内容</td>
+<td>✅</td>
+<td>由 <code>QPainter</code> 绘制决定</td>
+</tr>
+</tbody></table>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">张博豪</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://zhishuyouling7766.github.io/">https://zhishuyouling7766.github.io/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">此文章版权归 张博豪 所有，如有转载，请注明来自原作者</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/QT/">QT</a><a class="post-meta__tags" href="/tags/QT-UI/">QT_UI</a></div><div class="post-share"><div class="social-share" data-image="/img/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/07/21/C++%20%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%A9%B6/" title="C++ 枚举类型的深入探究"><img class="cover" src="/img/C++%20%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%A9%B6.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">C++ 枚举类型的深入探究</div></div><div class="info-2"><div class="info-item-1">本文件就 C++ 中的枚举类型 ，作以深入的探究和了解，总结了诸多莫名其妙可有可无的理解。</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/04/05/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5/" title="Qt UI 界面无操作超时自动返回首页"><img class="cover" src="/img/qt_UI_%E7%95%8C%E9%9D%A2%E6%97%A0%E6%93%8D%E4%BD%9C%E8%B6%85%E6%97%B6%E8%87%AA%E5%8A%A8%E8%BF%94%E5%9B%9E%E9%A6%96%E9%A1%B5.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-05</div><div class="info-item-2">Qt UI 界面无操作超时自动返回首页</div></div><div class="info-2"><div class="info-item-1">Qt 应用全局计时器功能实现：无操作一段时间后自动返回首页</div></div></div></a><a class="pagination-related" href="/2025/04/02/qt_UI_%E6%98%BE%E7%A4%BA%E5%99%A8%E5%88%86%E8%BE%A8%E7%8E%87%E5%B7%AE%E5%BC%82%E9%80%A0%E6%88%90%E6%8E%A7%E4%BB%B6%E4%B8%8E%E5%AD%97%E4%BD%93%E7%BC%A9%E6%94%BE%E5%B7%AE%E5%BC%82%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-02</div><div class="info-item-2">Qt UI 显示器分辨率差异造成控件与字体缩放差异解决方案</div></div><div class="info-2"><div class="info-item-1">在多分辨率或高 DPI 显示器环境下（例如 1080p 与 4K 显示器混用），默认 Qt 的缩放行为可能导致:字体和控件比例不正确</div></div></div></a><a class="pagination-related" href="/2025/05/25/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F/" title="Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）"><img class="cover" src="/img/qt_UI_%E8%AE%BE%E7%BD%AEMainWindow%E9%A1%B5%E9%A6%96%E8%8F%9C%E5%8D%95%E6%A0%8F.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-25</div><div class="info-item-2">Qt Designer 中设置MainWindow页首菜单栏（QMenu 与 QAction）</div></div><div class="info-2"><div class="info-item-1">本说明整理了如何在 Qt Designer 界面中设置首页顶部导航 QMenu 与 QAction，以及它们的关系和属性设置。</div></div></div></a><a class="pagination-related" href="/2025/04/30/C++%20%E4%B8%8E%20Qt%20%E5%AE%8F%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AF%B9%E6%AF%94/" title="C++ 与 Qt 宏机制详解与对比"><img class="cover" src="/img/C++%20%E4%B8%8E%20Qt%20%E5%AE%8F%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3%E4%B8%8E%E5%AF%B9%E6%AF%94.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-04-30</div><div class="info-item-2">C++ 与 Qt 宏机制详解与对比</div></div><div class="info-2"><div class="info-item-1">本文档介绍如何在 Qt 定义和运用宏 ， C++的一些常用宏 ， QT标准宏</div></div></div></a><a class="pagination-related" href="/2025/03/04/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF/" title="Qt项目在Android系统环境下实现开机自启"><img class="cover" src="/img/Qt%20for%20Android%20%E5%AE%9E%E7%8E%B0%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-04</div><div class="info-item-2">Qt项目在Android系统环境下实现开机自启</div></div><div class="info-2"><div class="info-item-1">Qt for Android 实现开机自启功能（BootReceiver + QtActivity）</div></div></div></a><a class="pagination-related" href="/2025/03/17/qmake_cmake%20%E9%A1%B9%E7%9B%AE%E9%85%8D%E7%BD%AE%E5%88%86%E6%9E%90/" title="qmake CMake 项目配置分析"><img class="cover" src="/img/qmake_cmake%20%E9%A1%B9%E7%9B%AE%E9%85%8D%E7%BD%AE%E5%88%86%E6%9E%90.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-03-17</div><div class="info-item-2">qmake CMake 项目配置分析</div></div><div class="info-2"><div class="info-item-1">QT两种配置文件qmake和CMake的对比分析与总结，以及qmake详细配置示例</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/%E5%A4%B4%E5%83%8F.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">张博豪</div><div class="author-info-description">18292971228</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">25</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/zhishuyouling7766"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="mailto:zbh18292971228@gmail.com" target="_blank" title="Google Email"><i class="fas fa-envelope" style="color: #646464;"></i></a><a class="social-icon" href="mailto:1932732463@qq.com" target="_blank" title="QQ Email"><i class="fab fa-qq" style="color: #646464;"></i></a><a class="social-icon" href="tel:+18292971228" target="_blank" title="telephone"><i class="fas fa-phone" style="color: #646464;"></i></a><a class="social-icon" href="https://butterfly.js.org/" target="_blank" title="Butterfly官方文档"><i class="fas fa-paperclip" style="color: #646464;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">由于浏览器缓存策略问题（为了快速的页面加载），博客内容可能无法自动获取更新，如有需求，请使用Ctrl+F5强制刷新页面，获取最新内容！！！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">一、简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%BB%98%E5%9B%BE%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="toc-number">2.</span> <span class="toc-text">二、绘图核心概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%BB%98%E5%9B%BE%E7%9A%84%E6%A0%87%E5%87%86%E6%B5%81%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">三、绘图的标准流程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81paintEvent-QPaintEvent-event-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E8%A7%A6%E5%8F%91%EF%BC%9F"><span class="toc-number">3.1.</span> <span class="toc-text">1、paintEvent(QPaintEvent *event) 什么时候触发？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81-%E7%AA%97%E5%8F%A3%E7%BB%98%E5%88%B6%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%EF%BC%88%E7%AE%80%E5%8C%96%E6%B5%81%E7%A8%8B%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">2、 窗口绘制生命周期（简化流程）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81-%E5%B1%80%E9%83%A8%E4%B8%B4%E6%97%B6%E5%8F%98%E9%87%8F-QPainter-painter-this-%E7%9A%84%E5%AD%98%E5%9C%A8%E9%80%BB%E8%BE%91"><span class="toc-number">3.3.</span> <span class="toc-text">3、 局部临时变量 QPainter painter(this)的存在逻辑</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%8E%B7%E5%8F%96%E7%94%BB%E5%AE%B6%E5%AF%B9%E8%B1%A1painter-this-%E5%90%8E%E5%8F%AF%E4%BB%A5%E8%BF%9B%E8%A1%8C%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-number">4.</span> <span class="toc-text">三、获取画家对象painter(this)后可以进行的操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E5%9F%BA%E7%A1%80%E7%BB%98%E5%88%B6%E6%93%8D%E4%BD%9C"><span class="toc-number">4.1.</span> <span class="toc-text">1、基础绘制操作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%98%E5%88%B6%E5%9F%BA%E6%9C%AC%E5%9B%BE%E5%BD%A2"><span class="toc-number">4.1.1.</span> <span class="toc-text">绘制基本图形</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%98%E5%88%B6%E6%96%87%E6%9C%AC"><span class="toc-number">4.1.2.</span> <span class="toc-text">绘制文本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%98%E5%88%B6%E5%9B%BE%E7%89%87"><span class="toc-number">4.1.3.</span> <span class="toc-text">绘制图片</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E8%AE%BE%E7%BD%AE%E7%BB%98%E5%9B%BE%E5%B1%9E%E6%80%A7"><span class="toc-number">4.2.</span> <span class="toc-text">2、设置绘图属性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E7%94%BB%E7%AC%94-QPen%EF%BC%88%E7%94%A8%E4%BA%8E%E8%BE%B9%E7%BA%BF%EF%BC%89"><span class="toc-number">4.2.1.</span> <span class="toc-text">设置画笔 QPen（用于边线）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E7%94%BB%E5%88%B7-QBrush%EF%BC%88%E7%94%A8%E4%BA%8E%E5%A1%AB%E5%85%85%EF%BC%89"><span class="toc-number">4.2.2.</span> <span class="toc-text">设置画刷 QBrush（用于填充）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E5%AD%97%E4%BD%93-QFont"><span class="toc-number">4.2.3.</span> <span class="toc-text">设置字体 QFont</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E5%8F%98%E6%8D%A2%E4%B8%8E%E5%9D%90%E6%A0%87%E7%B3%BB%E7%BB%9F"><span class="toc-number">4.3.</span> <span class="toc-text">3、变换与坐标系统</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%B3%E7%A7%BB%E3%80%81%E6%97%8B%E8%BD%AC%E3%80%81%E7%BC%A9%E6%94%BE"><span class="toc-number">4.3.1.</span> <span class="toc-text">平移、旋转、缩放</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%9D%E5%AD%98%E4%B8%8E%E6%81%A2%E5%A4%8D%E7%8A%B6%E6%80%81"><span class="toc-number">4.3.2.</span> <span class="toc-text">保存与恢复状态</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E6%8A%97%E9%94%AF%E9%BD%BF%E4%B8%8E%E6%B8%B2%E6%9F%93%E4%BC%98%E5%8C%96"><span class="toc-number">4.4.</span> <span class="toc-text">4、抗锯齿与渲染优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81%E5%89%AA%E8%A3%81%E5%8C%BA%E5%9F%9F%EF%BC%88%E9%99%90%E5%88%B6%E7%BB%98%E5%9B%BE%E5%8C%BA%E5%9F%9F%EF%BC%89"><span class="toc-number">4.5.</span> <span class="toc-text">5、剪裁区域（限制绘图区域）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6%E3%80%81%E5%A4%8D%E6%9D%82%E8%B7%AF%E5%BE%84%E7%BB%98%E5%88%B6%EF%BC%88QPainterPath%EF%BC%89"><span class="toc-number">4.6.</span> <span class="toc-text">6、复杂路径绘制（QPainterPath）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7%E3%80%81%E6%B8%90%E5%8F%98%E5%A1%AB%E5%85%85"><span class="toc-number">4.7.</span> <span class="toc-text">7、渐变填充</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8%E3%80%81%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F%EF%BC%88%E6%B7%B7%E5%90%88%E6%95%88%E6%9E%9C%EF%BC%89"><span class="toc-number">4.8.</span> <span class="toc-text">8、组合模式（混合效果）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%F0%9F%96%BC%EF%B8%8F-%E6%8E%A7%E4%BB%B6%E6%98%BE%E7%A4%BA-%E2%89%A0-%E5%AE%9E%E9%99%85%E2%80%9C%E5%A4%A7%E5%B0%8F%E2%80%9D"><span class="toc-number">5.</span> <span class="toc-text">四、🖼️ 控件显示 ≠ 实际“大小”</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/07/28/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3/" title="Qt （QPainter） 绘图系统详解"><img src="/img/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt （QPainter） 绘图系统详解"/></a><div class="content"><a class="title" href="/2025/07/28/qt_UI_%E7%BB%98%E5%9B%BE%E7%B3%BB%E7%BB%9F%E8%AF%A6%E8%A7%A3/" title="Qt （QPainter） 绘图系统详解">Qt （QPainter） 绘图系统详解</a><time datetime="2025-07-27T16:00:00.000Z" title="发表于 2025-07-28 00:00:00">2025-07-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/21/C++%20%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%A9%B6/" title="C++ 枚举类型的深入探究"><img src="/img/C++%20%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%A9%B6.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="C++ 枚举类型的深入探究"/></a><div class="content"><a class="title" href="/2025/07/21/C++%20%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%A9%B6/" title="C++ 枚举类型的深入探究">C++ 枚举类型的深入探究</a><time datetime="2025-07-20T16:00:00.000Z" title="发表于 2025-07-21 00:00:00">2025-07-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/19/C++&amp;QT%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E8%AF%8D%E6%95%B4%E7%90%86/" title="C++&amp;QT常用关键词汇总"><img src="/img/C++&amp;QT%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E8%AF%8D%E6%95%B4%E7%90%86.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="C++&amp;QT常用关键词汇总"/></a><div class="content"><a class="title" href="/2025/07/19/C++&amp;QT%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E8%AF%8D%E6%95%B4%E7%90%86/" title="C++&amp;QT常用关键词汇总">C++&amp;QT常用关键词汇总</a><time datetime="2025-07-18T16:00:00.000Z" title="发表于 2025-07-19 00:00:00">2025-07-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/18/C++%20%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E6%B1%87%E6%80%BB/" title="C++ 函数类型汇总"><img src="/img/C++%20%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E6%B1%87%E6%80%BB.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="C++ 函数类型汇总"/></a><div class="content"><a class="title" href="/2025/07/18/C++%20%E5%87%BD%E6%95%B0%E7%B1%BB%E5%9E%8B%E6%B1%87%E6%80%BB/" title="C++ 函数类型汇总">C++ 函数类型汇总</a><time datetime="2025-07-17T16:00:00.000Z" title="发表于 2025-07-18 00:00:00">2025-07-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/03/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B/" title="Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结"><img src="/img/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结"/></a><div class="content"><a class="title" href="/2025/07/03/qt_cmake_yaml-cpp%E9%85%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B/" title="Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结">Qt/C++ 项目集成 yaml-cpp 并实现配置持久化读取总结</a><time datetime="2025-07-02T16:00:00.000Z" title="发表于 2025-07-03 00:00:00">2025-07-03</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By 张博豪</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天" style="display:none"><i class="fas fa-message"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script>(() => {
+  window.$crisp = ['safe', true]
+  window.CRISP_WEBSITE_ID = "ab0f1555-16af-410e-9dd6-3f87be0b2664"
+
+  btf.getScript('https://client.crisp.chat/l.js').then(() => {
+    const isChatBtn = true
+    const isChatHideShow = false
+
+    if (isChatBtn) {
+      const open = () => {
+        $crisp.push(["do", "chat:show"])
+        $crisp.push(["do", "chat:open"])
+      }
+
+      const close = () => $crisp.push(["do", "chat:hide"])
+
+      close()
+
+      $crisp.push(["on", "chat:closed", close])
+
+      window.chatBtnFn = () => $crisp.is("chat:visible") ? close() : open()
+
+      document.getElementById('chat-btn').style.display = 'block'
+    } else if (isChatHideShow) {
+      window.chatBtn = {
+        hide: () => $crisp.push(["do", "chat:hide"]),
+        show: () => $crisp.push(["do", "chat:show"])
+      }
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
